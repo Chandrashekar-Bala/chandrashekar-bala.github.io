@@ -343,6 +343,27 @@ function initScrollReveal() {
     });
 }
 
+function handleResumeClick(event) {
+    event.preventDefault();
+
+    const resumeUrl = 'Chandrashekar_Bala_CV.pdf';
+    const connectSection = document.getElementById('connect');
+
+    fetch(resumeUrl, { method: 'HEAD' })
+        .then(response => {
+            if (response.ok) {
+                window.location.href = resumeUrl;
+            } else if (connectSection) {
+                connectSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        })
+        .catch(() => {
+            if (connectSection) {
+                connectSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+}
+
 // ===== 7. COUNTER ANIMATION =====
 function initCounterAnimation() {
     const counters = document.querySelectorAll('.stat-number[data-count]');
@@ -351,9 +372,10 @@ function initCounterAnimation() {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const el = entry.target;
-                const target = parseInt(el.getAttribute('data-count'));
+                const rawValue = el.getAttribute('data-count') || '';
+                const target = parseInt(rawValue, 10);
                 const duration = 2000;
-                const suffix = el.textContent.includes('+') ? '+' : '';
+                const suffix = rawValue.includes('+') ? '+' : '';
                 let start = 0;
                 const startTime = performance.now();
                 
