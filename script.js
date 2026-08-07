@@ -1,6 +1,5 @@
 /* ============================================
    CHANDRASHEKAR BALA - CYBERSECURITY PORTFOLIO
-   ULTIMATE ANIMATION ENGINE
    ============================================ */
 
 // ===== INITIALIZATION =====
@@ -18,12 +17,84 @@ document.addEventListener('DOMContentLoaded', () => {
     initTiltEffect();
     initParallaxEffect();
     initSmoothScroll();
+    initScrollIndicator();
     initBackToTop();
     initConsoleEasterEgg();
     initActiveNavHighlight();
     initFloatingElements();
     initHoverGlow();
+    initArsenalAccordion();
 });
+
+function initArsenalAccordion() {
+    const blocks = document.querySelectorAll('.arsenal-block');
+    if (!blocks.length) return;
+    function isMobile() { return window.innerWidth <= 680; }
+    blocks.forEach(block => {
+        block.classList.remove('open');
+        const title = block.querySelector('.arsenal-main-title');
+        const categories = block.querySelector('.arsenal-categories');
+        if (!title || !categories) return;
+        if (!title.querySelector('.arsenal-toggle-icon')) {
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-chevron-down arsenal-toggle-icon';
+            title.appendChild(icon);
+        }
+        title.setAttribute('role', 'button');
+        title.setAttribute('tabindex', '0');
+        title.addEventListener('click', () => {
+            if (!isMobile()) return;
+            block.classList.toggle('open');
+            update(block, categories);
+        });
+        title.addEventListener('keydown', (e) => {
+            if (!isMobile()) return;
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                block.classList.toggle('open');
+                update(block, categories);
+            }
+        });
+        categories.style.transition = 'max-height 320ms ease';
+        categories.style.overflow = 'hidden';
+    });
+    function update(block, categories) {
+        const title = block.querySelector('.arsenal-main-title');
+        const icon = title.querySelector('.arsenal-toggle-icon');
+        if (block.classList.contains('open')) {
+            categories.style.maxHeight = categories.scrollHeight + 'px';
+            title.setAttribute('aria-expanded', 'true');
+            if (icon) icon.style.transform = 'rotate(180deg)';
+        } else {
+            categories.style.maxHeight = '0px';
+            title.setAttribute('aria-expanded', 'false');
+            if (icon) icon.style.transform = '';
+        }
+    }
+    function handleResize() {
+        blocks.forEach(block => {
+            const categories = block.querySelector('.arsenal-categories');
+            const title = block.querySelector('.arsenal-main-title');
+            if (!categories || !title) return;
+            if (!isMobile()) {
+                block.classList.add('open');
+                categories.style.maxHeight = '';
+                title.removeAttribute('aria-expanded');
+                const icon = title.querySelector('.arsenal-toggle-icon');
+                if (icon) icon.style.transform = '';
+            } else {
+                if (!block.classList.contains('open')) {
+                    categories.style.maxHeight = '0px';
+                    title.setAttribute('aria-expanded', 'false');
+                } else {
+                    update(block, categories);
+                }
+            }
+        });
+    }
+    window.addEventListener('resize', handleResize);
+    handleResize();
+}
 
 // ===== 1. MATRIX RAIN (ENHANCED) =====
 function initMatrixRain() {
@@ -46,13 +117,15 @@ function initMatrixRain() {
     const chars = (katakana + latin + nums + symbols).split('');
     
     const fontSize = 14;
-    let columns = Math.floor(canvas.width / fontSize);
-    let drops = Array(columns).fill(1);
+        // leave padding on both sides so rain doesn't draw flush at the edges
+        const horizontalPadding = Math.max(8, Math.floor(fontSize / 1.5));
+        let columns = Math.floor((canvas.width - horizontalPadding * 2) / fontSize);
+        let drops = Array(columns).fill(1);
     let frameCount = 0;
     
     window.addEventListener('resize', () => {
         resizeCanvas();
-        columns = Math.floor(canvas.width / fontSize);
+            columns = Math.floor((canvas.width - horizontalPadding) / fontSize);
         drops = Array(columns).fill(1);
     });
     
@@ -65,7 +138,9 @@ function initMatrixRain() {
         
         for (let i = 0; i < drops.length; i++) {
             const text = chars[Math.floor(Math.random() * chars.length)];
-            const x = i * fontSize;
+            const x = i * fontSize + horizontalPadding;
+            // skip columns that would render too close to the right edge
+            if (x < horizontalPadding || x > canvas.width - horizontalPadding - fontSize) continue;
             const y = drops[i] * fontSize;
             
             // Head character - bright green
@@ -75,7 +150,7 @@ function initMatrixRain() {
             
             // Glow effect on head
             ctx.shadowColor = '#00ff41';
-            ctx.shadowBlur = 10;
+            ctx.shadowBlur = 6;
             ctx.fillText(text, x, y);
             ctx.shadowBlur = 0;
             
@@ -520,7 +595,34 @@ function initParallaxEffect() {
     });
 }
 
-// ===== 13. SMOOTH SCROLL =====
+// ===== 13. SCROLL INDICATOR =====
+function initScrollIndicator() {
+    const indicator = document.querySelector('.scroll-indicator');
+    const hero = document.querySelector('.hero');
+    if (!indicator || !hero) return;
+
+    const hideIndicator = () => {
+        indicator.classList.add('hidden');
+    };
+
+    const toggleIndicator = () => {
+        const isAtTop = window.pageYOffset < 80;
+        if (!isAtTop) {
+            hideIndicator();
+        }
+    };
+
+    toggleIndicator();
+    window.addEventListener('scroll', toggleIndicator, { passive: true });
+    window.addEventListener('resize', toggleIndicator);
+    setTimeout(() => {
+        if (window.pageYOffset < 120) {
+            hideIndicator();
+        }
+    }, 3000);
+}
+
+// ===== 14. SMOOTH SCROLL =====
 function initSmoothScroll() {
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
@@ -540,7 +642,7 @@ function initSmoothScroll() {
     });
 }
 
-// ===== 14. BACK TO TOP =====
+// ===== 15. BACK TO TOP =====
 function initBackToTop() {
     const btn = document.querySelector('.back-to-top');
     if (!btn) return;
