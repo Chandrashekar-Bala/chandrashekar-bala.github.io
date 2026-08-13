@@ -26,23 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initArsenalAccordion();
 });
 
-// ===== SCROLL INDICATOR =====
-function initScrollIndicator() {
-    const indicator = document.querySelector('.scroll-indicator');
-    if (!indicator) return;
-
-    const hideIndicator = () => {
-        indicator.classList.add('is-hidden');
-        window.removeEventListener('scroll', hideIndicator);
-        window.removeEventListener('wheel', hideIndicator);
-        window.removeEventListener('touchmove', hideIndicator);
-    };
-
-    window.addEventListener('scroll', hideIndicator, { passive: true });
-    window.addEventListener('wheel', hideIndicator, { passive: true });
-    window.addEventListener('touchmove', hideIndicator, { passive: true });
-}
-
 function initArsenalAccordion() {
     const blocks = document.querySelectorAll('.arsenal-block');
     if (!blocks.length) return;
@@ -435,25 +418,48 @@ function initScrollReveal() {
     });
 }
 
-function handleResumeClick(event) {
+function handleResumeClick(event, download = false) {
     event.preventDefault();
 
-    const resumeUrl = 'Chandrashekar_Bala_CV.pdf';
+    const resumeUrl = 'assets/resume.pdf';
     const connectSection = document.getElementById('connect');
 
     fetch(resumeUrl, { method: 'HEAD' })
         .then(response => {
             if (response.ok) {
-                window.location.href = resumeUrl;
+                if (download) {
+                const link = document.createElement('a');
+                link.href = resumeUrl;
+                link.download = 'Chandrashekar_Bala_Resume.pdf';
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+            } else {
+                window.open(resumeUrl, '_blank', 'noopener');
+            }
             } else if (connectSection) {
                 connectSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                showResumeNotice();
             }
         })
         .catch(() => {
             if (connectSection) {
                 connectSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                showResumeNotice();
             }
         });
+}
+
+function showResumeNotice() {
+    const existing = document.querySelector('.resume-toast');
+    if (existing) return;
+    const toast = document.createElement('div');
+    toast.className = 'resume-toast';
+    toast.setAttribute('role', 'status');
+    toast.innerHTML = '<strong>Resume is being updated.</strong><span>I am currently refreshing the PDF to include the latest project work and portfolio updates. The newest version will be available here once the update is complete.</span>';
+    document.body.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 6500);
 }
 
 // ===== 7. COUNTER ANIMATION =====
@@ -612,6 +618,24 @@ function initParallaxEffect() {
     });
 }
 
+// ===== 13. SCROLL INDICATOR =====
+function initScrollIndicator() {
+    const indicator = document.querySelector('.scroll-indicator');
+    if (!indicator) return;
+
+    let dismissed = window.pageYOffset > 20;
+
+    const dismissOnScroll = () => {
+        if (!dismissed && window.pageYOffset > 20) {
+            dismissed = true;
+            indicator.classList.add('hidden');
+        }
+    };
+
+    if (dismissed) indicator.classList.add('hidden');
+    window.addEventListener('scroll', dismissOnScroll, { passive: true });
+}
+
 // ===== 14. SMOOTH SCROLL =====
 function initSmoothScroll() {
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -759,16 +783,37 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }));
 
+    const jumpToProjects = (filter = 'all') => {
+        const projects = document.getElementById('projects');
+        const targetButton = document.querySelector(`.project-filter[data-filter="${filter}"]`);
+        if (targetButton) targetButton.click();
+        if (projects) projects.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    document.querySelectorAll('[data-project-filter]').forEach(button => {
+        button.addEventListener('click', () => jumpToProjects(button.dataset.projectFilter || 'all'));
+    });
+
+    const threatButton = document.querySelector('[data-project-key="threat"]');
+    if (threatButton) {
+        threatButton.addEventListener('click', () => {
+            const projects = document.getElementById('projects');
+            const target = document.querySelector('.project-card[data-project="threat"] .project-open');
+            if (projects) projects.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            setTimeout(() => target?.click(), 450);
+        });
+    }
+
     const modal = document.getElementById('projectModal');
     const content = document.getElementById('modalContent');
     if (!modal || !content) return;
     const details = {
-        driver: {kicker:'Linux Kernel · Driver Compatibility', title:'RTL8812BU Linux Driver — Kernel Compatibility Work', body:`<p>Modified and tested an upstream RTL8812BU/RTL8822BU Linux USB Wi-Fi driver to address compatibility issues with newer Linux kernel APIs and the target Kali Linux environment.</p><h4>My contribution</h4><ul><li>Compared the upstream codebase with the modified version to identify compatibility-sensitive changes.</li><li>Updated affected interfaces involving filesystem access, timers, USB callbacks, and regulatory-related kernel APIs.</li><li>Built and tested the modified driver and verified its behavior with the target TP-Link Archer T4U v3 hardware.</li><li>Preserved upstream attribution and retained the original documentation separately for traceability.</li></ul><div class="modal-meta"><span>Upstream: morrownr/88x2bu-20210702</span><span>Hardware: TP-Link Archer T4U v3 · 2357:0115</span><span>Target: Kali Linux 7.0.12+kali-amd64</span></div><a class="modal-source" href="https://github.com/morrownr/88x2bu-20210702" target="_blank" rel="noopener noreferrer">View upstream repository <i class="fas fa-external-link-alt"></i></a>`},
-        website: {kicker:'Web Development · Portfolio Engineering', title:'Cybersecurity Portfolio Website', body:`<p>Designed and developed this portfolio website as a working technical project rather than a static résumé page. The implementation combines a terminal-inspired cybersecurity interface with responsive layouts, structured project content, interactive filtering, project-detail modals, theme switching, accessible controls, and GitHub/GitHub Pages integration.</p><h4>What I developed</h4><ul><li>Built the semantic HTML structure and organized the portfolio around cybersecurity competencies, projects, labs, experience, certifications, education, achievements, focus areas, and contact.</li><li>Developed the responsive CSS system, dark/light themes, card layouts, mobile navigation, animations, reduced-motion handling, and visual states.</li><li>Implemented JavaScript interactions including theme persistence, navigation behavior, scroll effects, project filtering, technical-detail modals, terminal interactions, counters, and UI feedback.</li><li>Added accessibility-oriented details such as focus states, ARIA labels/roles, keyboard interaction, reduced-motion support, and mobile-friendly controls.</li><li>Added SEO/social metadata, external-link protections, performance-conscious effects, and a GitHub Pages-ready static deployment structure.</li></ul><h4>Skills &amp; Technologies</h4><div class="modal-meta"><span>HTML5</span><span>CSS3</span><span>JavaScript</span><span>Responsive Web Design</span><span>Accessibility</span><span>SEO</span><span>Git &amp; GitHub</span><span>GitHub Pages</span></div><a class="modal-source" href="https://github.com/Chandrashekar-Bala" target="_blank" rel="noopener noreferrer">View GitHub profile <i class="fas fa-external-link-alt"></i></a>`},
+        driver: {kicker:'Linux Kernel · Driver Compatibility', title:'RTL8812BU Linux Driver — Kernel Compatibility Work', body:`<p>Modified and tested an upstream RTL8812BU/RTL8822BU Linux USB Wi-Fi driver to address compatibility issues with newer Linux kernel APIs and the target Kali Linux environment.</p><h4>My contribution</h4><ul><li>Compared the upstream codebase with the modified version to identify compatibility-sensitive changes.</li><li>Updated affected interfaces involving filesystem access, timers, USB callbacks, and regulatory-related kernel APIs.</li><li>Built and tested the modified driver and verified its behavior with the target TP-Link Archer T4U v3 hardware.</li><li>Preserved upstream attribution and retained the original documentation separately for traceability.</li></ul><div class="modal-meta"><span>Upstream: morrownr/88x2bu-20210702</span><span>Hardware: TP-Link Archer T4U v3 · 2357:0115</span><span>Target: Kali Linux 7.0.12+kali-amd64</span></div><div class="modal-links"><a class="modal-source" href="https://github.com/Chandrashekar-Bala/RTL8812BU-Linux-7.0.12" target="_blank" rel="noopener noreferrer">View my repository <i class="fab fa-github"></i></a><a class="modal-source" href="https://github.com/morrownr/88x2bu-20210702" target="_blank" rel="noopener noreferrer">View upstream repository <i class="fas fa-external-link-alt"></i></a></div>`},
+        website: {kicker:'Web Development · Portfolio Engineering', title:'Cybersecurity Portfolio Website', body:`<p>Created and developed this portfolio website as a working technical project rather than a static résumé page. The implementation combines a terminal-inspired cybersecurity interface with responsive layouts, structured project content, interactive filtering, project-detail modals, theme switching, accessible controls, and GitHub/GitHub Pages integration.</p><h4>What I developed</h4><ul><li>Built the semantic HTML structure and organized the portfolio around cybersecurity competencies, projects, labs, experience, certifications, education, achievements, focus areas, and contact.</li><li>Developed the responsive CSS system, dark/light themes, card layouts, mobile navigation, animations, reduced-motion handling, and visual states.</li><li>Implemented JavaScript interactions including theme persistence, navigation behavior, scroll effects, project filtering, technical-detail modals, terminal interactions, counters, and UI feedback.</li><li>Added accessibility-oriented details such as focus states, ARIA labels/roles, keyboard interaction, reduced-motion support, and mobile-friendly controls.</li><li>Added SEO/social metadata, external-link protections, performance-conscious effects, and a GitHub Pages-ready static deployment structure.</li></ul><h4>Skills &amp; Technologies</h4><div class="modal-meta"><span>HTML5</span><span>CSS3</span><span>JavaScript</span><span>Responsive Web Design</span><span>Accessibility</span><span>SEO</span><span>Git &amp; GitHub</span><span>GitHub Pages</span></div><a class="modal-source" href="https://github.com/Chandrashekar-Bala" target="_blank" rel="noopener noreferrer">View GitHub profile <i class="fas fa-external-link-alt"></i></a>`},
         network: {kicker:'Network Security · Lab', title:'Enterprise Network Penetration Testing Lab', body:`<p>Practiced a structured penetration-testing workflow across Windows and Linux targets, moving from reconnaissance and enumeration through controlled exploitation, privilege-escalation practice, post-exploitation, and reporting.</p><h4>Tooling</h4><ul><li>Nmap and Nessus for reconnaissance and vulnerability assessment</li><li>Metasploit for controlled exploitation and post-exploitation workflows</li><li>Wireshark for traffic inspection and supporting analysis</li><li>Linux and Windows environments for target-side validation</li></ul>`},
-        web: {kicker:'Web Security · PortSwigger', title:'Web Application Security Assessment Lab', body:`<p>Completed 40+ PortSwigger Web Security Academy labs to build practical familiarity with common web application vulnerabilities and testing workflows.</p><h4>Coverage</h4><ul><li>SQL injection, XSS, CSRF and SSRF</li><li>Authentication and access-control weaknesses</li><li>Request manipulation and parameter handling</li><li>Exploitation notes and remediation-oriented thinking</li></ul><a class="modal-source" href="https://portswigger.net/web-security" target="_blank" rel="noopener noreferrer">View PortSwigger Web Security Academy <i class="fas fa-external-link-alt"></i></a>`},
+        web: {kicker:'Web Security · PortSwigger', title:'Web Application Security Assessment Lab', body:`<p>Completed 40+ PortSwigger Web Security Academy labs covering common web application vulnerabilities and hands-on testing workflows.</p><h4>Coverage</h4><ul><li>SQL injection, XSS, CSRF and SSRF</li><li>Authentication and access-control weaknesses</li><li>Request manipulation and parameter handling</li><li>Exploitation notes and remediation-oriented thinking</li></ul><a class="modal-source" href="https://portswigger.net/web-security" target="_blank" rel="noopener noreferrer">View PortSwigger Web Security Academy <i class="fas fa-external-link-alt"></i></a>`},
         android: {kicker:'Mobile Security · Android', title:'Android Security Analysis Toolkit', body:`<p>Practiced Android application analysis using static and dynamic techniques, combining APK inspection, decompilation, runtime logging, and application-behavior analysis.</p><h4>Tooling</h4><ul><li>Dex2jar and JD-GUI for decompilation and code inspection</li><li>Drozer for dynamic security-testing practice</li><li>Logcat for runtime observation and troubleshooting</li><li>Android Studio for application and emulator workflows</li></ul>`},
-        buffer: {kicker:'Exploit Development · Controlled Lab', title:'Buffer Overflow Exploit Development Lab', body:`<p>Studied and practiced stack-based buffer-overflow concepts in controlled Linux and Windows environments, using debugger-assisted analysis to understand memory layout and control-flow behavior.</p><h4>Tooling</h4><ul><li>GDB for Linux debugging and memory inspection</li><li>WinDbg for Windows-side analysis</li><li>C for understanding low-level memory behavior</li><li>msfvenom and related tooling for controlled payload-generation exercises</li></ul>`},
+        buffer: {kicker:'Exploit Development · Controlled Lab', title:'Buffer Overflow Exploit Development Lab', body:`<p>Performed stack-based buffer-overflow analysis in controlled Linux and Windows environments, using debugger-assisted analysis to inspect memory layout and control-flow behavior.</p><h4>Tooling</h4><ul><li>GDB for Linux debugging and memory inspection</li><li>WinDbg for Windows-side analysis</li><li>C for understanding low-level memory behavior</li><li>msfvenom and related tooling for controlled payload-generation exercises</li></ul>`},
         wireless: {kicker:'Wireless Security · Lab', title:'Wireless Security Assessment Lab', body:`<p>Practiced wireless assessment workflows in controlled environments, including discovery, packet capture, protocol analysis, and security testing of common Wi-Fi configurations.</p><h4>Tooling</h4><ul><li>Aircrack-ng for wireless security testing</li><li>Wireshark for packet analysis</li><li>Monitor mode and controlled deauthentication testing</li><li>Traffic observation and wireless attack-surface analysis</li></ul>`},
         threat: {kicker:'Defensive Security · Threat Hunting', title:'Network Traffic Analysis & Threat Hunting', body:`<p>Analyzed network traffic to identify suspicious patterns, indicators, and potential command-and-control behavior, then translated observations into defensive investigation and threat-hunting exercises.</p><h4>Focus</h4><ul><li>Packet and protocol analysis</li><li>IOC identification and contextual analysis</li><li>Threat-hunting hypotheses</li><li>MITRE ATT&amp;CK-aligned defensive thinking</li></ul>`},
         vulnhub: {kicker:'Offensive Security · VulnHub', title:'Vulnerability Assessment & Privilege Escalation', body:`<p>Worked through vulnerable virtual machines to practice enumeration, vulnerability identification, exploit validation, post-exploitation, and privilege-escalation workflows in controlled lab environments.</p><h4>Tooling</h4><ul><li>Nmap for service enumeration</li><li>Metasploit for controlled exploit validation</li><li>Linux and Windows privilege-escalation techniques</li><li>VulnHub machines for repeatable practice</li></ul>`},
