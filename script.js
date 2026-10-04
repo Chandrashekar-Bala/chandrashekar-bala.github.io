@@ -823,6 +823,34 @@ document.addEventListener('DOMContentLoaded',()=>{
     adversary:{what:['Research threat actors and underground ecosystems as intelligence sources','Monitor forum/community signals, leak reporting and adversary activity for context','Correlate infrastructure, indicators, reports and observed behavior without treating stolen data as an operational objective','Map adversary behavior to TTPs and defensive context'],tools:['OSINT','CTI','Tor / I2P research','Maltego','theHarvester','Subfinder','MITRE ATT&CK']},
     professional:{what:['Contribute to multidisciplinary cybersecurity work across assessment and research','Coordinate technical execution while staying close to hands-on validation','Connect offensive observations with defensive and engineering decisions','Deliver documented, evidence-driven technical outcomes'],tools:['VAPT','Security Assessment','Technical Reporting','Network Analysis','Security Tooling','Project Execution']}
   };
+  const envNarrative={
+    portswigger:{what:['Study application behavior through HTTP requests, sessions, parameters and trust boundaries.','Validate authentication, authorization, injection, SSRF and access-control weaknesses manually.','Use controlled labs to turn vulnerability mechanics into reusable attack-path reasoning.'],analysis:['Request/response comparison','Parameter and session behavior','Exploitability and impact reasoning','Evidence and remediation notes'],output:'Reproducible application-security findings, attack-path understanding and remediation-oriented analysis.'},
+    bugbounty:{what:['Approach web targets from an attack-surface and vulnerability-research perspective.','Prioritize manual validation before treating an observation as reportable.','Reason about impact, affected trust boundaries, report quality and responsible disclosure.'],analysis:['Asset discovery','Manual validation','Impact analysis','Clear reproduction steps','Disclosure and retest thinking'],output:'Concise, defensible vulnerability reports with reproducible evidence and remediation context.'},
+    htb:{what:['Use realistic environments to practice reconnaissance, enumeration and attack-path construction.','Move from exposed services to controlled exploitation and privilege-escalation reasoning.','Review what changed after exploitation instead of stopping at initial access.'],analysis:['Service enumeration','Exploit selection','Privilege boundaries','Post-exploitation impact','Attack-path reconstruction'],output:'A complete attack narrative rather than an isolated tool result.'},
+    vulnhub:{what:['Reproduce vulnerable systems in controlled virtual environments.','Validate exploitability and privilege-escalation paths without relying on assumptions.','Capture the sequence from discovery to impact for repeatable analysis.'],analysis:['Service discovery','Vulnerability validation','Controlled exploitation','Privilege escalation','Evidence capture'],output:'Repeatable vulnerable-system research and documented attack chains.'},
+    overthewire:{what:['Strengthen Linux command-line reasoning through constrained security problems.','Analyze permissions, authentication, filesystems and shell behavior.','Use deliberate problem solving rather than trial-and-error command execution.'],analysis:['Permissions','Authentication','Filesystem behavior','Shell reasoning','Command-line verification'],output:'Stronger Linux intuition that transfers into offensive, defensive and engineering work.'},
+    kali:{what:['Use Kali and Parrot as practical security workstations rather than as a list of tools.','Move between reconnaissance, web testing, network analysis and wireless workflows.','Troubleshoot the operating environment when the tooling itself becomes the problem.'],analysis:['Reconnaissance','Web testing','Packet analysis','Wireless assessment','Linux troubleshooting'],output:'A repeatable Linux-based security workspace for controlled technical research.'},
+    crossplatform:{what:['Investigate security behavior across Windows and Linux rather than treating either platform in isolation.','Review filesystem, registry, memory, network and suspicious-file evidence according to the scenario.','Correlate technical artifacts into an investigation timeline.'],analysis:['Windows artifacts','Linux behavior','Network evidence','Filesystem activity','Evidence correlation'],output:'Cross-platform investigation and forensic reasoning grounded in observable artifacts.'},
+    virtualbox:{what:['Build isolated environments where vulnerable systems and security tooling can be tested safely.','Use snapshots, network modes and repeatable configurations to reproduce an attack path.','Separate experiments from the host environment to preserve clean evidence.'],analysis:['Lab topology','Isolation','Snapshots','Network segmentation','Reproducibility'],output:'Controlled infrastructure for repeatable security research.'},
+    github:{what:['Use GitHub as the public engineering trail behind technical work.','Document code, experiments, security tooling and system-level changes so others can inspect the work.','Use version control to preserve reproducibility and trace technical decisions.'],analysis:['Version history','Code review','Documentation','Reproducibility','Public technical record'],output:'Public evidence that technical work was built, documented and maintained.'},
+    networkwalks:{what:['Work across VAPT, offensive security, defensive analysis, adversary research and security engineering.','Coordinate technical execution while remaining close to hands-on validation.','Connect individual project work to evidence, reporting and defensible outcomes.'],analysis:['Assessment delivery','Technical coordination','Evidence review','Research execution','Project delivery'],output:'Professional cybersecurity experience connecting breadth with hands-on technical work.'},
+    underground:{what:['Study underground ecosystems as intelligence sources rather than as an end in themselves.','Observe public or research-accessible forum activity, threat-actor behavior, service models and exposed information.','Correlate underground observations with OSINT, infrastructure and threat reporting to build context.'],analysis:['Forum/community observation','Threat-actor behavior','Leak and exposure intelligence','Data-dump reporting as signals','Infrastructure correlation','TTP mapping'],output:'Adversary context that can inform threat intelligence, detection and security decisions.'},
+    osint:{what:['Collect public intelligence from domains, certificates, DNS, reports and other observable sources.','Correlate independent sources before drawing conclusions about infrastructure or actors.','Turn fragmented observations into a structured threat picture.'],analysis:['Domain and DNS discovery','Certificate intelligence','Source correlation','IOC research','Threat-report analysis','TTP context'],output:'Context-rich intelligence that connects infrastructure, indicators and adversary behavior.'}
+  };
+  const envInsights={
+    portswigger:{objective:'Application-security practice with emphasis on request-level reasoning and reproducible vulnerability validation.',approach:['Map the application behavior before testing individual weaknesses.','Manipulate requests, parameters and sessions manually to understand trust boundaries.','Validate exploitability and impact, then record the security consequence and remediation direction.'],artifacts:['HTTP request/response pairs','Authentication and session behavior','Reproduction steps','Impact and remediation notes'],outcome:'Builds practical web-security judgment that transfers into real assessment work.'},
+    bugbounty:{objective:'Vulnerability-research discipline focused on finding meaningful web weaknesses and communicating them responsibly.',approach:['Start with the attack surface and observable behavior rather than assumptions.','Manually reproduce a suspected weakness and determine the affected trust boundary.','Separate a technical observation from a reportable security impact and document the evidence clearly.'],artifacts:['Reproduction requests','Affected parameters/endpoints','Impact reasoning','Disclosure-quality notes'],outcome:'Turns web testing into concise, defensible vulnerability research.'},
+    htb:{objective:'Attack-path practice across realistic Linux and Windows targets where enumeration has to lead to a coherent exploitation narrative.',approach:['Enumerate services and identify the most promising attack surface.','Validate the weakness in a controlled manner and understand why the path works.','Follow privilege boundaries and post-exploitation consequences instead of stopping at initial access.'],artifacts:['Enumeration results','Service/version observations','Attack-path steps','Privilege-escalation notes'],outcome:'Strengthens attacker-perspective reasoning and complete attack-chain analysis.'},
+    vulnhub:{objective:'Reproducible vulnerable-system research where the complete chain from exposure to privilege is observable.',approach:['Build or restore the vulnerable environment in isolation.','Reproduce the weakness and verify the actual exploitation condition.','Document the path, privilege boundary and security lesson so the result can be repeated.'],artifacts:['Lab topology','Enumeration output','Exploit validation','Privilege-escalation path'],outcome:'Provides controlled evidence for VAPT and attack-path reasoning.'},
+    overthewire:{objective:'Command-line security problem solving that strengthens Linux intuition used throughout offensive and engineering work.',approach:['Read the environment and constraints before issuing commands.','Reason about permissions, filesystems, authentication and process behavior.','Verify the result and understand the mechanism rather than memorizing a command sequence.'],artifacts:['Shell commands','Permission observations','Filesystem state','Verified solution path'],outcome:'Sharpens low-level Linux reasoning that transfers into larger security investigations.'},
+    kali:{objective:'A practical Linux security workstation used to move between reconnaissance, application testing, network analysis and wireless work.',approach:['Prepare the environment and validate interfaces, routes and tooling.','Select the smallest toolset necessary for the security question.','Troubleshoot the platform itself when drivers, networking or tooling become part of the problem.'],artifacts:['Scan results','HTTP captures','Packet captures','Wireless observations','System diagnostics'],outcome:'Provides a repeatable workspace for hands-on security research and troubleshooting.'},
+    crossplatform:{objective:'Cross-platform analysis that connects Windows and Linux behavior, artifacts and network evidence.',approach:['Identify the relevant host, filesystem, registry, memory or network evidence.','Preserve and correlate artifacts rather than treating one indicator as conclusive.','Build an investigation timeline that explains what happened and why it matters.'],artifacts:['Windows artifacts','Filesystem evidence','Network captures','Investigation timelines'],outcome:'Builds evidence-driven investigation skills across the two dominant desktop/server ecosystems.'},
+    virtualbox:{objective:'Controlled research infrastructure for reproducible vulnerable systems, isolated testing and clean resets.',approach:['Design the virtual topology around the research question.','Use isolation, snapshots and repeatable configurations to control variables.','Reset and reproduce the same path when validating a finding or technique.'],artifacts:['VM configurations','Network topology','Snapshots','Reproduction states'],outcome:'Makes security experiments repeatable without contaminating the primary environment.'},
+    github:{objective:'Public engineering trail where code, documentation and technical decisions become inspectable evidence.',approach:['Version technical changes instead of presenting only the final result.','Document compatibility issues, implementation decisions and validation.','Keep research reproducible enough for another engineer to inspect the work.'],artifacts:['Source code','Commit history','README documentation','Build/validation notes'],outcome:'Demonstrates that technical security work is built, maintained and documented—not merely claimed.'},
+    networkwalks:{objective:'Professional cybersecurity environment combining assessment, research, investigation, engineering and technical project execution.',approach:['Translate assigned objectives into structured technical work.','Stay hands-on with validation and evidence while coordinating execution.','Connect findings and project output to defensible security decisions and documentation.'],artifacts:['Assessment evidence','Technical reports','Research outputs','Project deliverables'],outcome:'Connects multidisciplinary security practice with professional execution and technical responsibility.'},
+    underground:{objective:'Adversary and underground intelligence research focused on understanding ecosystems, actors, infrastructure and exposed information.',approach:['Observe research-accessible underground communities and threat reporting for context.','Correlate aliases, infrastructure, service models, leak/exposure signals and behavior across sources.','Translate observations into threat context, indicators and TTP-oriented understanding rather than treating a source in isolation.'],artifacts:['Forum observations','Threat-actor context','Infrastructure relationships','Leak/exposure indicators','TTP mappings'],outcome:'Adds adversary context to OSINT and threat intelligence without confusing observation with attribution.'},
+    osint:{objective:'Open-source intelligence collection that turns fragmented public observations into structured infrastructure and adversary context.',approach:['Collect domains, DNS, certificates, reports and other observable indicators.','Cross-check independent sources before drawing conclusions.','Connect infrastructure, indicators and behavior into a coherent intelligence picture.'],artifacts:['Domains and DNS records','Certificate relationships','IOC sets','Threat-report references','TTP context'],outcome:'Builds a disciplined foundation for reconnaissance and threat intelligence.'}
+  };
   const envProjects={
     portswigger:[['web','Web Application Security Lab','50+ PortSwigger labs across application-security scenarios.'],['mediroza','Mediroza Web Application Security Assessment','Authorized black-box assessment with 8+ documented findings.']],
     bugbounty:[['web','Web Application Security Lab','50+ labs supporting vulnerability discovery and manual validation.'],['mediroza','Mediroza Web Application Security Assessment','Authorized assessment demonstrating practical web-security validation.']],
@@ -870,20 +898,63 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   function openLayer(el){if(!el)return;el.classList.add('open');el.setAttribute('aria-hidden','false');document.body.classList.add('modal-open');}
   function closeLayer(el){if(!el)return;el.classList.remove('open');el.setAttribute('aria-hidden','true');if(!document.querySelector('.research-map-modal.open,.env-group-modal.open,.role-dossier-modal.open,.env-modal.open,.env-project-modal.open')) document.body.classList.remove('modal-open');}
+  /* Central project resolver. Every interactive layer uses the same canonical IDs. */
+  const projectAliases={
+    assessment:'mediroza', mediroza:'mediroza', 'mediroza assessment':'mediroza',
+    engineering:'driver', driver:'driver', 'rtl8812bu driver engineering':'driver', 'rtl8812bu linux driver modernization':'driver',
+    network:'recon', recon:'recon', 'network reconnaissance':'recon', 'network reconnaissance & attack-surface mapping':'recon',
+    web:'web', 'web application security lab':'web', portswigger:'web',
+    offensive:'vulnhub', vulnhub:'vulnhub', 'vulnerability assessment & privilege escalation':'vulnhub',
+    defensive:'threat', threat:'threat', 'network traffic analysis & threat hunting':'threat',
+    forensics:'malware', malware:'malware', 'malware analysis & windows forensics research':'malware',
+    mobile:'android', android:'android', 'android security analysis':'android',
+    automation:'automation', 'security automation & poc tooling':'automation',
+    firmware:'firmware', 'spi flash & bios protection research':'firmware',
+    wireless:'wireless', 'wireless security assessment lab':'wireless',
+    password:'password', 'protected pdf & password security analysis':'password',
+    buffer:'buffer', 'buffer overflow exploit development':'buffer',
+    website:'website', 'cybersecurity portfolio engineering':'website',
+    experience:null, projects:null
+  };
+  function normalizeProjectKey(value){return String(value||'').trim().toLowerCase().replace(/&amp;/g,'&').replace(/\s+/g,' ');}
   function projectRef(key){
-    const map={assessment:'mediroza',engineering:'driver',network:'recon',web:'web',offensive:'vulnhub',defensive:'threat',threat:'threat',forensics:'malware',mobile:'android',automation:'automation',firmware:'firmware',wireless:'wireless',password:'password',buffer:'buffer',experience:null,projects:null};
-    return map[key] || key;
+    const normalized=normalizeProjectKey(key);
+    return Object.prototype.hasOwnProperty.call(projectAliases,normalized)?projectAliases[normalized]:String(key||'').trim();
+  }
+  function resolveProjectFromLabel(label){
+    const direct=projectRef(label); if(direct && document.querySelector(`#projects .project-card[data-project=\"${CSS.escape?CSS.escape(direct):direct}\"]`)) return direct;
+    const wanted=normalizeProjectKey(label);
+    const card=[...document.querySelectorAll('#projects .project-card')].find(c=>normalizeProjectKey(c.querySelector('h3')?.textContent)===wanted);
+    return card?.dataset.project||null;
   }
   window.resolveProjectKey=projectRef;
+  window.resolveProjectFromLabel=resolveProjectFromLabel;
 
   function renderEnv(key){
     const d=envData[key]||envData.portswigger;
     const depth=envDepth[key]||{skills:d.focus,tools:d.signals};
+    const narrative=envNarrative[key]||{what:d.focus,analysis:d.signals,output:'Practical security research connected to the broader technical record.'};
     const ext=externalLinks[key];
     const extHtml=ext?`<a class="env-external-link" href="${ext[0]}" target="_blank" rel="noopener noreferrer"><i class="fas fa-arrow-up-right-from-square"></i> ${escapeHtml(ext[1])}</a>`:'';
     const backHtml=researchParentGroup?`<button type="button" class="env-back-link" data-back-env-group="${escapeHtml(researchParentGroup)}"><i class="fas fa-arrow-left"></i> Back to ${escapeHtml(groups[researchParentGroup]?.title||'Research Domain')}</button>`:'';
-    envContent.innerHTML=`<div class="env-dossier-identity"><div><span class="modal-kicker">${escapeHtml(d.k)}</span><h2 id="envModalTitle">${escapeHtml(d.t)}</h2><p class="env-modal-lead">${escapeHtml(d.lead)}</p></div><span class="env-dossier-status">HANDS-ON</span></div>${backHtml}<div class="env-modal-grid"><section><h4><i class="fas fa-magnifying-glass"></i> What I Work On</h4><ul>${d.focus.map(x=>`<li>${escapeHtml(x)}</li>`).join('')}</ul></section><section><h4><i class="fas fa-route"></i> Working Method</h4><div class="env-flow"><small>WORKFLOW</small><strong>${escapeHtml(d.flow)}</strong></div><p class="env-modal-note">I use this environment to reproduce behaviour, validate assumptions, preserve evidence and connect practical observations to a defensible security decision.</p></section></div><section class="env-depth-panel"><div class="env-depth-head"><div><span class="modal-kicker">PRACTICAL DEPTH</span><h4><i class="fas fa-layer-group"></i> Skills &amp; Tools</h4></div><span class="env-depth-count">${depth.skills.length + depth.tools.length} signals</span></div><div class="env-depth-columns"><div><small>SKILLS</small><div class="env-signal-tags">${depth.skills.map(x=>`<span>${escapeHtml(x)}</span>`).join('')}</div></div><div><small>TOOLS / PLATFORMS</small><div class="env-signal-tags">${depth.tools.map(x=>`<span>${escapeHtml(x)}</span>`).join('')}</div></div></div></section><section class="env-modal-actions"><button type="button" class="env-project-record-trigger" data-open-env-projects="${escapeHtml(key)}"><i class="fas fa-folder-open"></i> View Related Project Record</button>${extHtml}</section>`;
+    const what=narrative.what.map(x=>`<li>${escapeHtml(x)}</li>`).join('');
+    const analysis=narrative.analysis.map(x=>`<span>${escapeHtml(x)}</span>`).join('');
+    const insight=envInsights[key]||{objective:narrative.output,approach:narrative.what,artifacts:narrative.analysis,outcome:narrative.output};
+    const related=envProjects[key]||[];
+    const relatedHtml=related.length?related.map(x=>{const ref=projectRef(x[0]);return `<button type="button" class="env-evidence-card" data-env-evidence-project="${escapeHtml(ref)}"><span>RELATED EVIDENCE</span><strong>${escapeHtml(x[1])}</strong><small>${escapeHtml(x[2])}</small><i class="fas fa-arrow-right"></i></button>`}).join(''):'<p class="env-empty-note">No dedicated public case file is currently mapped to this environment.</p>';
+    const domainKey=Object.entries(groups).find(([,g])=>g.envs.includes(key))?.[0]||null;
+    const domainTitle=domainKey?groups[domainKey].title:'Research Environment';
+    const domainBtn=domainKey?`<button type="button" class="env-domain-link" data-open-domain-from-env="${escapeHtml(domainKey)}"><i class="fas fa-sitemap"></i> Explore ${escapeHtml(domainTitle)}</button>`:'';
+    envContent.innerHTML=`<div class="env-dossier-identity"><div><span class="modal-kicker">${escapeHtml(d.k)}</span><h2 id="envModalTitle">${escapeHtml(d.t)}</h2><p class="env-modal-lead">${escapeHtml(d.lead)}</p></div><span class="env-dossier-status">HANDS-ON · ${escapeHtml(String(d.signals.length).padStart(2,'0'))} SIGNALS</span></div>${backHtml}
+      <section class="env-deep-intro env-objective-panel"><div><span class="modal-kicker">RESEARCH OBJECTIVE</span><h4>Why this environment matters</h4></div><p>${escapeHtml(insight.objective)}</p></section>
+      <div class="env-modal-grid"><section><h4><i class="fas fa-crosshairs"></i> What I Actually Do</h4><ul>${insight.approach.map(x=>`<li>${escapeHtml(x)}</li>`).join('')}</ul></section><section><h4><i class="fas fa-route"></i> Working Method</h4><div class="env-flow"><small>WORKFLOW</small><strong>${escapeHtml(d.flow)}</strong></div><p class="env-modal-note">${escapeHtml(insight.outcome)}</p></section></div>
+      <section class="env-analysis-panel"><div><span class="modal-kicker">RESEARCH LENS</span><h4>What I inspect, test or correlate</h4></div><div class="env-analysis-tags">${analysis}</div></section>
+      <section class="env-evidence-panel"><div class="env-depth-head"><div><span class="modal-kicker">TECHNICAL RECORD</span><h4><i class="fas fa-file-shield"></i> Evidence &amp; Outputs</h4></div><span class="env-depth-count">${insight.artifacts.length} focus points</span></div><div class="env-artifact-grid">${insight.artifacts.map(x=>`<span>${escapeHtml(x)}</span>`).join('')}</div></section>
+      <section class="env-depth-panel"><div class="env-depth-head"><div><span class="modal-kicker">PRACTICAL DEPTH</span><h4><i class="fas fa-screwdriver-wrench"></i> Skills &amp; Tools</h4></div><span class="env-depth-count">${depth.skills.length + depth.tools.length} signals</span></div><div class="env-depth-columns"><div><small>SKILLS</small><div class="env-signal-tags">${depth.skills.map(x=>`<span>${escapeHtml(x)}</span>`).join('')}</div></div><div><small>TOOLS / PLATFORMS</small><div class="env-signal-tags">${depth.tools.map(x=>`<span>${escapeHtml(x)}</span>`).join('')}</div></div></div></section>
+      <section class="env-related env-evidence-record"><div class="env-related-head"><div><span class="modal-kicker">CONNECTED WORK</span><h4><i class="fas fa-link"></i> Related Projects &amp; Case Files</h4></div><small>Open the evidence behind this environment.</small></div><div class="env-evidence-grid">${relatedHtml}</div></section>
+      <section class="env-modal-actions">${domainBtn}<button type="button" class="env-project-record-trigger" data-open-env-projects="${escapeHtml(key)}"><i class="fas fa-folder-open"></i> Open Project Record</button>${extHtml}</section>`;
   }
+
   function openEnv(key='portswigger',parentGroup=null){researchParentGroup=parentGroup;researchParentEnv=key;if(envGroupModal?.classList.contains('open'))closeLayer(envGroupModal);renderEnv(key);openLayer(envModal);}
 
   function renderGroup(key){
@@ -895,6 +966,8 @@ document.addEventListener('DOMContentLoaded',()=>{
     envGroupContent.innerHTML=`<div class="group-dossier-grid"><section><h4><i class="fas fa-brain"></i> What I Do</h4><ul class="group-focus-list">${depth.what.map(x=>`<li>${escapeHtml(x)}</li>`).join('')}</ul></section><section><h4><i class="fas fa-screwdriver-wrench"></i> Skills &amp; Tools</h4><div class="env-signal-tags group-tool-tags">${depth.tools.map(x=>`<span>${escapeHtml(x)}</span>`).join('')}</div><div class="group-flow"><small>RESEARCH PATH</small><strong>Explore → Reproduce → Validate → Investigate → Engineer</strong></div></section></div><section class="group-environments-panel"><h4><i class="fas fa-cubes"></i> Environments &amp; Practice</h4><div class="group-env-list">${envButtons}</div></section><section class="env-related"><h4><i class="fas fa-file-shield"></i> Related Technical Record</h4><div class="env-related-grid">${related || '<p class="env-empty-note">No dedicated public case file is currently mapped to this domain.</p>'}</div></section><div class="env-group-footer"><button type="button" class="env-back-link" data-back-to-research-map><i class="fas fa-arrow-left"></i> Back to Research Environment</button></div>`;
   }
   function openGroup(key){researchParentGroup=key;researchParentEnv=null;researchParentProject=null;if(mapModal?.classList.contains('open'))closeLayer(mapModal);renderGroup(key);openLayer(envGroupModal);}
+  window.__cbOpenResearchGroup=openGroup;
+  window.__cbOpenResearchEnvironment=openEnv;
 
   function renderProjectRecord(title,lead,keys,sourceType='environment',parentKey=null){
     if(!envProjectContent||!envProjectTitle||!envProjectLead)return;
@@ -937,7 +1010,9 @@ document.addEventListener('DOMContentLoaded',()=>{
     const backGroup=e.target.closest('[data-back-to-group]'); if(backGroup){closeLayer(envProjectModal);renderGroup(backGroup.dataset.backToGroup);openLayer(envGroupModal);return;}
     const backEnv=e.target.closest('[data-back-to-env]'); if(backEnv){closeLayer(envProjectModal);openEnv(backEnv.dataset.backToEnv,researchParentGroup);return;}
     const backEnvGroup=e.target.closest('[data-back-env-group]'); if(backEnvGroup){closeLayer(envModal);openGroup(backEnvGroup.dataset.backEnvGroup);return;}
-    const envProject=e.target.closest('[data-env-project-key]'); if(envProject){closeLayer(envProjectModal);setTimeout(()=>{const key=projectRef(envProject.dataset.envProjectKey);if(window.openProjectModal&&key)window.openProjectModal(key);},120);return;}
+    const evidence=e.target.closest('[data-env-evidence-project]'); if(evidence){const key=projectRef(evidence.dataset.envEvidenceProject);closeLayer(envModal);setTimeout(()=>{if(window.__cbOpenCase)window.__cbOpenCase(key);else if(window.openProjectModal)window.openProjectModal(key);},90);return;}
+    const domain=e.target.closest('[data-open-domain-from-env]'); if(domain){closeLayer(envModal);setTimeout(()=>openGroup(domain.dataset.openDomainFromEnv),90);return;}
+    const envProject=e.target.closest('[data-env-project-key]'); if(envProject){closeLayer(envProjectModal);setTimeout(()=>{const key=projectRef(envProject.dataset.envProjectKey);if(window.__cbOpenCase)window.__cbOpenCase(key);else if(window.openProjectModal&&key)window.openProjectModal(key);},120);return;}
     const related=e.target.closest('[data-env-related]'); if(related){
       const filter=related.dataset.envRelated;
       closeLayer(envModal);closeLayer(roleModal);
@@ -1328,4 +1403,149 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Add a small "secure interface" status toast on first load, but never obstruct the user.
   setTimeout(()=>{if(!sessionStorage.getItem('cb_v5_seen')){notify('0xCB Research OS ready · 50+ web labs · 65+ evidence files.');sessionStorage.setItem('cb_v5_seen','1');}},900);
+})();
+
+
+/* =====================================================================
+   0xCB FINAL INTERACTION ROUTER
+   One canonical router for every nested Research OS → Case File path.
+   This intentionally runs in capture phase so legacy handlers cannot
+   swallow a click or route a project key to the wrong layer.
+   ===================================================================== */
+(function(){
+  const q=(s,r=document)=>r.querySelector(s);
+  const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
+  const canonical={
+    mediroza:'mediroza', assessment:'mediroza', 'mediroza assessment':'mediroza',
+    driver:'driver', engineering:'driver', 'rtl8812bu driver engineering':'driver', 'rtl8812bu linux driver modernization':'driver',
+    recon:'recon', network:'recon', 'network reconnaissance':'recon', 'network reconnaissance & attack-surface mapping':'recon',
+    web:'web', portswigger:'web', 'web application security lab':'web',
+    vulnhub:'vulnhub', offensive:'vulnhub', 'vulnerability assessment & privilege escalation':'vulnhub',
+    threat:'threat', defensive:'threat', 'network traffic analysis & threat hunting':'threat',
+    malware:'malware', forensics:'malware', 'malware analysis & windows forensics research':'malware',
+    android:'android', mobile:'android', 'android security analysis':'android',
+    wireless:'wireless', 'wireless security assessment lab':'wireless',
+    firmware:'firmware', 'spi flash & bios protection research':'firmware',
+    automation:'automation', 'security automation & poc tooling':'automation',
+    buffer:'buffer', 'buffer overflow exploit development':'buffer',
+    website:'website', 'cybersecurity portfolio engineering':'website',
+    password:'password', 'protected pdf & password security analysis':'password'
+  };
+  const norm=v=>String(v||'').trim().toLowerCase().replace(/&amp;/g,'&').replace(/\s+/g,' ');
+  function resolve(value){
+    const n=norm(value); if(canonical[n]) return canonical[n];
+    const card=qa('#projects .project-card').find(c=>norm(c.dataset.project)===n || norm(c.querySelector('h3')?.textContent)===n);
+    return card?.dataset.project||null;
+  }
+  function closeResearchLayers(){
+    ['envProjectModal','envModal','envGroupModal','researchMapModal','roleDossierModal','securityCommandModal','caseIndexModal'].forEach(id=>{
+      const m=q('#'+id); if(m){m.classList.remove('open');m.setAttribute('aria-hidden','true');}
+    });
+  }
+  function openCase(key){
+    const resolved=resolve(key);
+    if(!resolved){
+      const title=String(key||'').trim();
+      window.__cbNotify?.('No case file is mapped to this record yet.');
+      return false;
+    }
+    if(typeof window.openProjectModal!=='function'){
+      window.__cbNotify?.('Case file engine is still initializing. Please try again.');
+      return false;
+    }
+    closeResearchLayers();
+    requestAnimationFrame(()=>window.openProjectModal(resolved));
+    return true;
+  }
+  window.__cbOpenCase=openCase;
+  window.__cbNotify=window.__cbNotify||function(msg){
+    const t=q('#enhancedToast'); if(!t)return; t.textContent=msg; t.classList.add('show'); clearTimeout(t.__timer); t.__timer=setTimeout(()=>t.classList.remove('show'),2600);
+  };
+
+  /* Primary Research Environment map: bypass fragile legacy delegation. */
+  document.addEventListener('click',function(e){
+    const card=e.target.closest('.research-map-card[data-research-group]');
+    if(!card)return;
+    const key=card.dataset.researchGroup;
+    if(typeof window.__cbOpenResearchGroup==='function'){
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+      window.__cbOpenResearchGroup(key);
+    }
+  },true);
+
+  /* Environment cards: direct, deterministic environment dossier. */
+  document.addEventListener('click',function(e){
+    const card=e.target.closest('.env-card[data-env]');
+    if(!card)return;
+    const key=card.dataset.env;
+    if(typeof window.__cbOpenResearchEnvironment==='function'){
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+      window.__cbOpenResearchEnvironment(key, null);
+    }
+  },true);
+
+  /* Related Case Files in Security Practice Map. */
+  document.addEventListener('click',function(e){
+    const b=e.target.closest('.security-related-case,[data-domain-project],[data-role-project],[data-role-project-key],[data-case-open],[data-env-project-key]');
+    if(!b) return;
+    const key=b.dataset.securityProject||b.dataset.domainProject||b.dataset.roleProject||b.dataset.roleProjectKey||b.dataset.caseOpen||b.dataset.envProjectKey;
+    if(!key) return;
+    if(resolve(key)){
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+      openCase(key);
+    }
+  },true);
+
+  /* Research Environment project-record buttons. */
+  document.addEventListener('click',function(e){
+    const b=e.target.closest('.env-related-project,[data-open-group-project-record],.env-project-item');
+    if(!b) return;
+    const key=b.dataset.openGroupProjectRecord||b.dataset.envProjectKey;
+    if(!key) return;
+    if(resolve(key)){
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+      openCase(key);
+    }
+  },true);
+
+  /* Full Case File Index button: always opens the actual index modal. */
+  document.addEventListener('click',function(e){
+    const b=e.target.closest('[data-research-jump="casefiles"]');
+    if(!b)return;
+    e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+    closeResearchLayers();
+    const m=q('#caseIndexModal');
+    if(m){m.classList.add('open');m.setAttribute('aria-hidden','false');document.body.classList.add('modal-open');}
+  },true);
+
+  /* Keep case index entries deterministic even when legacy handlers change. */
+  document.addEventListener('click',function(e){
+    const b=e.target.closest('#caseIndexList [data-case-open]');
+    if(!b)return;
+    const key=b.dataset.caseOpen;
+    if(resolve(key)){
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+      const m=q('#caseIndexModal'); if(m){m.classList.remove('open');m.setAttribute('aria-hidden','true');}
+      openCase(key);
+    }
+  },true);
+
+  /* Make Security Practice Map project references resilient to renamed labels. */
+  document.addEventListener('click',function(e){
+    const b=e.target.closest('.detail-project-btn');
+    if(!b)return;
+    const key=b.dataset.domainProject;
+    if(resolve(key)){
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+      openCase(key);
+    }
+  },true);
+
+  /* Accessibility: Enter/Space activates the same routing as a click. */
+  document.addEventListener('keydown',function(e){
+    if(e.key!=='Enter'&&e.key!==' ')return;
+    const el=e.target.closest('.security-related-case,.env-related-project,.env-project-item,.detail-project-btn,[data-case-open]');
+    if(!el)return;
+    e.preventDefault(); el.click();
+  });
 })();
