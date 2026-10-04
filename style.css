@@ -3159,3 +3159,52 @@ section {
 .env-related-grid button{min-height:72px;transition:.2s ease}
 .env-related-grid button:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(0,0,0,.2)}
 @media (max-width:720px){.sc-depth-note{grid-template-columns:1fr;gap:8px}.sc-related-head{display:block}.sc-related-head small{display:block;margin-top:7px}.sc-related-grid{grid-template-columns:1fr}.group-env-list,.env-related-grid{grid-template-columns:1fr}}
+
+/* 0xCB v5.1 Expert Research Environment depth layer */
+.env-deep-intro{margin:18px 0;padding:18px 20px;border:1px solid rgba(0,255,65,.14);border-radius:12px;background:linear-gradient(135deg,rgba(0,255,65,.035),rgba(0,180,255,.025));}
+.env-deep-intro p{margin:7px 0 0;max-width:900px;color:var(--text-secondary,#aeb5b0);line-height:1.7;font-size:1rem;}
+.env-analysis-panel{margin:18px 0;padding:18px 20px;border:1px solid rgba(0,210,255,.14);border-radius:12px;background:rgba(255,255,255,.015);}
+.env-analysis-panel h4{margin:5px 0 14px;}
+.env-analysis-tags{display:flex;flex-wrap:wrap;gap:8px;}
+.env-analysis-tags span{display:inline-flex;align-items:center;padding:7px 10px;border:1px solid rgba(0,210,255,.16);border-radius:999px;color:#8bdfff;font-family:var(--mono-font,'monospace');font-size:.72rem;letter-spacing:.04em;background:rgba(0,210,255,.025);}
+.env-modal-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:18px;}
+.env-project-record-trigger,.env-external-link{display:inline-flex;align-items:center;gap:9px;min-height:44px;padding:11px 15px;border-radius:9px;text-decoration:none;cursor:pointer;font:600 .78rem var(--mono-font,'monospace');letter-spacing:.03em;transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease;}
+.env-project-record-trigger{border:1px solid rgba(0,255,65,.35);background:rgba(0,255,65,.045);color:#00ff41;}
+.env-external-link{border:1px solid rgba(0,210,255,.25);background:rgba(0,210,255,.035);color:#71dcff;}
+.env-project-record-trigger:hover,.env-external-link:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.2);}
+.security-related-case,.env-related-project,.env-project-item,.detail-project-btn{cursor:pointer;}
+.security-related-case:focus-visible,.env-related-project:focus-visible,.env-project-item:focus-visible,.detail-project-btn:focus-visible,.env-project-record-trigger:focus-visible,.env-external-link:focus-visible{outline:2px solid #00ff41;outline-offset:3px;}
+.env-project-item,.env-related-project,.security-related-case,.detail-project-btn{transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease;}
+.env-project-item:hover,.env-related-project:hover,.security-related-case:hover,.detail-project-btn:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.2);}
+@media (max-width:760px){.env-modal-actions{align-items:stretch}.env-project-record-trigger,.env-external-link{width:100%;justify-content:center}.env-analysis-tags span{font-size:.67rem}.env-deep-intro,.env-analysis-panel{padding:15px;}}
+
+/* =====================================================================
+   0xCB RESEARCH ENVIRONMENT // DETAIL DOSSIER PASS
+   Dedicated depth layer for the 12 hands-on environment cards.
+   ===================================================================== */
+.env-card{overflow:hidden}
+.env-card:after{content:'OPEN ENVIRONMENT DOSSIER  →';position:absolute;right:16px;bottom:14px;font:700 .5rem var(--font-mono,monospace);letter-spacing:.08em;color:var(--text-tertiary);opacity:0;transform:translateY(4px);transition:.2s ease}
+.env-card:hover:after,.env-card:focus-visible:after{opacity:1;transform:none;color:var(--accent-green)}
+.env-card:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+.env-objective-panel{display:grid;grid-template-columns:minmax(160px,.35fr) 1fr;gap:18px;align-items:start}
+.env-objective-panel h4{margin:0;font-size:.76rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text-primary)}
+.env-objective-panel p{margin:0;color:var(--text-secondary);font-size:.76rem;line-height:1.75}
+.env-evidence-panel{margin-top:12px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.015);padding:17px;border-radius:9px}
+.env-artifact-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:10px}
+.env-artifact-grid span{padding:9px 10px;border:1px solid rgba(6,182,212,.12);border-radius:6px;background:rgba(6,182,212,.025);color:var(--text-secondary);font:600 .61rem var(--font-mono);line-height:1.4}
+.env-evidence-record{margin-top:12px}
+.env-related-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:12px}
+.env-related-head h4{margin:3px 0 0}
+.env-related-head small{color:var(--text-tertiary);font:600 .57rem var(--font-mono);text-align:right}
+.env-evidence-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.env-evidence-card{position:relative;display:grid;grid-template-columns:1fr auto;gap:4px 12px;text-align:left;padding:14px 38px 14px 14px;border:1px solid rgba(255,255,255,.075);border-radius:8px;background:rgba(255,255,255,.018);color:inherit;cursor:pointer;transition:.2s ease}
+.env-evidence-card:hover,.env-evidence-card:focus-visible{transform:translateY(-2px);border-color:rgba(0,255,65,.34);background:rgba(0,255,65,.025);box-shadow:0 12px 30px rgba(0,0,0,.22);outline:none}
+.env-evidence-card span{grid-column:1;font:700 .5rem var(--font-mono);letter-spacing:.1em;color:var(--accent-cyan)}
+.env-evidence-card strong{grid-column:1;font-size:.72rem;line-height:1.4}
+.env-evidence-card small{grid-column:1;color:var(--text-tertiary);font-size:.61rem;line-height:1.55}
+.env-evidence-card i{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--accent-green)}
+.env-domain-link{appearance:none;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:11px 15px;border-radius:9px;border:1px solid rgba(168,85,247,.25);background:rgba(168,85,247,.035);color:#c084fc;font:600 .78rem var(--font-mono,monospace);letter-spacing:.03em;cursor:pointer;transition:.18s ease}
+.env-domain-link:hover,.env-domain-link:focus-visible{transform:translateY(-2px);border-color:rgba(168,85,247,.5);box-shadow:0 8px 24px rgba(168,85,247,.08);outline:none}
+.env-modal-dialog{width:min(1040px,calc(100% - 28px));max-height:89vh;padding:31px}
+.env-modal-dialog .env-deep-intro{margin-top:4px}
+@media(max-width:760px){.env-objective-panel{grid-template-columns:1fr}.env-artifact-grid,.env-evidence-grid{grid-template-columns:1fr}.env-related-head{display:block}.env-related-head small{display:block;text-align:left;margin-top:7px}.env-domain-link,.env-project-record-trigger,.env-external-link{width:100%;justify-content:center}}
