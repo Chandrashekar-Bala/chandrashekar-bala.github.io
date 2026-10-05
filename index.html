@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html data-theme="dark" lang="en">
 <head>
 <meta charset="utf-8"/>
@@ -22,8 +23,9 @@
 <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"/>
 </head>
 <body>
+<!-- Matrix Rain Canvas -->
 <canvas id="matrixRain"></canvas>
-
+<!-- Navigation -->
 <nav class="navbar" id="navbar">
 <div class="nav-container">
 <a class="logo" href="#">
@@ -33,21 +35,28 @@
 </a>
 <div class="nav-links"><a href="#home"><i class="fas fa-house"></i> Overview</a><a href="#about"><i class="fas fa-user-tie"></i> Profile</a><a href="#security-command"><i class="fas fa-crosshairs"></i> Security Command</a><a href="#experience"><i class="fas fa-briefcase"></i> Experience</a><a href="#projects"><i class="fas fa-diagram-project"></i> Case Studies</a><a href="#services"><i class="fas fa-shield-halved"></i> Services</a><a href="#connect"><i class="fas fa-envelope"></i> Contact</a></div>
 <div class="nav-actions">
-<button aria-label="Open command center" class="quick-action-toggle" id="commandTrigger" title="Command Center (Ctrl+K)"><i class="fas fa-terminal"></i></button>
-<button aria-label="Start a conversation" class="quick-action-toggle nav-conversation-trigger" id="navConversationTrigger" title="Start a Conversation"><i class="fas fa-comments"></i></button>
-<button aria-label="Toggle theme" class="theme-toggle"><i class="fas fa-moon"></i></button>
-<button aria-label="Menu" class="hamburger"><span></span><span></span><span></span></button>
+<button aria-label="Open command center" class="quick-action-toggle" id="commandTrigger" title="Command Center (Ctrl+K)"><i class="fas fa-terminal"></i></button><button aria-label="Start a conversation" class="quick-action-toggle nav-conversation-trigger" id="navConversationTrigger" title="Start a Conversation"><i class="fas fa-comments"></i></button>
+<button aria-label="Toggle theme" class="theme-toggle">
+<i class="fas fa-moon"></i>
+</button>
+<button aria-label="Menu" class="hamburger">
+<span></span><span></span><span></span>
+</button>
 </div>
 </div>
 </nav>
-
+<!-- Hero Section -->
 <section class="hero" id="home">
 <div class="hero-content">
 <div class="hero-grid">
 <div class="hero-left">
 <div class="hero-badge-group">
-<span class="hero-badge pulse-badge"><span class="pulse-dot"></span> Cybersecurity Research · Assessment · Investigation · Engineering</span>
-<span class="hero-badge location-badge"><i class="fas fa-map-marker-alt"></i> Hyderabad, Telangana, India · Open to Security Roles</span>
+<span class="hero-badge pulse-badge">
+<span class="pulse-dot"></span> Cybersecurity Research · Assessment · Investigation · Engineering
+                        </span>
+<span class="hero-badge location-badge">
+<i class="fas fa-map-marker-alt"></i> Hyderabad, Telangana, India · Open to Security Roles
+                        </span>
 </div>
 <div class="hero-name-container">
 <p class="hero-greeting"># Hi, I'm</p>
@@ -62,11 +71,17 @@
 <span class="role-tag"><i class="fas fa-mask"></i> Adversary Research</span>
 <span class="role-tag"><i class="fas fa-shield-virus"></i> Security Defense &amp; Detection</span>
 </div>
-<p class="hero-mission">I investigate how systems behave under attack, validate security boundaries, preserve technical evidence, and turn findings into remediation, detection, and engineering decisions across applications, networks, endpoints, and Linux systems.</p>
+<p class="hero-mission">
+                        I investigate how systems behave under attack, validate security boundaries, preserve technical evidence, and turn findings into remediation, detection, and engineering decisions across applications, networks, endpoints, and Linux systems.
+                    </p>
 <div class="hero-actions">
 <button class="btn btn-primary conversation-trigger" type="button"><i class="fas fa-comments"></i> Start a Conversation</button>
-<a class="btn btn-secondary" href="mailto:chandrashekar-bala@protonmail.com"><i class="fas fa-envelope"></i> Direct Contact</a>
-<a class="btn btn-outline" href="#" data-resume="view"><i class="fas fa-download"></i> Resume</a>
+<a class="btn btn-secondary" href="mailto:chandrashekar-bala@protonmail.com">
+<i class="fas fa-envelope"></i> Direct Contact
+                        </a>
+<a class="btn btn-outline" href="#" onclick="handleResumeClick(event)">
+<i class="fas fa-download"></i> Resume
+                        </a>
 </div>
 <div class="hero-stats">
 <div class="stat-item"><span class="stat-number" data-count="8+">8+</span><span class="stat-label">Documented Findings</span></div>
@@ -77,9 +92,15 @@
 </div>
 <div class="hero-social-proof"><span class="network-primary">1,000+ professional connections</span><span class="network-secondary">1,300+ LinkedIn followers</span><span class="network-labs">50+ PortSwigger Web Security Academy labs</span><span class="network-location">Hyderabad · India</span></div>
 <div class="hero-socials">
-<a aria-label="GitHub" class="social-btn" href="https://github.com/Chandrashekar-Bala" rel="noopener noreferrer" target="_blank"><i class="fab fa-github"></i> GitHub</a>
-<a aria-label="LinkedIn" class="social-btn linkedin" href="https://www.linkedin.com/in/chandrashekar-bala/" rel="noopener noreferrer" target="_blank"><i class="fab fa-linkedin"></i> LinkedIn</a>
-<a aria-label="Email" class="social-btn email" href="mailto:chandrashekar-bala@protonmail.com"><i class="fas fa-envelope"></i> Email</a>
+<a aria-label="GitHub" class="social-btn" href="https://github.com/Chandrashekar-Bala" rel="noopener noreferrer" target="_blank">
+<i class="fab fa-github"></i> GitHub
+                        </a>
+<a aria-label="LinkedIn" class="social-btn linkedin" href="https://www.linkedin.com/in/chandrashekar-bala/" rel="noopener noreferrer" target="_blank">
+<i class="fab fa-linkedin"></i> LinkedIn
+                        </a>
+<a aria-label="Email" class="social-btn email" href="mailto:chandrashekar-bala@protonmail.com">
+<i class="fas fa-envelope"></i> Email
+                        </a>
 </div>
 <div class="hero-command-ribbon" aria-label="Portfolio command shortcuts">
 <span><i class="fas fa-satellite-dish"></i> RESEARCH OS ONLINE</span>
@@ -96,7 +117,9 @@
 </div>
 <div class="terminal-mini">
 <div class="terminal-header">
-<span class="t-dot red"></span><span class="t-dot yellow"></span><span class="t-dot green"></span>
+<span class="t-dot red"></span>
+<span class="t-dot yellow"></span>
+<span class="t-dot green"></span>
 <span class="terminal-title">chandrashekar@kali:~$</span>
 </div>
 <div class="terminal-body">
@@ -113,38 +136,109 @@
 </div>
 </div>
 <div class="scroll-indicator">
-<div class="scroll-mouse"><div class="scroll-wheel"></div></div>
+<div class="scroll-mouse">
+<div class="scroll-wheel"></div>
+</div>
 <span>SCROLL DOWN</span>
 </div>
 </section>
-
+<!-- About Section -->
 <section class="about section-dark" id="about">
 <div class="section-container">
-<h2 class="section-title"><span class="title-hash">#</span><span class="title-text">/whoami · Professional Profile</span><span class="title-line"></span></h2>
+<h2 class="section-title">
+<span class="title-hash">#</span>
+<span class="title-text">/whoami · Professional Profile</span>
+<span class="title-line"></span>
+</h2>
 <div class="about-grid">
 <div class="about-terminal">
-<div class="terminal-header"><span class="t-dot red"></span><span class="t-dot yellow"></span><span class="t-dot green"></span><span class="terminal-title">professional_summary.sh</span></div>
+<div class="terminal-header">
+<span class="t-dot red"></span>
+<span class="t-dot yellow"></span>
+<span class="t-dot green"></span>
+<span class="terminal-title">professional_summary.sh</span>
+</div>
 <div class="terminal-body about-body">
-<div class="terminal-line"><span class="line-number">01</span><span class="t-prompt">$</span><div class="terminal-text">I work across <span class="text-highlight">security assessment</span>, <span class="text-highlight">adversary research</span>, <span class="text-highlight">defensive investigation</span>, and <span class="text-highlight">security engineering</span>—using technical projects and independent research to understand how systems behave, where trust boundaries fail, and what evidence can prove the difference.</div></div>
-<div class="terminal-line"><span class="line-number">02</span><span class="t-prompt">$</span><div class="terminal-text">My work spans web application security, network and wireless security, threat intelligence, Active Directory attack-path analysis, malware research, digital forensics, mobile security, exploit development, and Linux systems engineering. The common thread is not a toolset; it is the ability to move from <span class="text-highlight">observation → validation → impact → response</span>.</div></div>
-<div class="terminal-line"><span class="line-number">03</span><span class="t-prompt">$</span><div class="terminal-text">I approach assessments by establishing a baseline, validating behavior manually, preserving evidence, reconstructing attack paths, and documenting root cause, impact, remediation, and detection opportunities. The same discipline carries into malware and forensic research, where execution behavior, artifacts, indicators, and timelines have to agree.</div></div>
-<div class="terminal-line"><span class="line-number">04</span><span class="t-prompt">$</span><div class="terminal-text">On the engineering side, I work close to the system: kernel-facing C, Linux compatibility, wireless drivers, debugging, firmware protection research, and Python/Bash security automation. This gives the portfolio a second dimension beyond testing—understanding the technology deeply enough to change, troubleshoot, or instrument it.</div></div>
-<div class="terminal-line"><span class="line-number">05</span><span class="t-prompt">$</span><div class="terminal-text">My research interests connect offensive tradecraft with defensive outcomes: adversary infrastructure, ATT&amp;CK-aligned TTPs, Active Directory attack paths, application security, network visibility, malware behavior, and detection opportunities.</div></div>
-<div class="terminal-line mission-line"><span class="line-number">06</span><span class="t-prompt">$</span><div class="terminal-text"><span class="mission-text">Mission: produce security work that is technically defensible, evidence-led, and useful to the people who have to remediate, detect, investigate, or engineer the next version of the system.</span></div></div>
+<div class="terminal-line">
+<span class="line-number">01</span>
+<span class="t-prompt">$</span>
+<div class="terminal-text">I work across <span class="text-highlight">security assessment</span>, <span class="text-highlight">adversary research</span>, <span class="text-highlight">defensive investigation</span>, and <span class="text-highlight">security engineering</span>—using technical projects and independent research to understand how systems behave, where trust boundaries fail, and what evidence can prove the difference.</div>
+</div>
+<div class="terminal-line">
+<span class="line-number">02</span>
+<span class="t-prompt">$</span>
+<div class="terminal-text">My work spans web application security, network and wireless security, threat intelligence, Active Directory attack-path analysis, malware research, digital forensics, mobile security, exploit development, and Linux systems engineering. The common thread is not a toolset; it is the ability to move from <span class="text-highlight">observation → validation → impact → response</span>.</div>
+</div>
+<div class="terminal-line">
+<span class="line-number">03</span>
+<span class="t-prompt">$</span>
+<div class="terminal-text">I approach assessments by establishing a baseline, validating behavior manually, preserving evidence, reconstructing attack paths, and documenting root cause, impact, remediation, and detection opportunities. The same discipline carries into malware and forensic research, where execution behavior, artifacts, indicators, and timelines have to agree.</div>
+</div>
+<div class="terminal-line">
+<span class="line-number">04</span>
+<span class="t-prompt">$</span>
+<div class="terminal-text">On the engineering side, I work close to the system: kernel-facing C, Linux compatibility, wireless drivers, debugging, firmware protection research, and Python/Bash security automation. This gives the portfolio a second dimension beyond testing—understanding the technology deeply enough to change, troubleshoot, or instrument it.</div>
+</div>
+<div class="terminal-line">
+<span class="line-number">05</span>
+<span class="t-prompt">$</span>
+<div class="terminal-text">My research interests connect offensive tradecraft with defensive outcomes: adversary infrastructure, ATT&amp;CK-aligned TTPs, Active Directory attack paths, application security, network visibility, malware behavior, and detection opportunities.</div>
+</div>
+<div class="terminal-line mission-line">
+<span class="line-number">06</span>
+<span class="t-prompt">$</span>
+<div class="terminal-text"><span class="mission-text">Mission: produce security work that is technically defensible, evidence-led, and useful to the people who have to remediate, detect, investigate, or engineer the next version of the system.</span></div>
+</div>
 </div>
 </div>
 <div class="about-info-cards">
-<div class="info-card"><div class="info-icon"><i class="fas fa-map-marker-alt"></i></div><div class="info-content"><h4>Location</h4><p>Based in Hyderabad, Telangana, India · Open to cybersecurity opportunities · Remote · Hybrid · On-site</p></div></div>
-<div class="info-card"><div class="info-icon"><i class="fas fa-building"></i></div><div class="info-content"><h4>Work Preferences</h4><p>On-site • Hybrid • Remote</p></div></div>
-<div class="info-card"><div class="info-icon"><i class="fas fa-globe-americas"></i></div><div class="info-content"><h4>Opportunities</h4><p>Open to Cybersecurity Opportunities</p></div></div>
-<div class="info-card"><div class="info-icon"><i class="fas fa-clock"></i></div><div class="info-content"><h4>Status</h4><p><span class="status-active">●</span> Open to Work</p></div></div>
-<div class="info-card"><div class="info-icon"><i class="fas fa-users"></i></div><div class="info-content"><h4>Professional Network</h4><p><strong>1,000+ Professional Connections</strong> · 1,300+ followers</p></div></div>
-<div class="info-card"><div class="info-icon"><i class="fas fa-code-branch"></i></div><div class="info-content"><h4>GitHub</h4><p>Active Contributor</p></div></div>
+<div class="info-card">
+<div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
+<div class="info-content">
+<h4>Location</h4>
+<p>Based in Hyderabad, Telangana, India · Open to cybersecurity opportunities · Remote · Hybrid · On-site</p>
+</div>
+</div>
+<div class="info-card">
+<div class="info-icon"><i class="fas fa-building"></i></div>
+<div class="info-content">
+<h4>Work Preferences</h4>
+<p>On-site • Hybrid • Remote</p>
+</div>
+</div>
+<div class="info-card">
+<div class="info-icon"><i class="fas fa-globe-americas"></i></div>
+<div class="info-content">
+<h4>Opportunities</h4>
+<p>Open to Cybersecurity Opportunities</p>
+</div>
+</div>
+<div class="info-card">
+<div class="info-icon"><i class="fas fa-clock"></i></div>
+<div class="info-content">
+<h4>Status</h4>
+<p><span class="status-active">●</span> Open to Work</p>
+</div>
+</div>
+<div class="info-card">
+<div class="info-icon"><i class="fas fa-users"></i></div>
+<div class="info-content">
+<h4>Professional Network</h4>
+<p><strong>1,000+ Professional Connections</strong> · 1,300+ followers</p>
+</div>
+</div>
+<div class="info-card">
+<div class="info-icon"><i class="fas fa-code-branch"></i></div>
+<div class="info-content">
+<h4>GitHub</h4>
+<p>Active Contributor</p>
+</div>
+</div>
 </div>
 </div>
 </div>
 </section>
-
+<!-- Core Competencies Section -->
 <section class="security-command section-dark" id="security-command">
 <div class="section-container">
 <h2 class="section-title"><span class="title-hash">#</span><span class="title-text">Security Command Center</span><span class="title-line"></span></h2>
@@ -160,10 +254,7 @@
 </div>
 </div>
 <div class="command-center-metrics">
-<div><strong>04</strong><span>Security perspectives</span></div>
-<div><strong>12</strong><span>Technical disciplines</span></div>
-<div><strong>50+</strong><span>Web security labs</span></div>
-<div><strong>65+</strong><span>Evidence files</span></div>
+<div><strong>04</strong><span>Security perspectives</span></div><div><strong>12</strong><span>Technical disciplines</span></div><div><strong>50+</strong><span>Web security labs</span></div><div><strong>65+</strong><span>Evidence files</span></div>
 </div>
 <div class="unified-domain-grid" id="unifiedDomainGrid">
 <button class="unified-domain-card domain-offensive" data-security-domain="offensive" type="button"><span>01</span><i>⚔</i><h3>Offensive Security</h3><p>Reconnaissance, vulnerability validation, exploitation, privilege escalation, and controlled post-exploitation.</p><small>Attack surface · VAPT · PoC</small></button>
@@ -182,7 +273,9 @@
 <div class="command-center-footer"><span><i class="fas fa-route"></i> Find → Validate → Investigate → Engineer → Improve</span><button class="command-center-mini" type="button" id="openSecurityCommandBottom">View complete technical map <i class="fas fa-arrow-right"></i></button></div>
 </div>
 </section>
+<!-- Professional Services -->
 
+<!-- Experience Section -->
 <section class="experience" id="experience">
 <div class="section-container">
 <h2 class="section-title"><span class="title-hash">#</span><span class="title-text">Professional Experience &amp; Research Record</span><span class="title-line"></span></h2>
@@ -206,9 +299,11 @@
 <div class="exp-depth-grid"><div><span>LEADERSHIP · SCOPE</span><strong>Multidisciplinary Security Work</strong><p>Coordinate and contribute across assessment, offensive, defensive, adversary, engineering, and project execution.</p></div><div><span>TECHNICAL · DEPTH</span><strong>Hands-on Security Practice</strong><p>Stay close to the technical work through validation, investigation, research, tooling, evidence and technical review.</p></div><div><span>OUTCOME · FOCUS</span><strong>Defensible Security Decisions</strong><p>Connect observations to impact, evidence, remediation, hardening, detection opportunities and measurable project outputs.</p></div></div>
 <div class="role-skill-strip"><span class="role-skill-label">TECHNICAL SCOPE</span><div class="role-skill-chips"><button type="button" data-role-skill="vapt">VAPT</button><button type="button" data-role-skill="web">WEB SECURITY</button><button type="button" data-role-skill="network">NETWORK SECURITY</button><button type="button" data-role-skill="offensive">OFFENSIVE</button><button type="button" data-role-skill="defensive">DEFENSIVE</button><button type="button" data-role-skill="adversary">CTI / OSINT</button><button type="button" data-role-skill="engineering">SECURITY ENGINEERING</button><button type="button" data-role-skill="forensics">DFIR</button><button type="button" data-role-skill="projects">TECHNICAL PROJECTS</button></div></div>
 </article>
-
 <article class="exp-card main-exp exp-networkwalks">
-<div class="exp-header"><div class="exp-icon-large">NW</div><div class="exp-title-group"><h3>Cybersecurity Intern</h3><p class="exp-type">NETWORKWALKS · Cybersecurity</p><span class="exp-date">Sep 2026 — Oct 2026</span></div></div>
+<div class="exp-header">
+<div class="exp-icon-large">NW</div>
+<div class="exp-title-group"><h3>Cybersecurity Intern</h3><p class="exp-type">NETWORKWALKS · Cybersecurity</p><span class="exp-date">Sep 2026 — Oct 2026</span></div>
+</div>
 <div class="exp-body">
 <p class="exp-summary">Contributing to structured cybersecurity assessment and investigation work across network security, vulnerability assessment, penetration testing, security operations, incident response, digital forensics, and risk assessment.</p>
 <div class="exp-section"><h4><i class="fas fa-crosshairs"></i> Assessment &amp; Investigation</h4><ul><li>Perform reconnaissance, vulnerability validation, technical analysis, investigation, evidence review, and security documentation across assigned work.</li><li>Apply assessment and investigation techniques to identify weaknesses and risks, analyze findings and security events, assess impact, and document remediation considerations.</li><li>Work across Linux and Windows environments with practical exposure to security testing, network analysis, vulnerability assessment, incident-response activities, and forensic investigation.</li></ul></div>
@@ -227,7 +322,6 @@
 <div class="exp-proof"><span>Offensive</span><span>Defensive</span><span>Threat Intelligence</span><span>Malware / Forensics</span><span>Security Engineering</span></div>
 </div>
 <div class="exp-depth-grid"><div><span>DEPTH · SCOPE</span><strong>Assessment + Investigation</strong><p>Reconnaissance, VAPT, network analysis, evidence review, incident-response activities, and forensic investigation.</p></div><div><span>DEPTH · EVIDENCE</span><strong>Traceable Security Work</strong><p>Scan artifacts, traffic analysis, validation notes, evidence interpretation, and technical reporting.</p></div><div><span>DEPTH · OUTCOME</span><strong>Defensible Findings</strong><p>Connect observed behavior to impact, risk, remediation considerations, and repeatable security documentation.</p></div></div></article>
-
 <article class="exp-card exp-engineering">
 <div class="exp-header"><div class="exp-icon">C</div><div class="exp-title-group"><h3>Security Researcher — Independent</h3><p class="exp-type">Linux Kernel Compatibility &amp; Wireless Security Engineering · Project-based research</p><span class="exp-date">Jul 2026 — Aug 2026 · Remote</span></div></div>
 <div class="exp-body">
@@ -237,7 +331,6 @@
 <div class="exp-proof"><span>C</span><span>Linux Kernel</span><span>GCC</span><span>Git</span><span>RTL8812BU</span><span>Real Hardware</span></div>
 </div>
 <div class="exp-depth-grid"><div><span>DEPTH · SCOPE</span><strong>Offense → Defense</strong><p>Web, network/wireless, threat intelligence, Active Directory, malware/DFIR, exploit research, and engineering.</p></div><div><span>DEPTH · EVIDENCE</span><strong>Research Record</strong><p>Case studies, lab work, technical notes, controlled proof-of-concepts, forensic artifacts, and attack-path analysis.</p></div><div><span>DEPTH · OUTCOME</span><strong>Security Decisions</strong><p>Translate attacker behavior into detection opportunities, remediation, hardening, and engineering improvements.</p></div></div></article>
-
 <article class="exp-card exp-early">
 <div class="exp-header"><div class="exp-icon">JV</div><div class="exp-title-group"><h3>Java Full Stack Developer</h3><p class="exp-type">CipherSchools · Internship · Remote</p><span class="exp-date">Jan 2023 — Feb 2023</span></div></div>
 <div class="exp-body"><p class="exp-summary">Early software-development experience covering Java, object-oriented programming, full-stack development workflows, and software engineering and application development.</p><div class="exp-proof"><span>Java</span><span>OOP</span><span>Full Stack</span></div></div>
@@ -245,7 +338,7 @@
 </div>
 </div>
 </section>
-
+<!-- Projects Section -->
 <section class="projects section-dark" id="projects">
 <div class="section-container">
 <h2 class="section-title"><span class="title-hash">#</span><span class="title-text">Case Studies &amp; Technical Record</span><span class="title-line"></span></h2>
@@ -284,39 +377,132 @@
 </div></div>
 </div>
 </section>
-
+<!-- Project Details Modal -->
+<div aria-hidden="true" class="project-modal" id="projectModal"><div class="project-modal-backdrop" data-close-modal=""></div><div aria-labelledby="modalTitle" aria-modal="true" class="project-modal-dialog" role="dialog"><button aria-label="Close project details" class="modal-close" data-close-modal="" type="button">×</button><div id="modalContent"></div></div></div><div aria-hidden="true" class="expertise-modal" id="expertiseModal"><div class="expertise-modal-backdrop" data-close-expertise=""></div><div aria-labelledby="expertiseModalTitle" aria-modal="true" class="expertise-modal-dialog" role="dialog"><button aria-label="Close expertise dossier" class="modal-close" data-close-expertise="" type="button">×</button><div class="modal-kicker" id="expertiseModalKicker">TECHNICAL DOMAIN</div><h2 id="expertiseModalTitle">Domain dossier</h2><div id="expertiseModalContent"></div></div></div><div aria-hidden="true" class="case-index-modal" id="caseIndexModal"><div class="case-index-backdrop" data-close-case-index=""></div><div aria-labelledby="caseIndexTitle" aria-modal="true" class="case-index-dialog" role="dialog"><button aria-label="Close case index" class="modal-close" data-close-case-index="" type="button">×</button><span class="modal-kicker">TECHNICAL RECORD</span><h2 id="caseIndexTitle">Full case file index</h2><p class="case-index-lead">The complete project record remains available here without turning the main page into a wall of cards. Select any case file to open its technical dossier.</p><div class="case-index-list" id="caseIndexList"></div></div></div>
+<!-- Unified Security Command Center Modal -->
+<div aria-hidden="true" class="security-command-modal" id="securityCommandModal">
+<div class="security-command-modal-backdrop" data-close-security-command=""></div>
+<div class="security-command-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="securityCommandModalTitle">
+<button class="modal-close" aria-label="Close security command center" data-close-security-command="" type="button">×</button>
+<div class="security-command-modal-head"><span class="modal-kicker">0xCB · TECHNICAL COMMAND CENTER</span><span class="security-command-live"><i class="fas fa-circle"></i> LIVE MAP</span></div>
+<h2 id="securityCommandModalTitle">Security Practice Map</h2>
+<p class="security-command-modal-lead">A single technical index connecting disciplines to methods, tooling, evidence, and the case work where those skills are applied.</p>
+<div class="security-command-tabs" id="securityCommandTabs"></div>
+<div class="security-command-modal-content" id="securityCommandModalContent"></div>
+</div>
+</div>
+<!-- Education Section -->
 <section class="education" id="education">
 <div class="section-container">
-<h2 class="section-title"><span class="title-hash">#</span><span class="title-text">Education</span><span class="title-line"></span></h2>
+<h2 class="section-title">
+<span class="title-hash">#</span>
+<span class="title-text">Education</span>
+<span class="title-line"></span>
+</h2>
 <div class="edu-grid">
-<div class="edu-card main-edu"><div class="edu-icon">🎓</div><h3>Bachelor of Technology - Computer Science and Engineering</h3><p class="edu-school">Lovely Professional University</p><p class="edu-year">2024</p><div class="edu-courses"><h4>Relevant Coursework:</h4><div class="course-tags"><span>Network Security &amp; Ethical Hacking</span><span>Penetration Testing &amp; Vulnerability Assessment</span><span>Data Analysis &amp; Software Development</span></div></div></div>
-<div class="edu-card"><div class="edu-icon">📚</div><h3>Intermediate (MPC)</h3><p class="edu-school">Telangana Board of Intermediate Education</p><p class="edu-year">2020</p></div>
+<div class="edu-card main-edu">
+<div class="edu-icon">🎓</div>
+<h3>Bachelor of Technology - Computer Science and Engineering</h3>
+<p class="edu-school">Lovely Professional University</p>
+<p class="edu-year">2024</p>
+<div class="edu-courses">
+<h4>Relevant Coursework:</h4>
+<div class="course-tags">
+<span>Network Security &amp; Ethical Hacking</span>
+<span>Penetration Testing &amp; Vulnerability Assessment</span>
+<span>Data Analysis &amp; Software Development</span>
 </div>
 </div>
-</section>
-
+</div>
+<div class="edu-card">
+<div class="edu-icon">📚</div>
+<h3>Intermediate (MPC)</h3>
+<p class="edu-school">Telangana Board of Intermediate Education</p>
+<p class="edu-year">2020</p>
+</div>
+</div>
+<!-- Research Environment -->
 <section class="research-environment" id="research-environment">
 <div class="section-container">
 <div class="research-env-head"><div><span class="section-kicker">0xCB // HANDS-ON SECURITY ENVIRONMENT</span><h2 class="subsection-title">Research Environment</h2><p>Platforms, operating environments, repositories, and research ecosystems that support continuous hands-on security work. The portfolio shows documented practice rather than an arbitrary hour counter.</p></div><div class="lab-signal"><span class="signal-dot"></span><div><strong>LAB WORK</strong><small>ONGOING</small></div></div></div>
 <div class="lab-proof-strip"><div><strong>50+</strong><span>PortSwigger labs</span></div><div><strong>8+</strong><span>documented findings</span></div><div><strong>13+</strong><span>driver source files</span></div><div><strong>65+</strong><span>evidence files</span></div></div>
 <div class="research-env-grid">
-<button class="env-card env-web" data-env="portswigger" type="button"><span class="env-index">01</span><i class="fas fa-globe"></i><h3>PortSwigger Web Security Academy</h3><strong>50+ labs</strong><p>Authentication, access control, injection, SSRF, request manipulation and application-security analysis.</p><small>WEB · BURP · HTTP · OWASP</small></button>
-<button class="env-card env-bugbounty" data-env="bugbounty" type="button"><span class="env-index">02</span><i class="fas fa-bug-slash"></i><h3>Bug Bounty &amp; Responsible Disclosure</h3><strong>Vulnerability research</strong><p>Web-focused vulnerability discovery, manual validation, impact reasoning, report quality and remediation-oriented thinking.</p><small>WEB · BURP · HTTP · DISCLOSURE</small></button>
-<button class="env-card env-offensive" data-env="htb" type="button"><span class="env-index">03</span><i class="fas fa-cube"></i><h3>Hack The Box</h3><strong>Hands-on security environments</strong><p>Reconnaissance, enumeration, exploitation, privilege escalation and post-exploitation analysis.</p><small>PENTEST · LINUX · WINDOWS</small></button>
-<button class="env-card env-vuln" data-env="vulnhub" type="button"><span class="env-index">04</span><i class="fas fa-bug"></i><h3>VulnHub</h3><strong>Vulnerable systems &amp; attack paths</strong><p>Controlled vulnerable environments used to reproduce attack chains and validate exploitation paths.</p><small>VAPT · PRIVESC · EXPLOITATION</small></button>
-<button class="env-card env-linux" data-env="overthewire" type="button"><span class="env-index">05</span><i class="fas fa-terminal"></i><h3>OverTheWire</h3><strong>Linux security challenges</strong><p>Command-line problem solving across permissions, authentication, filesystems and Linux security behavior.</p><small>LINUX · BASH · CLI</small></button>
-<button class="env-card env-platform" data-env="kali" type="button"><span class="env-index">06</span><i class="fas fa-shield-halved"></i><h3>Kali / Parrot</h3><strong>Security research environments</strong><p>Primary operating environments for reconnaissance, web testing, network analysis, wireless work and security tooling.</p><small>NMAP · BURP · WIRESHARK · AIRCRACK</small></button>
-<button class="env-card env-forensics" data-env="crossplatform" type="button"><span class="env-index">07</span><i class="fas fa-desktop"></i><h3>Windows / Linux</h3><strong>Forensics &amp; security analysis</strong><p>Cross-platform environments for network analysis, filesystem investigation, Windows artifacts and security testing.</p><small>DFIR · NETWORKING · ANALYSIS</small></button>
-<button class="env-card env-virtual" data-env="virtualbox" type="button"><span class="env-index">08</span><i class="fas fa-layer-group"></i><h3>VirtualBox</h3><strong>Isolated research infrastructure</strong><p>Virtualized vulnerable systems and controlled environments for reproducible attack-path research.</p><small>LABS · ISOLATION · TESTING</small></button>
-<button class="env-card env-engineering" data-env="github" type="button"><span class="env-index">09</span><i class="fab fa-github"></i><h3>GitHub</h3><strong>Security engineering &amp; research archive</strong><p>Public technical work spanning Linux driver engineering, security tooling, technical projects and documented research.</p><small>GIT · C · PYTHON · ENGINEERING</small></button>
-<button class="env-card env-professional" data-env="networkwalks" type="button"><span class="env-index">10</span><i class="fas fa-briefcase"></i><h3>Networkwalks</h3><strong>Professional cybersecurity environment</strong><p>Hands-on work spanning VAPT, offensive, defensive, adversary research, security engineering and technical projects.</p><small>VAPT · OFFENSIVE · DEFENSIVE · RESEARCH</small></button>
-<button class="env-card env-intel" data-env="underground" type="button"><span class="env-index">11</span><i class="fas fa-user-secret"></i><h3>Dark Web &amp; Underground Intelligence</h3><strong>Adversary ecosystem research</strong><p>Research into underground ecosystems, threat actors, infrastructure, exposed information, criminal services and adversary behavior.</p><small>OSINT · CTI · TOR/I2P · TTPs</small></button>
-<button class="env-card env-intel" data-env="osint" type="button"><span class="env-index">12</span><i class="fas fa-satellite-dish"></i><h3>OSINT &amp; Threat Intelligence</h3><strong>Open-source intelligence collection</strong><p>Infrastructure discovery, source correlation, threat-report analysis, IOC research and adversary context building.</p><small>OSINT · IOC · INFRASTRUCTURE</small></button>
+<button class="env-card env-web" data-env="portswigger" type="button" onclick="window.cbOpenEnvironment && window.cbOpenEnvironment('portswigger')"><span class="env-index">01</span><i class="fas fa-globe"></i><h3>PortSwigger Web Security Academy</h3><strong>50+ labs</strong><p>Authentication, access control, injection, SSRF, request manipulation and application-security analysis.</p><small>WEB · BURP · HTTP · OWASP</small></button>
+<button class="env-card env-bugbounty" data-env="bugbounty" type="button" onclick="window.cbOpenEnvironment && window.cbOpenEnvironment('bugbounty')"><span class="env-index">02</span><i class="fas fa-bug-slash"></i><h3>Bug Bounty &amp; Responsible Disclosure</h3><strong>Vulnerability research</strong><p>Web-focused vulnerability discovery, manual validation, impact reasoning, report quality and remediation-oriented thinking.</p><small>WEB · BURP · HTTP · DISCLOSURE</small></button>
+<button class="env-card env-offensive" data-env="htb" type="button" onclick="window.cbOpenEnvironment && window.cbOpenEnvironment('htb')"><span class="env-index">03</span><i class="fas fa-cube"></i><h3>Hack The Box</h3><strong>Hands-on security environments</strong><p>Reconnaissance, enumeration, exploitation, privilege escalation and post-exploitation analysis.</p><small>PENTEST · LINUX · WINDOWS</small></button>
+<button class="env-card env-vuln" data-env="vulnhub" type="button" onclick="window.cbOpenEnvironment && window.cbOpenEnvironment('vulnhub')"><span class="env-index">04</span><i class="fas fa-bug"></i><h3>VulnHub</h3><strong>Vulnerable systems &amp; attack paths</strong><p>Controlled vulnerable environments used to reproduce attack chains and validate exploitation paths.</p><small>VAPT · PRIVESC · EXPLOITATION</small></button>
+<button class="env-card env-linux" data-env="overthewire" type="button" onclick="window.cbOpenEnvironment && window.cbOpenEnvironment('overthewire')"><span class="env-index">05</span><i class="fas fa-terminal"></i><h3>OverTheWire</h3><strong>Linux security challenges</strong><p>Command-line problem solving across permissions, authentication, filesystems and Linux security behavior.</p><small>LINUX · BASH · CLI</small></button>
+<button class="env-card env-platform" data-env="kali" type="button" onclick="window.cbOpenEnvironment && window.cbOpenEnvironment('kali')"><span class="env-index">06</span><i class="fas fa-shield-halved"></i><h3>Kali / Parrot</h3><strong>Security research environments</strong><p>Primary operating environments for reconnaissance, web testing, network analysis, wireless work and security tooling.</p><small>NMAP · BURP · WIRESHARK · AIRCRACK</small></button>
+<button class="env-card env-forensics" data-env="crossplatform" type="button" onclick="window.cbOpenEnvironment && window.cbOpenEnvironment('crossplatform')"><span class="env-index">07</span><i class="fas fa-desktop"></i><h3>Windows / Linux</h3><strong>Forensics &amp; security analysis</strong><p>Cross-platform environments for network analysis, filesystem investigation, Windows artifacts and security testing.</p><small>DFIR · NETWORKING · ANALYSIS</small></button>
+<button class="env-card env-virtual" data-env="virtualbox" type="button" onclick="window.cbOpenEnvironment && window.cbOpenEnvironment('virtualbox')"><span class="env-index">08</span><i class="fas fa-layer-group"></i><h3>VirtualBox</h3><strong>Isolated research infrastructure</strong><p>Virtualized vulnerable systems and controlled environments for reproducible attack-path research.</p><small>LABS · ISOLATION · TESTING</small></button>
+<button class="env-card env-engineering" data-env="github" type="button" onclick="window.cbOpenEnvironment && window.cbOpenEnvironment('github')"><span class="env-index">09</span><i class="fab fa-github"></i><h3>GitHub</h3><strong>Security engineering &amp; research archive</strong><p>Public technical work spanning Linux driver engineering, security tooling, technical projects and documented research.</p><small>GIT · C · PYTHON · ENGINEERING</small></button>
+<button class="env-card env-professional" data-env="networkwalks" type="button" onclick="window.cbOpenEnvironment && window.cbOpenEnvironment('networkwalks')"><span class="env-index">10</span><i class="fas fa-briefcase"></i><h3>Networkwalks</h3><strong>Professional cybersecurity environment</strong><p>Hands-on work spanning VAPT, offensive, defensive, adversary research, security engineering and technical projects.</p><small>VAPT · OFFENSIVE · DEFENSIVE · RESEARCH</small></button>
+<button class="env-card env-intel" data-env="underground" type="button" onclick="window.cbOpenEnvironment && window.cbOpenEnvironment('underground')"><span class="env-index">11</span><i class="fas fa-user-secret"></i><h3>Dark Web &amp; Underground Intelligence</h3><strong>Adversary ecosystem research</strong><p>Research into underground ecosystems, threat actors, infrastructure, exposed information, criminal services and adversary behavior.</p><small>OSINT · CTI · TOR/I2P · TTPs</small></button>
+<button class="env-card env-intel" data-env="osint" type="button" onclick="window.cbOpenEnvironment && window.cbOpenEnvironment('osint')"><span class="env-index">12</span><i class="fas fa-satellite-dish"></i><h3>OSINT &amp; Threat Intelligence</h3><strong>Open-source intelligence collection</strong><p>Infrastructure discovery, source correlation, threat-report analysis, IOC research and adversary context building.</p><small>OSINT · IOC · INFRASTRUCTURE</small></button>
 </div>
 <div class="research-env-footer"><span><i class="fas fa-route"></i> Discover → Correlate → Validate → Investigate → Engineer</span><button class="btn btn-secondary" id="openResearchEnvironment" type="button"><i class="fas fa-expand"></i> Explore Research Environment</button></div>
 </div>
 </section>
 
+<!-- 0xCB Research Environment command map -->
+<div class="research-map-modal" id="researchMapModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="researchMapTitle">
+  <div class="research-map-backdrop" data-close-research-map></div>
+  <div class="research-map-dialog">
+    <button class="modal-close" type="button" aria-label="Close research environment" data-close-research-map><i class="fas fa-xmark"></i></button>
+    <div class="research-map-top"><div><span class="modal-kicker">0xCB // HANDS-ON SECURITY ENVIRONMENT</span><h2 id="researchMapTitle">Research Environment</h2><p>Platforms, operating environments, repositories and intelligence ecosystems used to build, test, investigate and validate security work.</p></div><div class="research-map-status"><i class="fas fa-circle"></i><span>RESEARCH MODE</span><small>ACTIVE</small></div></div>
+    <div class="research-path"><span>LEARN</span><b>→</b><span>REPRODUCE</span><b>→</b><span>VALIDATE</span><b>→</b><span>INVESTIGATE</span><b>→</b><span>DOCUMENT</span><b>→</b><span>ENGINEER</span></div>
+    <div class="research-map-grid">
+      <button class="research-map-card map-web" data-research-group="web" type="button"><span>01</span><i class="fas fa-globe"></i><h3>WEB APPLICATION</h3><p>PortSwigger · Burp · HTTP · OWASP</p><strong>50+ labs</strong></button>
+      <button class="research-map-card map-bugbounty" data-research-group="bugbounty" type="button"><span>02</span><i class="fas fa-bug-slash"></i><h3>BUG BOUNTY &amp; DISCLOSURE</h3><p>Web research · validation · reporting · remediation</p><strong>Research mindset</strong></button>
+      <button class="research-map-card map-offensive" data-research-group="offensive" type="button"><span>03</span><i class="fas fa-crosshairs"></i><h3>OFFENSIVE SECURITY</h3><p>HTB · VulnHub · OverTheWire · Kali</p><strong>Attack-path research</strong></button>
+      <button class="research-map-card map-systems" data-research-group="systems" type="button"><span>04</span><i class="fas fa-microchip"></i><h3>SYSTEMS &amp; FORENSICS</h3><p>Windows · Linux · VirtualBox</p><strong>Analysis environments</strong></button>
+      <button class="research-map-card map-engineering" data-research-group="engineering" type="button"><span>05</span><i class="fas fa-code"></i><h3>SECURITY ENGINEERING</h3><p>GitHub · C · Python · RTL8812BU</p><strong>Build · validate · publish</strong></button>
+      <button class="research-map-card map-adversary" data-research-group="adversary" type="button"><span>06</span><i class="fas fa-user-secret"></i><h3>ADVERSARY &amp; UNDERGROUND INTELLIGENCE</h3><p>Dark Web · OSINT · CTI · Infrastructure · TTPs</p><strong>Correlate · map · assess</strong></button>
+      <button class="research-map-card map-professional" data-research-group="professional" type="button"><span>07</span><i class="fas fa-briefcase"></i><h3>PROFESSIONAL ENVIRONMENT</h3><p>Networkwalks · VAPT · projects · security work</p><strong>Technical execution</strong></button>
+    </div>
+    <div class="research-map-footer"><span><i class="fas fa-link"></i> Every environment connects to evidence, projects or the relevant technical discipline.</span><button type="button" class="btn btn-secondary" data-research-jump="casefiles"><i class="fas fa-folder-open"></i> View Case Files</button></div>
+  </div>
+</div>
+
+<!-- Team Lead role dossier -->
+<div class="role-dossier-modal" id="roleDossierModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="roleDossierTitle">
+  <div class="role-dossier-backdrop" data-close-role-dossier></div>
+  <div class="role-dossier-dialog">
+    <button class="modal-close" type="button" aria-label="Close role dossier" data-close-role-dossier><i class="fas fa-xmark"></i></button>
+    <div id="roleDossierContent"></div>
+  </div>
+</div>
+
+<!-- Research Environment domain dossier -->
+<div class="env-group-modal" id="envGroupModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="envGroupModalTitle">
+  <div class="env-group-backdrop" data-close-env-group></div>
+  <div class="env-group-dialog">
+    <button class="modal-close" type="button" aria-label="Close research domain" data-close-env-group><i class="fas fa-xmark"></i></button>
+    <div class="env-group-head"><div><span class="modal-kicker">0xCB · RESEARCH DOMAIN</span><h2 id="envGroupModalTitle">Research Domain</h2><p id="envGroupModalLead">Domain-level security practice and related environments.</p></div><span class="env-project-index">DOMAIN DOSSIER</span></div>
+    <div id="envGroupModalContent"></div>
+  </div>
+</div>
+
+<div class="env-modal" id="envModal" aria-hidden="true">
+<div class="env-modal-backdrop" data-close-env></div>
+<div class="env-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="envModalTitle">
+<button class="modal-close" type="button" aria-label="Close research environment" data-close-env>×</button>
+<div class="env-modal-head"><span class="modal-kicker">0xCB · RESEARCH ENVIRONMENT</span><span class="security-command-live"><i class="fas fa-circle"></i> HANDS-ON</span></div>
+<div id="envModalContent"></div>
+</div>
+</div>
+
+<!-- Environment project record: second-level dossier -->
+<div class="env-project-modal" id="envProjectModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="envProjectModalTitle">
+  <div class="env-project-backdrop" data-close-env-project></div>
+  <div class="env-project-dialog">
+    <button class="modal-close" type="button" aria-label="Close related project record" data-close-env-project><i class="fas fa-xmark"></i></button>
+    <div class="env-project-head"><div><span class="modal-kicker">0xCB · RELATED PROJECT RECORD</span><h2 id="envProjectModalTitle">Related Work</h2><p id="envProjectModalLead">Projects connected to this research environment.</p></div><span class="env-project-index">PROJECT RECORD</span></div>
+    <div id="envProjectModalContent"></div>
+  </div>
+</div>
+
+<!-- Certifications & Job Simulations Section -->
 <section class="certs section-dark" id="certs">
 <div class="section-container">
 <h2 class="section-title"><span class="title-hash">#</span><span class="title-text">Credentials</span><span class="title-line"></span></h2>
@@ -331,7 +517,7 @@
 </div>
 </div>
 </section>
-
+<!-- Achievements Section -->
 <section class="achievements" id="achievements">
 <div class="section-container">
 <h2 class="section-title"><span class="title-hash">#</span><span class="title-text">Professional Record</span><span class="title-line"></span></h2>
@@ -339,10 +525,9 @@
 <div class="achievements-grid upgraded-achievements">
 <div class="achievement-card signal-primary"><span class="ach-icon">◆</span><div><h4>08 Documented Security Findings</h4><p>Mediroza assessment findings classified with CVSS/CWE context, root cause, impact, and remediation considerations.</p></div></div>
 <div class="achievement-card signal-primary"><span class="ach-icon">📶</span><div><h4>13 Driver Source Files Targeted</h4><p>Linux kernel compatibility work across an RTL8812BU/RTL8822BU wireless driver codebase.</p></div></div>
-<div class="achievement-card signal-primary"><span class="ach-icon">▤</span><div><h4>65 Evidence Files Preserved</h4><p>Assessment evidence organized for traceability, including 58 unique SHA-256 contents and 25 screenshots.</p></div></div>
-<div class="achievement-card signal-primary"><span class="ach-icon">🌐</span><div><h4>50+ PortSwigger Web Security Academy Labs</h4><p>Manual web-security practice across authentication, access control, injection, server-side behavior, and other application-security scenarios.</p></div></div>
-<div class="achievement-card signal-primary"><span class="ach-icon">🤝</span><div><h4>1,000+ Professional Connections</h4><p>Professional network spanning cybersecurity, technology, and related engineering communities.</p></div></div>
-<div class="achievement-card"><span class="ach-icon">👥</span><div><h4>1,300+ LinkedIn Followers</h4><p>Growing professional visibility through technical cybersecurity research and security content.</p></div></div>
+<div class="achievement-card signal-primary"><span class="ach-icon">▤</span><div><h4>65 Evidence Files Preserved</h4><p>Assessment evidence organized for traceability, including 58 unique SHA-256 contents and 25 screenshots.</p></div></div><div class="achievement-card signal-primary"><span class="ach-icon">🌐</span><div><h4>50+ PortSwigger Web Security Academy Labs</h4><p>Manual web-security practice across authentication, access control, injection, server-side behavior, and other application-security scenarios.</p></div></div><div class="achievement-card signal-primary"><span class="ach-icon">🤝</span><div><h4>1,000+ Professional Connections</h4><p>Professional network spanning cybersecurity, technology, and related engineering communities.</p></div></div><div class="achievement-card"><span class="ach-icon">👥</span><div><h4>1,300+ LinkedIn Followers</h4><p>Growing professional visibility through technical cybersecurity research and security content.</p></div></div>
+
+
 <div class="achievement-card"><span class="ach-icon">🌐</span><div><h4>50+ Web Security Labs</h4><p>PortSwigger Web Security Academy practice across 50+ application-security labs and OWASP-aligned scenarios.</p></div></div>
 <div class="achievement-card"><span class="ach-icon">🛡️</span><div><h4>Google Cybersecurity Certified</h4><p>Professional Certificate completed February 2026.</p></div></div>
 <div class="achievement-card"><span class="ach-icon">🧪</span><div><h4>Hands-on Research Across 9 Security Domains</h4><p>Assessment, web, network, wireless, mobile, malware, forensics, threat intelligence, and security engineering.</p></div></div>
@@ -350,7 +535,7 @@
 <div class="achievement-principles"><div><span>01</span><b>Evidence-led</b><p>Separate observation, validation, impact, and remediation.</p></div><div><span>02</span><b>Attack-path oriented</b><p>Connect individual weaknesses into realistic security chains.</p></div><div><span>03</span><b>Engineering minded</b><p>Translate research into controls, detection opportunities, and regression thinking.</p></div></div>
 </div>
 </section>
-
+<!-- Current Focus -->
 <section class="focus section-dark" id="focus">
 <div class="section-container">
 <h2 class="section-title"><span class="title-hash">#</span><span class="title-text">Research Priorities</span><span class="title-line"></span></h2>
@@ -367,7 +552,7 @@
 </div>
 </div>
 </section>
-
+<!-- Connect Section -->
 <section class="services section-dark" id="services">
 <div class="section-container">
 <h2 class="section-title"><span class="title-hash">#</span><span class="title-text">Security Services</span><span class="title-line"></span></h2>
@@ -384,11 +569,13 @@
 <article class="service-card"><span class="service-number">06</span><i class="fas fa-gears"></i><h3>Security Engineering &amp; Automation</h3><p>Python/Bash security workflows, proof-of-concept tooling, Linux troubleshooting, and engineering work that makes security testing more repeatable.</p><div class="service-tags"><span>Python</span><span>Linux</span><span>Automation</span></div><a href="#projects">View engineering work →</a></article>
 </div>
 </div>
-</section>
-
-<section class="connect" id="connect">
+</section><section class="connect" id="connect">
 <div class="section-container">
-<h2 class="section-title"><span class="title-hash">#</span><span class="title-text">Contact &amp; Collaboration</span><span class="title-line"></span></h2>
+<h2 class="section-title">
+<span class="title-hash">#</span>
+<span class="title-text">Contact &amp; Collaboration</span>
+<span class="title-line"></span>
+</h2>
 <div class="hire-banner">
 <div>
 <span class="hire-kicker">CURRENT AVAILABILITY</span>
@@ -406,20 +593,39 @@
 </div>
 <div class="connect-grid">
 <div class="connect-card main-connect">
-<div class="connect-header"><div class="terminal-dots"><span class="t-dot red"></span><span class="t-dot yellow"></span><span class="t-dot green"></span></div><span class="connect-terminal-title">ssh chandrashekar@security</span></div>
+<div class="connect-header">
+<div class="terminal-dots">
+<span class="t-dot red"></span>
+<span class="t-dot yellow"></span>
+<span class="t-dot green"></span>
+</div>
+<span class="connect-terminal-title">ssh chandrashekar@security</span>
+</div>
 <div class="connect-body">
 <p class="connect-intro">Let's connect about cybersecurity opportunities, technical collaboration, security research, or engineering work where hands-on security skills can add value.</p>
 <div class="connect-links">
-<a class="connect-link" href="mailto:chandrashekar-bala@protonmail.com"><div class="connect-link-icon email-icon"><i class="fas fa-envelope"></i></div><div class="connect-link-text"><strong>Email</strong><span>chandrashekar-bala@protonmail.com</span></div><i class="fas fa-arrow-right connect-arrow"></i></a>
-<a class="connect-link" href="https://www.linkedin.com/in/chandrashekar-bala/" rel="noopener noreferrer" target="_blank"><div class="connect-link-icon linkedin-icon"><i class="fab fa-linkedin"></i></div><div class="connect-link-text"><strong>LinkedIn</strong><span>linkedin.com/in/chandrashekar-bala</span></div><i class="fas fa-arrow-right connect-arrow"></i></a>
-<a class="connect-link" href="https://github.com/Chandrashekar-Bala" rel="noopener noreferrer" target="_blank"><div class="connect-link-icon github-icon"><i class="fab fa-github"></i></div><div class="connect-link-text"><strong>GitHub</strong><span>github.com/Chandrashekar-Bala</span></div><i class="fas fa-arrow-right connect-arrow"></i></a>
+<a class="connect-link" href="mailto:chandrashekar-bala@protonmail.com">
+<div class="connect-link-icon email-icon"><i class="fas fa-envelope"></i></div>
+<div class="connect-link-text"><strong>Email</strong><span>chandrashekar-bala@protonmail.com</span></div>
+<i class="fas fa-arrow-right connect-arrow"></i>
+</a>
+<a class="connect-link" href="https://www.linkedin.com/in/chandrashekar-bala/" rel="noopener noreferrer" target="_blank">
+<div class="connect-link-icon linkedin-icon"><i class="fab fa-linkedin"></i></div>
+<div class="connect-link-text"><strong>LinkedIn</strong><span>linkedin.com/in/chandrashekar-bala</span></div>
+<i class="fas fa-arrow-right connect-arrow"></i>
+</a>
+<a class="connect-link" href="https://github.com/Chandrashekar-Bala" rel="noopener noreferrer" target="_blank">
+<div class="connect-link-icon github-icon"><i class="fab fa-github"></i></div>
+<div class="connect-link-text"><strong>GitHub</strong><span>github.com/Chandrashekar-Bala</span></div>
+<i class="fas fa-arrow-right connect-arrow"></i>
+</a>
 </div>
 <div class="connect-actions">
 <button class="btn btn-primary conversation-trigger" type="button"><i class="fas fa-comments"></i> Start a Conversation</button>
 <a class="btn btn-secondary" href="#projects"><i class="fas fa-project-diagram"></i> View Projects</a>
 <button class="btn btn-secondary" id="referralButton" type="button"><i class="fas fa-user-plus"></i> Refer / Share</button>
-<a class="btn btn-outline resume-action" href="#" data-resume="view"><i class="fas fa-file-alt"></i> View Resume</a>
-<a class="btn btn-outline resume-action" href="#" data-resume="download"><i class="fas fa-download"></i> Download Resume</a>
+<a class="btn btn-outline resume-action" href="#" onclick="handleResumeClick(event, false)"><i class="fas fa-file-alt"></i> View Resume</a>
+<a class="btn btn-outline resume-action" href="#" onclick="handleResumeClick(event, true)"><i class="fas fa-download"></i> Download Resume</a>
 </div>
 <p class="resume-note"><i class="fas fa-sync-alt"></i> Resume link is kept separate from the portfolio record so the site can evolve without changing the technical project history.</p>
 </div>
@@ -428,11 +634,67 @@
 </div>
 </section>
 
+<!-- 0xCB Interaction Layer: conversation, referral, command center -->
+<div class="enhanced-modal" id="conversationModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="conversationTitle">
+  <div class="enhanced-modal-backdrop" data-close-enhanced></div>
+  <div class="enhanced-dialog conversation-dialog">
+    <button class="modal-close" type="button" aria-label="Close" data-close-enhanced><i class="fas fa-xmark"></i></button>
+    <span class="modal-kicker">0xCB / COMMUNICATION CHANNEL</span>
+    <h2 id="conversationTitle">Start a Conversation</h2>
+    <p class="enhanced-lead">Choose the reason for reaching out and I’ll prepare a focused message. No form submission is sent to a third-party service — the final action opens your own email client.</p>
+    <div class="conversation-grid">
+      <label><span>Conversation type</span><select id="conversationTopic"><option value="Cybersecurity opportunity">Cybersecurity opportunity</option><option value="Security research collaboration">Security research collaboration</option><option value="Security assessment discussion">Security assessment discussion</option><option value="Threat intelligence / CTI">Threat intelligence / CTI</option><option value="Technical project discussion">Technical project discussion</option><option value="General introduction">General introduction</option></select></label>
+      <label><span>Your name</span><input id="conversationName" autocomplete="name" placeholder="Your name" /></label>
+    </div>
+    <label class="conversation-field"><span>Message</span><textarea id="conversationMessage" placeholder="Tell me what you would like to discuss..."></textarea></label>
+    <div class="conversation-preview" id="conversationPreview"><span>MAIL</span><strong>Subject: Cybersecurity opportunity</strong><small>Ready to open in your email client.</small></div>
+    <div class="enhanced-actions">
+      <button class="btn btn-primary" id="sendConversation" type="button"><i class="fas fa-paper-plane"></i> Open Email Draft</button>
+      <button class="btn btn-outline" id="copyConversation" type="button"><i class="fas fa-copy"></i> Copy Draft</button>
+      <a class="btn btn-secondary" href="https://www.linkedin.com/in/chandrashekar-bala/" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin"></i> Continue on LinkedIn</a>
+    </div>
+  </div>
+</div>
+<div class="enhanced-modal" id="referralModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="referralTitle">
+  <div class="enhanced-modal-backdrop" data-close-enhanced></div>
+  <div class="enhanced-dialog">
+    <button class="modal-close" type="button" aria-label="Close" data-close-enhanced><i class="fas fa-xmark"></i></button>
+    <span class="modal-kicker">0xCB / REFERRAL CHANNEL</span>
+    <h2 id="referralTitle">Know someone hiring for security?</h2>
+    <p class="enhanced-lead">Share the portfolio directly or copy a short referral note. The wording stays factual and points the recipient toward the technical record rather than generic claims.</p>
+    <div class="referral-grid">
+      <button class="referral-card" type="button" data-referral="copy"><i class="fas fa-copy"></i><strong>Copy referral note</strong><span>Copies a recruiter-friendly introduction.</span></button>
+      <button class="referral-card" type="button" data-referral="share"><i class="fas fa-share-nodes"></i><strong>Share portfolio</strong><span>Uses native sharing where supported.</span></button>
+      <a class="referral-card" href="mailto:?subject=Cybersecurity%20Candidate%20Referral&body=I%27d%20like%20to%20recommend%20Chandrashekar%20Bala%20for%20a%20cybersecurity%20opportunity.%20His%20portfolio%20covers%20security%20assessment%2C%20web%20security%2C%20threat%20intelligence%2C%20DFIR%2C%20wireless%20security%2C%20and%20security%20engineering." ><i class="fas fa-envelope"></i><strong>Send by email</strong><span>Open a prefilled referral email.</span></a>
+      <a class="referral-card" href="https://www.linkedin.com/in/chandrashekar-bala/" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin"></i><strong>Refer on LinkedIn</strong><span>Open the professional profile.</span></a>
+    </div>
+    <div class="referral-note">Referral text is intentionally evidence-led: security assessment, research, engineering, and documented technical work.</div>
+  </div>
+</div>
+<div class="enhanced-modal" id="commandModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="commandTitle">
+  <div class="enhanced-modal-backdrop" data-close-enhanced></div>
+  <div class="enhanced-dialog command-dialog">
+    <button class="modal-close" type="button" aria-label="Close" data-close-enhanced><i class="fas fa-xmark"></i></button>
+    <span class="modal-kicker">0xCB / COMMAND CENTER</span>
+    <h2 id="commandTitle">Navigate the research record</h2>
+    <div class="command-search"><i class="fas fa-terminal"></i><input id="commandSearch" type="search" placeholder="Search sections, actions, case files..." autocomplete="off" /><kbd>ESC</kbd></div>
+    <div class="command-list" id="commandList"></div>
+    <p class="command-hint"><kbd>↑</kbd> <kbd>↓</kbd> move · <kbd>Enter</kbd> execute · <kbd>Esc</kbd> close · <kbd>Ctrl/Cmd</kbd> + <kbd>K</kbd> open</p>
+  </div>
+</div>
+<div class="enhanced-toast" id="enhancedToast" role="status" aria-live="polite"></div>
+<!-- Footer -->
 <footer class="footer">
 <div class="footer-container">
-<div class="footer-quote"><i class="fas fa-quote-left"></i><p>Security is not a product, but a process. It's more than designing strong cryptography into a system; it's designing the entire system such that all security measures, including cryptography, work together.</p><span class="quote-author">— Bruce Schneier</span></div>
+<div class="footer-quote">
+<i class="fas fa-quote-left"></i>
+<p>Security is not a product, but a process. It's more than designing strong cryptography into a system; it's designing the entire system such that all security measures, including cryptography, work together.</p>
+<span class="quote-author">— Bruce Schneier</span>
+</div>
 <div class="footer-main">
-<div class="footer-logo"><span class="logo-bracket">{</span>0xCB<span class="logo-bracket">}</span></div>
+<div class="footer-logo">
+<span class="logo-bracket">{</span>0xCB<span class="logo-bracket">}</span>
+</div>
 <p class="footer-tagline">🔒 Building a safer digital future, one commit at a time.</p>
 <div class="footer-socials">
 <a aria-label="GitHub" href="https://github.com/Chandrashekar-Bala" rel="noopener noreferrer" target="_blank"><i class="fab fa-github"></i></a>
@@ -441,37 +703,25 @@
 </div>
 <p class="footer-copy">© 2026 Chandrashekar Bala. All Rights Reserved.</p>
 <p class="footer-updated">📅 Last Updated: October 2026</p>
-<div class="footer-tools">
-<button type="button" data-command-action="command"><i class="fas fa-terminal"></i> Command Center</button>
-<button type="button" data-command-action="conversation"><i class="fas fa-comments"></i> Start a Conversation</button>
-<button type="button" data-command-action="share"><i class="fas fa-share-nodes"></i> Share</button>
-<a href="https://github.com/Chandrashekar-Bala/chandrashekar-bala.github.io" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> View Source</a>
-</div>
+<div class="footer-tools"><button type="button" data-command-action="command"><i class="fas fa-terminal"></i> Command Center</button><button type="button" data-command-action="conversation"><i class="fas fa-comments"></i> Start a Conversation</button><button type="button" data-command-action="share"><i class="fas fa-share-nodes"></i> Share</button><a href="https://github.com/Chandrashekar-Bala/chandrashekar-bala.github.io" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> View Source</a></div>
 <p class="footer-built">Designed, developed, written &amp; maintained by <strong>Chandrashekar Bala</strong> · static HTML/CSS/JavaScript · GitHub Pages</p>
 </div>
 </div>
 </footer>
-
-<a aria-label="Back to top" class="back-to-top" href="#home"><i class="fas fa-chevron-up"></i></a>
-
-<div aria-hidden="true" class="project-modal" id="projectModal" data-cb-modal-root role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="project-modal-backdrop" data-close-modal></div><div class="project-modal-dialog" role="document"></div></div>
-<div aria-hidden="true" class="case-index-modal" id="caseIndexModal" data-cb-modal-root role="dialog" aria-modal="true" aria-labelledby="caseIndexTitle"><div class="case-index-backdrop" data-close-modal></div><div class="case-index-dialog" role="document"></div></div>
-<div aria-hidden="true" class="security-command-modal" id="securityCommandModal" data-cb-modal-root role="dialog" aria-modal="true" aria-labelledby="securityCommandModalTitle"><div class="security-command-modal-backdrop" data-close-modal></div><div class="security-command-modal-dialog" role="document"></div></div>
-<div class="enhanced-modal" id="conversationModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="conversationTitle" data-cb-modal-root><div class="enhanced-modal-backdrop" data-close-modal></div><div class="enhanced-dialog" role="document"></div></div>
-<div class="enhanced-modal" id="referralModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="referralTitle" data-cb-modal-root><div class="enhanced-modal-backdrop" data-close-modal></div><div class="enhanced-dialog" role="document"></div></div>
-<div class="enhanced-modal" id="commandModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="commandTitle" data-cb-modal-root><div class="enhanced-modal-backdrop" data-close-modal></div><div class="enhanced-dialog" role="document"></div></div>
-<div class="research-map-modal" id="researchMapModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="researchMapTitle" data-cb-modal-root><div class="research-map-backdrop" data-close-modal></div><div class="research-map-dialog" role="document"></div></div>
-<div class="role-dossier-modal" id="roleDossierModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="roleDossierTitle" data-cb-modal-root><div class="role-dossier-backdrop" data-close-modal></div><div class="role-dossier-dialog" role="document"></div></div>
-<div class="env-group-modal" id="envGroupModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="envGroupModalTitle" data-cb-modal-root><div class="env-group-backdrop" data-close-modal></div><div class="env-group-dialog" role="document"></div></div>
-<div class="env-modal" id="envModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="envModalTitle" data-cb-modal-root><div class="env-modal-backdrop" data-close-modal></div><div class="env-modal-dialog" role="document"></div></div>
-
-<div class="enhanced-toast" id="enhancedToast" role="status" aria-live="polite"></div>
-<div class="cb-breadcrumb" id="cbBreadcrumb" aria-hidden="true"></div>
-
+<!-- Back to Top -->
+<a aria-label="Back to top" class="back-to-top" href="#home">
+<i class="fas fa-chevron-up"></i>
+</a>
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
-try { if (window.AOS) AOS.init({ duration: 800, easing: 'ease-out-cubic', once: false, mirror: true, offset: 100 }); } catch (e) {}
-</script>
+            AOS.init({
+                duration: 800,
+                easing: 'ease-out-cubic',
+                once: false,
+                mirror: true,
+                offset: 100
+            });
+        </script>
 <script src="script.js"></script>
 </body>
 </html>
