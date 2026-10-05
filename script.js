@@ -1,8 +1,21 @@
-/* ============================================
-   CHANDRASHEKAR BALA - CYBERSECURITY PORTFOLIO
-   ============================================ */
+/* ============================================================
+   0xCB RESEARCH OS v5.1 — FINAL INTERACTION ARCHITECTURE
+   ------------------------------------------------------------
+   This file replaces every previous routing and modal system
+   with two singletons:
 
-// ===== INITIALIZATION =====
+     window.Cases    — canonical case registry + resolver
+     window.CBModal  — single modal-stack manager
+
+   All decorative systems (matrix rain, particles, theme,
+   navigation, scroll reveal, counters, etc.) are preserved.
+   ============================================================ */
+'use strict';
+
+/* ============================================================
+   PART 1 — DECORATIVE SYSTEMS (preserved from v5.1)
+   ============================================================ */
+
 document.addEventListener('DOMContentLoaded', () => {
     initMatrixRain();
     initParticleSystem();
@@ -23,335 +36,140 @@ document.addEventListener('DOMContentLoaded', () => {
     initActiveNavHighlight();
     initFloatingElements();
     initHoverGlow();
-    initArsenalAccordion();
 });
 
-function initArsenalAccordion() {
-    const blocks = document.querySelectorAll('.arsenal-block');
-    if (!blocks.length) return;
-    function isMobile() { return window.innerWidth <= 680; }
-    blocks.forEach(block => {
-        block.classList.remove('open');
-        const title = block.querySelector('.arsenal-main-title');
-        const categories = block.querySelector('.arsenal-categories');
-        if (!title || !categories) return;
-        if (!title.querySelector('.arsenal-toggle-icon')) {
-            const icon = document.createElement('i');
-            icon.className = 'fas fa-chevron-down arsenal-toggle-icon';
-            title.appendChild(icon);
-        }
-        title.setAttribute('role', 'button');
-        title.setAttribute('tabindex', '0');
-        title.addEventListener('click', () => {
-            if (!isMobile()) return;
-            block.classList.toggle('open');
-            update(block, categories);
-        });
-        title.addEventListener('keydown', (e) => {
-            if (!isMobile()) return;
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                block.classList.toggle('open');
-                update(block, categories);
-            }
-        });
-        categories.style.transition = 'max-height 320ms ease';
-        categories.style.overflow = 'hidden';
-    });
-    function update(block, categories) {
-        const title = block.querySelector('.arsenal-main-title');
-        const icon = title.querySelector('.arsenal-toggle-icon');
-        if (block.classList.contains('open')) {
-            categories.style.maxHeight = categories.scrollHeight + 'px';
-            title.setAttribute('aria-expanded', 'true');
-            if (icon) icon.style.transform = 'rotate(180deg)';
-        } else {
-            categories.style.maxHeight = '0px';
-            title.setAttribute('aria-expanded', 'false');
-            if (icon) icon.style.transform = '';
-        }
-    }
-    function handleResize() {
-        blocks.forEach(block => {
-            const categories = block.querySelector('.arsenal-categories');
-            const title = block.querySelector('.arsenal-main-title');
-            if (!categories || !title) return;
-            if (!isMobile()) {
-                block.classList.add('open');
-                categories.style.maxHeight = '';
-                title.removeAttribute('aria-expanded');
-                const icon = title.querySelector('.arsenal-toggle-icon');
-                if (icon) icon.style.transform = '';
-            } else {
-                if (!block.classList.contains('open')) {
-                    categories.style.maxHeight = '0px';
-                    title.setAttribute('aria-expanded', 'false');
-                } else {
-                    update(block, categories);
-                }
-            }
-        });
-    }
-    window.addEventListener('resize', handleResize);
-    handleResize();
-}
-
-// ===== 1. MATRIX RAIN (ENHANCED) =====
 function initMatrixRain() {
     const canvas = document.getElementById('matrixRain');
     if (!canvas) return;
-    
     const ctx = canvas.getContext('2d');
-    
-    function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    }
-    
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     resizeCanvas();
-    
     const katakana = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
     const latin = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     const nums = '0123456789';
     const symbols = '@#$%^&*()_+-=[]{}|;:,.<>?/~`';
     const chars = (katakana + latin + nums + symbols).split('');
-    
     const fontSize = 14;
-        // leave padding on both sides so rain doesn't draw flush at the edges
-        const horizontalPadding = Math.max(8, Math.floor(fontSize / 1.5));
-        let columns = Math.floor((canvas.width - horizontalPadding * 2) / fontSize);
-        let drops = Array(columns).fill(1);
+    const horizontalPadding = Math.max(8, Math.floor(fontSize / 1.5));
+    let columns = Math.floor((canvas.width - horizontalPadding * 2) / fontSize);
+    let drops = Array(columns).fill(1);
     let frameCount = 0;
-    
     window.addEventListener('resize', () => {
         resizeCanvas();
-            columns = Math.floor((canvas.width - horizontalPadding) / fontSize);
+        columns = Math.floor((canvas.width - horizontalPadding) / fontSize);
         drops = Array(columns).fill(1);
     });
-    
     function draw() {
         frameCount++;
-        
-        // Fade effect for trail
         ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
         for (let i = 0; i < drops.length; i++) {
             const text = chars[Math.floor(Math.random() * chars.length)];
             const x = i * fontSize + horizontalPadding;
-            // skip columns that would render too close to the right edge
             if (x < horizontalPadding || x > canvas.width - horizontalPadding - fontSize) continue;
             const y = drops[i] * fontSize;
-            
-            // Head character - bright green
             ctx.fillStyle = '#00ff41';
             ctx.font = `bold ${fontSize}px "Fira Code", monospace`;
             ctx.fillText(text, x, y);
-            
-            // Glow effect on head
             ctx.shadowColor = '#00ff41';
             ctx.shadowBlur = 6;
             ctx.fillText(text, x, y);
             ctx.shadowBlur = 0;
-            
-            // Trail characters - fading
             for (let j = 1; j < 5; j++) {
                 const trailY = y - j * fontSize;
                 if (trailY > 0) {
                     const opacity = 1 - (j * 0.2);
                     ctx.fillStyle = `rgba(0, 255, 65, ${opacity * 0.5})`;
                     ctx.font = `${fontSize}px "Fira Code", monospace`;
-                    const trailChar = chars[Math.floor(Math.random() * chars.length)];
-                    ctx.fillText(trailChar, x, trailY);
+                    ctx.fillText(chars[Math.floor(Math.random() * chars.length)], x, trailY);
                 }
             }
-            
-            // Reset drop
-            if (y > canvas.height && Math.random() > 0.975) {
-                drops[i] = 0;
-            }
-            
-            // Random speed variation
+            if (y > canvas.height && Math.random() > 0.975) drops[i] = 0;
             drops[i] += Math.random() > 0.1 ? 1 : 2;
         }
-        
-        // Occasional bright flash
         if (frameCount % 120 === 0) {
             ctx.fillStyle = 'rgba(0, 255, 65, 0.03)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
-        
         requestAnimationFrame(draw);
     }
-    
     draw();
 }
 
-// ===== 2. PARTICLE SYSTEM =====
 function initParticleSystem() {
     const hero = document.querySelector('.hero');
     if (!hero) return;
-    
     const particleContainer = document.createElement('div');
     particleContainer.className = 'particle-container';
-    particleContainer.style.cssText = `
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 0;
-        overflow: hidden;
-    `;
+    particleContainer.style.cssText = `position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden;`;
     hero.insertBefore(particleContainer, hero.firstChild);
-    
     const particles = [];
-    const particleCount = 50;
-    
-    for (let i = 0; i < particleCount; i++) {
+    for (let i = 0; i < 50; i++) {
         const particle = document.createElement('div');
         particle.className = 'particle';
         const size = Math.random() * 3 + 1;
-        particle.style.cssText = `
-            position: absolute;
-            width: ${size}px;
-            height: ${size}px;
-            background: var(--accent-green);
-            border-radius: 50%;
-            left: ${Math.random() * 100}%;
-            top: ${Math.random() * 100}%;
-            opacity: ${Math.random() * 0.5 + 0.1};
-            animation: float ${Math.random() * 10 + 10}s linear infinite;
-            animation-delay: ${Math.random() * 5}s;
-            box-shadow: 0 0 ${size * 3}px var(--accent-green-glow);
-        `;
+        particle.style.cssText = `position:absolute;width:${size}px;height:${size}px;background:var(--accent-green);border-radius:50%;left:${Math.random()*100}%;top:${Math.random()*100}%;opacity:${Math.random()*0.5+0.1};animation:float ${Math.random()*10+10}s linear infinite;animation-delay:${Math.random()*5}s;box-shadow:0 0 ${size*3}px var(--accent-green-glow);`;
         particleContainer.appendChild(particle);
-        particles.push({
-            element: particle,
-            x: Math.random() * 100,
-            y: Math.random() * 100,
-            speedX: (Math.random() - 0.5) * 0.3,
-            speedY: (Math.random() - 0.5) * 0.3,
-        });
+        particles.push({ element: particle, x: Math.random()*100, y: Math.random()*100, speedX: (Math.random()-0.5)*0.3, speedY: (Math.random()-0.5)*0.3 });
     }
-    
-    // Animate particles
-    function animateParticles() {
+    (function animateParticles() {
         particles.forEach(p => {
-            p.x += p.speedX;
-            p.y += p.speedY;
-            
-            if (p.x > 100) p.x = 0;
-            if (p.x < 0) p.x = 100;
-            if (p.y > 100) p.y = 0;
-            if (p.y < 0) p.y = 100;
-            
+            p.x += p.speedX; p.y += p.speedY;
+            if (p.x > 100) p.x = 0; if (p.x < 0) p.x = 100;
+            if (p.y > 100) p.y = 0; if (p.y < 0) p.y = 100;
             p.element.style.left = p.x + '%';
             p.element.style.top = p.y + '%';
         });
         requestAnimationFrame(animateParticles);
-    }
-    
-    animateParticles();
+    })();
 }
 
-// ===== 3. CUSTOM CURSOR GLOW =====
 function initCustomCursor() {
     const cursor = document.createElement('div');
     cursor.className = 'custom-cursor';
-    cursor.style.cssText = `
-        position: fixed;
-        width: 300px;
-        height: 300px;
-        border-radius: 50%;
-        pointer-events: none;
-        z-index: 9999;
-        background: radial-gradient(circle, rgba(0,255,65,0.03) 0%, transparent 70%);
-        transform: translate(-50%, -50%);
-        transition: opacity 0.3s;
-        display: none;
-    `;
+    cursor.style.cssText = `position:fixed;width:300px;height:300px;border-radius:50%;pointer-events:none;z-index:9999;background:radial-gradient(circle,rgba(0,255,65,0.03) 0%,transparent 70%);transform:translate(-50%,-50%);transition:opacity 0.3s;display:none;`;
     document.body.appendChild(cursor);
-    
-    let mouseX = 0, mouseY = 0;
-    let cursorX = 0, cursorY = 0;
-    
-    document.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-        cursor.style.display = 'block';
-    });
-    
-    document.addEventListener('mouseleave', () => {
-        cursor.style.display = 'none';
-    });
-    
-    document.addEventListener('mouseenter', () => {
-        cursor.style.display = 'block';
-    });
-    
-    function animateCursor() {
+    let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0;
+    document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; cursor.style.display = 'block'; });
+    document.addEventListener('mouseleave', () => { cursor.style.display = 'none'; });
+    document.addEventListener('mouseenter', () => { cursor.style.display = 'block'; });
+    (function animateCursor() {
         cursorX += (mouseX - cursorX) * 0.1;
         cursorY += (mouseY - cursorY) * 0.1;
         cursor.style.left = cursorX + 'px';
         cursor.style.top = cursorY + 'px';
         requestAnimationFrame(animateCursor);
-    }
-    
-    animateCursor();
+    })();
 }
 
-// ===== 4. THEME SYSTEM =====
 function initThemeSystem() {
     const themeToggle = document.querySelector('.theme-toggle');
     const html = document.documentElement;
     const themeIcon = themeToggle?.querySelector('i');
-    
     function setTheme(theme) {
         html.setAttribute('data-theme', theme);
         localStorage.setItem('theme', theme);
-        if (themeIcon) {
-            themeIcon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
-        }
-        // Add transition class
+        if (themeIcon) themeIcon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
         document.body.classList.add('theme-transitioning');
         setTimeout(() => document.body.classList.remove('theme-transitioning'), 500);
     }
-    
     const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-        setTheme(savedTheme);
-    } else {
-        setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    }
-    
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-        if (!localStorage.getItem('theme')) {
-            setTheme(e.matches ? 'dark' : 'light');
-        }
+    setTheme(savedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        if (!localStorage.getItem('theme')) setTheme(e.matches ? 'dark' : 'light');
     });
-    
-    themeToggle?.addEventListener('click', () => {
-        const current = html.getAttribute('data-theme');
-        setTheme(current === 'dark' ? 'light' : 'dark');
-    });
+    themeToggle?.addEventListener('click', () => setTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'));
 }
 
-// ===== 5. NAVIGATION =====
 function initNavigation() {
     const navbar = document.getElementById('navbar');
     const hamburger = document.querySelector('.hamburger');
     const navLinks = document.querySelector('.nav-links');
-    
-    // Mobile menu
     hamburger?.addEventListener('click', () => {
         hamburger.classList.toggle('active');
         navLinks.classList.toggle('active');
         document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
     });
-    
-    // Close on click
     document.querySelectorAll('.nav-links a').forEach(link => {
         link.addEventListener('click', () => {
             hamburger?.classList.remove('active');
@@ -359,12 +177,8 @@ function initNavigation() {
             document.body.style.overflow = '';
         });
     });
-    
-    // Navbar hide/show on scroll
-    let lastScroll = 0;
     window.addEventListener('scroll', () => {
         const currentScroll = window.pageYOffset;
-        
         if (navbar) {
             if (currentScroll > 100) {
                 navbar.style.background = 'rgba(10, 10, 11, 0.95)';
@@ -376,22 +190,12 @@ function initNavigation() {
                 navbar.style.boxShadow = 'none';
             }
         }
-        
-        lastScroll = currentScroll;
     });
 }
 
-// ===== 6. SCROLL REVEAL (ENHANCED) =====
 function initScrollReveal() {
-    const revealElements = document.querySelectorAll(`
-        .project-card, .cert-card, .achievement-card, .focus-card,
-        .arsenal-cat, .role-card, .info-card, .training-card,
-        .exp-card, .repo-card, .edu-card, .connect-link,
-        .comp-table tbody tr, .arsenal-block, .about-terminal,
-        .profile-container, .terminal-mini
-    `);
-    
-    const observer = new IntersectionObserver((entries) => {
+    const revealElements = document.querySelectorAll(`.project-card,.cert-card,.achievement-card,.focus-card,.arsenal-cat,.role-card,.info-card,.training-card,.exp-card,.repo-card,.edu-card,.connect-link,.comp-table tbody tr,.arsenal-block,.about-terminal,.profile-container,.terminal-mini`);
+    const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const delay = entry.target.dataset.delay || 0;
@@ -403,11 +207,7 @@ function initScrollReveal() {
                 observer.unobserve(entry.target);
             }
         });
-    }, {
-        threshold: 0.1,
-        rootMargin: '0px 0px -30px 0px'
-    });
-    
+    }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
     revealElements.forEach((el, index) => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(40px) scale(0.95)';
@@ -419,24 +219,22 @@ function initScrollReveal() {
 }
 
 function handleResumeClick(event, download = false) {
-    event.preventDefault();
-
+    if (event && event.preventDefault) event.preventDefault();
     const resumeUrl = 'assets/resume.pdf';
     const connectSection = document.getElementById('connect');
-
     fetch(resumeUrl, { method: 'HEAD' })
         .then(response => {
             if (response.ok) {
                 if (download) {
-                const link = document.createElement('a');
-                link.href = resumeUrl;
-                link.download = 'Chandrashekar_Bala_Resume.pdf';
-                document.body.appendChild(link);
-                link.click();
-                link.remove();
-            } else {
-                window.open(resumeUrl, '_blank', 'noopener');
-            }
+                    const link = document.createElement('a');
+                    link.href = resumeUrl;
+                    link.download = 'Chandrashekar_Bala_Resume.pdf';
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                } else {
+                    window.open(resumeUrl, '_blank', 'noopener');
+                }
             } else if (connectSection) {
                 connectSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 showResumeNotice();
@@ -462,11 +260,9 @@ function showResumeNotice() {
     setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 6500);
 }
 
-// ===== 7. COUNTER ANIMATION =====
 function initCounterAnimation() {
     const counters = document.querySelectorAll('.stat-number[data-count]');
-    
-    const observer = new IntersectionObserver((entries) => {
+    const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const el = entry.target;
@@ -474,80 +270,55 @@ function initCounterAnimation() {
                 const target = parseInt(rawValue, 10);
                 const duration = 2000;
                 const suffix = rawValue.includes('+') ? '+' : '';
-                let start = 0;
                 const startTime = performance.now();
-                
-                function update(currentTime) {
+                (function update(currentTime) {
                     const elapsed = currentTime - startTime;
                     const progress = Math.min(elapsed / duration, 1);
-                    
-                    // Ease out cubic
                     const eased = 1 - Math.pow(1 - progress, 3);
-                    const current = Math.floor(eased * target);
-                    
-                    el.textContent = current + suffix;
-                    
-                    if (progress < 1) {
-                        requestAnimationFrame(update);
-                    } else {
-                        el.textContent = target + suffix;
-                    }
-                }
-                
-                requestAnimationFrame(update);
+                    el.textContent = Math.floor(eased * target) + suffix;
+                    if (progress < 1) requestAnimationFrame(update);
+                    else el.textContent = target + suffix;
+                })(startTime);
                 observer.unobserve(el);
             }
         });
     }, { threshold: 0.5 });
-    
     counters.forEach(counter => observer.observe(counter));
 }
 
-// ===== 8. PROGRESS BARS =====
 function initProgressBars() {
-    const observer = new IntersectionObserver((entries) => {
+    const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                const fills = entry.target.querySelectorAll('.bar-fill, .progress-fill');
+                const fills = entry.target.querySelectorAll('.bar-fill,.progress-fill');
                 fills.forEach(fill => {
                     const width = fill.style.width;
                     fill.style.width = '0%';
                     fill.style.transition = 'width 1.5s cubic-bezier(0.4, 0, 0.2, 1)';
-                    setTimeout(() => {
-                        fill.style.width = width;
-                    }, 200);
+                    setTimeout(() => { fill.style.width = width; }, 200);
                 });
                 observer.unobserve(entry.target);
             }
         });
     }, { threshold: 0.3 });
-    
-    document.querySelectorAll('.activity-bars, .focus-grid').forEach(el => observer.observe(el));
+    document.querySelectorAll('.activity-bars,.focus-grid').forEach(el => observer.observe(el));
 }
 
-// ===== 9. GLITCH EFFECT =====
 function initGlitchEffect() {
-    const glitchElements = document.querySelectorAll('.hero-name, .logo-text, .section-title');
-    
-    glitchElements.forEach(el => {
+    document.querySelectorAll('.hero-name,.logo-text,.section-title').forEach(el => {
         el.addEventListener('mouseenter', () => {
             el.style.animation = 'glitch 0.3s ease-in-out';
-            setTimeout(() => {
-                el.style.animation = '';
-            }, 300);
+            setTimeout(() => { el.style.animation = ''; }, 300);
         });
     });
 }
 
-// ===== 10. TYPEWRITER EFFECT =====
 function initTypewriterEffect() {
     const heroMission = document.querySelector('.hero-mission');
     if (!heroMission) return;
-    
     const originalText = heroMission.textContent;
     heroMission.textContent = '';
     heroMission.style.borderRight = '2px solid var(--accent-green)';
-    
     let i = 0;
     function type() {
         if (i < originalText.length) {
@@ -558,1026 +329,1321 @@ function initTypewriterEffect() {
             heroMission.style.borderRight = 'none';
         }
     }
-    
-    const observer = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) {
-            setTimeout(type, 500);
-            observer.unobserve(heroMission);
-        }
+    const observer = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting) { setTimeout(type, 500); observer.unobserve(heroMission); }
     }, { threshold: 0.5 });
-    
     observer.observe(heroMission);
 }
 
-// ===== 11. TILT EFFECT ON CARDS =====
 function initTiltEffect() {
-    const cards = document.querySelectorAll('.project-card, .cert-card, .focus-card, .role-card');
-    
-    cards.forEach(card => {
-        card.addEventListener('mousemove', (e) => {
+    document.querySelectorAll('.project-card,.cert-card,.focus-card,.role-card').forEach(card => {
+        card.addEventListener('mousemove', e => {
             const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            
-            const rotateX = (y - centerY) / centerY * -5;
-            const rotateY = (x - centerX) / centerX * 5;
-            
+            const x = e.clientX - rect.left, y = e.clientY - rect.top;
+            const rotateX = (y - rect.height / 2) / (rect.height / 2) * -5;
+            const rotateY = (x - rect.width / 2) / (rect.width / 2) * 5;
             card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-5px)`;
-            card.style.boxShadow = `
-                0 20px 40px rgba(0,0,0,0.3),
-                ${x/rect.width * 20 - 10}px ${y/rect.height * 20 - 10}px 30px rgba(0,255,65,0.1)
-            `;
         });
-        
         card.addEventListener('mouseleave', () => {
-            card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
-            card.style.boxShadow = '';
+            card.style.transform = '';
             card.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
-            setTimeout(() => {
-                card.style.transition = '';
-            }, 500);
+            setTimeout(() => { card.style.transition = ''; }, 500);
         });
     });
 }
 
-// ===== 12. PARALLAX EFFECT =====
 function initParallaxEffect() {
-    const parallaxElements = document.querySelectorAll('.hero-right, .profile-ring');
-    
-    window.addEventListener('mousemove', (e) => {
+    const parallaxElements = document.querySelectorAll('.hero-right,.profile-ring');
+    window.addEventListener('mousemove', e => {
         const x = (e.clientX / window.innerWidth - 0.5) * 20;
         const y = (e.clientY / window.innerHeight - 0.5) * 20;
-        
         parallaxElements.forEach(el => {
             const speed = el.classList.contains('profile-ring') ? 1.5 : 0.5;
             el.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
-            el.style.transition = 'transform 0.1s ease-out';
         });
     });
 }
 
-// ===== 13. SCROLL INDICATOR =====
 function initScrollIndicator() {
     const indicator = document.querySelector('.scroll-indicator');
     if (!indicator) return;
-
     let dismissed = window.pageYOffset > 20;
-
-    const dismissOnScroll = () => {
+    if (dismissed) indicator.classList.add('hidden');
+    window.addEventListener('scroll', () => {
         if (!dismissed && window.pageYOffset > 20) {
             dismissed = true;
             indicator.classList.add('hidden');
         }
-    };
-
-    if (dismissed) indicator.classList.add('hidden');
-    window.addEventListener('scroll', dismissOnScroll, { passive: true });
+    }, { passive: true });
 }
 
-// ===== 14. SMOOTH SCROLL =====
 function initSmoothScroll() {
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            e.preventDefault();
+        anchor.addEventListener('click', function (e) {
             const targetId = this.getAttribute('href');
-            if (targetId === '#') {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                return;
-            }
+            if (targetId === '#') { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+            // Skip in-page anchors that begin with '#case/' — those are managed by Cases.open()
+            if (targetId.startsWith('#case/')) return;
             const target = document.querySelector(targetId);
             if (target) {
-                const offset = 80;
-                const position = target.getBoundingClientRect().top + window.pageYOffset - offset;
+                e.preventDefault();
+                const position = target.getBoundingClientRect().top + window.pageYOffset - 80;
                 window.scrollTo({ top: position, behavior: 'smooth' });
             }
         });
     });
 }
 
-// ===== 15. BACK TO TOP =====
 function initBackToTop() {
     const btn = document.querySelector('.back-to-top');
     if (!btn) return;
-    
-    window.addEventListener('scroll', () => {
-        if (window.pageYOffset > 500) {
-            btn.classList.add('visible');
-        } else {
-            btn.classList.remove('visible');
-        }
-    });
-    
-    btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
+    window.addEventListener('scroll', () => btn.classList.toggle('visible', window.pageYOffset > 500));
+    btn.addEventListener('click', e => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
 }
 
-// ===== 15. ACTIVE NAV HIGHLIGHT =====
 function initActiveNavHighlight() {
     const sections = document.querySelectorAll('section[id]');
     const navLinks = document.querySelectorAll('.nav-links a');
-    
     window.addEventListener('scroll', () => {
         let current = '';
         sections.forEach(section => {
-            const sectionTop = section.offsetTop - 150;
-            if (window.pageYOffset >= sectionTop) {
-                current = section.getAttribute('id');
-            }
+            if (window.pageYOffset >= section.offsetTop - 150) current = section.getAttribute('id');
         });
-        
         navLinks.forEach(link => {
-            link.classList.remove('active');
-            if (link.getAttribute('href') === '#' + current) {
-                link.classList.add('active');
-            }
+            link.classList.toggle('active', link.getAttribute('href') === '#' + current);
         });
     });
 }
 
-// ===== 16. FLOATING ELEMENTS =====
 function initFloatingElements() {
-    const floatingElements = document.querySelectorAll('.project-icon, .cert-icon-cert, .focus-icon');
-    
-    floatingElements.forEach((el, index) => {
+    document.querySelectorAll('.project-icon,.cert-icon-cert,.focus-icon').forEach((el, index) => {
         el.style.animation = `floatIcon ${3 + index % 3}s ease-in-out infinite`;
         el.style.animationDelay = `${index * 0.2}s`;
     });
 }
 
-// ===== 17. HOVER GLOW EFFECT =====
 function initHoverGlow() {
-    const glowElements = document.querySelectorAll('.btn-primary, .connect-link, .social-btn');
-    
-    glowElements.forEach(el => {
-        el.addEventListener('mouseenter', () => {
-            el.style.boxShadow = '0 0 30px var(--accent-green-glow)';
-        });
-        el.addEventListener('mouseleave', () => {
-            el.style.boxShadow = '';
-        });
+    document.querySelectorAll('.btn-primary,.connect-link,.social-btn').forEach(el => {
+        el.addEventListener('mouseenter', () => el.style.boxShadow = '0 0 30px var(--accent-green-glow)');
+        el.addEventListener('mouseleave', () => el.style.boxShadow = '');
     });
 }
 
-// ===== 18. CONSOLE EASTER EGG =====
 function initConsoleEasterEgg() {
-    const styles = [
-        'color: #00ff41; font-size: 14px; font-weight: bold;',
-        'color: #0ea5e9; font-size: 12px;',
-        'color: #a855f7; font-size: 12px;',
-        'color: #ef4444; font-size: 12px;',
-        'color: #eab308; font-size: 12px;',
-    ];
-    
-    console.log('%c╔══════════════════════════════════════════╗', styles[0]);
-    console.log('%c║   CHANDRASHEKAR BALA - PORTFOLIO         ║', styles[0]);
-    console.log('%c╚══════════════════════════════════════════╝', styles[0]);
-    console.log('%c🔒 Cybersecurity Professional', styles[1]);
-    console.log('%c🎯 Penetration Tester | Adversary Researcher', styles[2]);
-    console.log('%c💻 github.com/Chandrashekar-Bala', styles[3]);
-    console.log('%c📧 chandrashekar-bala@protonmail.com', styles[4]);
-    console.log('%c👋 Thanks for checking out the code! Stay secure. 🔐', styles[1]);
+    const s = ['color:#00ff41;font-size:14px;font-weight:bold;','color:#0ea5e9;font-size:12px;','color:#a855f7;font-size:12px;','color:#ef4444;font-size:12px;','color:#eab308;font-size:12px;'];
+    console.log('%c╔══════════════════════════════════════════╗', s[0]);
+    console.log('%c║   CHANDRASHEKAR BALA - PORTFOLIO         ║', s[0]);
+    console.log('%c╚══════════════════════════════════════════╝', s[0]);
+    console.log('%c🔒 Cybersecurity Professional', s[1]);
+    console.log('%c🎯 Penetration Tester | Adversary Researcher', s[2]);
+    console.log('%c💻 github.com/Chandrashekar-Bala', s[3]);
+    console.log('%c📧 chandrashekar-bala@protonmail.com', s[4]);
 }
 
-// ===== KEYBOARD SHORTCUTS =====
-document.addEventListener('keydown', (e) => {
-    if (e.key === 't' && e.ctrlKey) {
-        e.preventDefault();
-        document.querySelector('.theme-toggle')?.click();
-    }
-    if (e.key === 'Escape') {
-        document.querySelector('.nav-links')?.classList.remove('active');
-        document.querySelector('.hamburger')?.classList.remove('active');
-    }
-});
+/* ============================================================
+   PART 2 — CANONICAL CASE REGISTRY (window.Cases)
+   Single source of truth for every case-file route.
+   ============================================================ */
 
-// ===== PERFORMANCE OBSERVER =====
-if ('PerformanceObserver' in window) {
-    try {
-        const perfObserver = new PerformanceObserver((list) => {
-            for (const entry of list.getEntries()) {
-                if (entry.entryType === 'largest-contentful-paint') {
-                    console.log(`%c⚡ LCP: ${entry.startTime.toFixed(0)}ms`, 'color: #00ff41;');
-                }
+window.Cases = (function () {
+    'use strict';
+
+    /* Canonical IDs. Every case in the portfolio gets exactly one. */
+    const IDS = ['mediroza','driver','recon','password','web','threat','malware','android','vulnhub','wireless','buffer','firmware','automation','website'];
+
+    /* Alias table — single copy. Maps display labels and category words to canonical IDs. */
+    const ALIASES = {
+        'assessment': 'mediroza',
+        'mediroza assessment': 'mediroza',
+        'engineering': 'driver',
+        'rtl8812bu driver engineering': 'driver',
+        'rtl8812bu linux driver modernization': 'driver',
+        'network': 'recon',
+        'network reconnaissance': 'recon',
+        'network reconnaissance & attack-surface mapping': 'recon',
+        'portswigger': 'web',
+        'web application security lab': 'web',
+        'offensive': 'vulnhub',
+        'vulnerability assessment & privilege escalation': 'vulnhub',
+        'defensive': 'threat',
+        'network traffic analysis & threat hunting': 'threat',
+        'forensics': 'malware',
+        'malware analysis & windows forensics research': 'malware',
+        'mobile': 'android',
+        'android security analysis': 'android',
+        'security automation & poc tooling': 'automation',
+        'spi flash & bios protection research': 'firmware',
+        'wireless security assessment lab': 'wireless',
+        'protected pdf & password security analysis': 'password',
+        'buffer overflow exploit development': 'buffer',
+        'cybersecurity portfolio engineering': 'website',
+        'active directory attack-path research': 'threat',
+        'adversary research': 'threat'
+    };
+
+    /* Case content — migrated verbatim from the existing v4 projectDetails. */
+    const BODIES = {
+        mediroza: { kicker: 'Authorized External Assessment · Authorized Assessment', title: 'Mediroza Web Application Security Assessment', body: `<p>An authorized black-box web application assessment documented as a technical security investigation rather than a claim of real-world compromise.</p><h4>Attack path</h4><div class="attack-path"><span>Recon</span><b>→</b><span>SQL Injection</span><b>→</b><span>Authentication Bypass</span><b>→</b><span>Patient Portal</span><b>→</b><span>Protected Report Retrieval</span></div><h4>Documented findings</h4><ul><li>08 findings spanning directory exposure, database backup exposure, SQL injection, verbose error disclosure, sensitive report retrieval, predictable storage, log metadata disclosure, and server fingerprinting.</li><li>Highest documented severity: CVSS 9.8 / CWE-89 for the demonstrated SQL injection authentication-bypass chain.</li><li>Manual differential testing, Burp evidence, browser behavior, and application responses were used when automated SQLi confirmation was inconclusive.</li></ul><h4>Evidence &amp; remediation</h4><ul><li>65 source evidence files, 58 unique SHA-256 contents, and 25 screenshots were preserved and organized for traceability.</li><li>Findings were translated into root cause, impact, CVSS/CWE context, remediation recommendations, and retest considerations.</li><li>Public materials intentionally exclude passwords, patient documents, raw sensitive databases, and other restricted evidence.</li></ul><div class="modal-meta"><span>Black-box</span><span>Burp Suite</span><span>Nmap</span><span>CVSS / CWE</span><span>Evidence Engineering</span></div><a class="modal-source" href="https://github.com/Chandrashekar-Bala/Independent-Web-Application-Security-Assessment-Mediroza-General-Hospital" target="_blank" rel="noopener noreferrer">View public assessment repository <i class="fab fa-github"></i></a>` },
+        driver: { kicker: 'Linux Kernel · Driver Compatibility · Real Hardware', title: 'RTL8812BU Linux Driver Modernization', body: `<p>Modernized an upstream RTL8812BU/RTL8822BU Linux USB Wi-Fi driver for newer kernel environments through kernel-facing C analysis, compatibility changes, build troubleshooting, and hardware validation.</p><h4>Engineering record</h4><ul><li>Targeted compatibility-sensitive Linux kernel interfaces across 13 source files.</li><li>Investigated compiler, kernel API, module-build, USB callback, timer, filesystem-access, and regulatory-related compatibility issues.</li><li>Built and validated the resulting module on Kali Linux using TP-Link Archer T4U v3 hardware (USB ID 2357:0115).</li><li>Preserved upstream attribution and maintained traceability between the upstream and modified code.</li></ul><div class="modal-meta"><span>C</span><span>Linux Kernel</span><span>GCC</span><span>Git</span><span>RTL8812BU</span><span>Real Hardware</span></div><div class="modal-links"><a class="modal-source" href="https://github.com/Chandrashekar-Bala/RTL8812BU-Linux-7.0.12" target="_blank" rel="noopener noreferrer">My repository <i class="fab fa-github"></i></a><a class="modal-source" href="https://github.com/morrownr/88x2bu-20210702" target="_blank" rel="noopener noreferrer">Upstream repository <i class="fas fa-external-link-alt"></i></a></div>` },
+        recon: { kicker: 'Reconnaissance Research · Reconnaissance', title: 'Network Reconnaissance & Attack-Surface Mapping', body: `<p>Structured reconnaissance work focused on collecting, validating, and interpreting external attack-surface information before making security conclusions.</p><h4>Coverage</h4><ul><li>WHOIS, nslookup/dig, DNSRecon, WhatWeb, cURL, WAFW00F, certificate discovery, crt.sh, CertSpotter, Subfinder and theHarvester.</li><li>Nmap/NSE service enumeration, version detection, OS detection, HTTP/HTTPS and TLS validation, and Zenmap-supported review.</li><li>Evidence-first workflow separating observed exposure from assumptions and hypotheses.</li></ul><div class="modal-meta"><span>OSINT</span><span>DNS</span><span>Nmap/NSE</span><span>TLS</span><span>Web Fingerprinting</span></div>` },
+        password: { kicker: 'Controlled Password Security Analysis · Controlled Offline Analysis', title: 'Protected PDF & Password Security Analysis', body: `<p>Controlled offline password-security analysis of protected PDF artifacts using purpose-built extraction and validation workflows.</p><h4>Workflow</h4><ul><li>Used pdf2john and John the Ripper with RockYou-based testing.</li><li>Compared local recovery results with Networkwalks-provided tooling and documented limitations.</li><li>Validated recovered files with QPDF and correlated evidence rather than treating a password hit alone as the complete result.</li></ul><div class="modal-meta"><span>pdf2john</span><span>John the Ripper</span><span>RockYou</span><span>QPDF</span></div>` },
+        web: { kicker: 'Application Security · PortSwigger', title: 'Web Application Security Lab', body: `<p>Hands-on PortSwigger Web Security Academy practice focused on understanding application behavior through manual request/response analysis and controlled exploitation.</p><h4>Coverage</h4><ul><li>SQL injection, XSS, CSRF, SSRF, authentication, authorization and access-control weaknesses.</li><li>Parameter and session behavior, HTTP request manipulation, validation, and remediation-oriented notes.</li><li>Burp Suite and OWASP ZAP used to support repeatable application-security testing.</li></ul><div class="modal-meta"><span>50+ Labs</span><span>Burp Suite</span><span>OWASP ZAP</span><span>OWASP Top 10</span></div><a class="modal-source" href="https://portswigger.net/web-security" target="_blank" rel="noopener noreferrer">PortSwigger Web Security Academy <i class="fas fa-external-link-alt"></i></a>` },
+        threat: { kicker: 'Defensive Security · Threat Hunting', title: 'Network Traffic Analysis & Threat Hunting', body: `<p>Network investigation work connecting packet-level observations with defensive hypotheses, indicators, and ATT&amp;CK-aligned analysis.</p><h4>Focus</h4><ul><li>Wireshark packet capture and protocol analysis.</li><li>Suspicious-connection investigation and IOC-oriented review.</li><li>Threat-hunting hypotheses around attacker communication and potential command-and-control behavior.</li><li>Translation of network observations into detection and investigation opportunities.</li></ul><div class="modal-meta"><span>Wireshark</span><span>Tcpdump</span><span>Zeek</span><span>IOC Analysis</span><span>MITRE ATT&amp;CK</span></div>` },
+        malware: { kicker: 'Malware Analysis · Digital Forensics · Research', title: 'Malware Analysis & Windows Forensics Research', body: `<p>Hands-on research spanning suspicious-file investigation, binary analysis, execution behavior, indicator extraction, and Windows forensic artifacts.</p><h4>Static + dynamic analysis</h4><ul><li>Static inspection of suspicious files and binaries, including structure and behavior-oriented analysis.</li><li>Dynamic analysis exercises focused on execution behavior and observable indicators.</li><li>Reverse-engineering methods using C, GDB, memory/stack analysis, control-flow analysis and debugging.</li></ul><h4>Forensics</h4><ul><li>Windows Registry artifacts, filesystem activity, disk artifacts, suspicious-file evidence, and timeline-oriented investigation.</li><li>Volatility, Autopsy and network-analysis tooling used according to the research scenario.</li></ul><div class="modal-meta"><span>Ghidra</span><span>IDA Pro</span><span>GDB</span><span>Volatility</span><span>Autopsy</span><span>Wireshark</span></div>` },
+        android: { kicker: 'Mobile Security · Android', title: 'Android Security Analysis', body: `<p>Android application security research combining APK inspection, decompilation, static review, runtime logging, and dynamic analysis.</p><h4>Tooling</h4><ul><li>Dex2jar and JD-GUI for decompilation and code inspection.</li><li>Drozer for dynamic security-testing practice.</li><li>Logcat for runtime observation and troubleshooting.</li><li>Android Studio for application and emulator workflows.</li></ul><div class="modal-meta"><span>APK Analysis</span><span>Reverse Engineering</span><span>Static Analysis</span><span>Dynamic Analysis</span></div>` },
+        vulnhub: { kicker: 'Controlled Offensive Practice · VulnHub / HTB', title: 'Vulnerability Assessment & Privilege Escalation', body: `<p>Repeatable security practice across vulnerable virtual environments, moving from enumeration through validation and post-exploitation analysis.</p><h4>Workflow</h4><ul><li>Service and version enumeration with Nmap.</li><li>Vulnerability identification and controlled exploit validation with Metasploit.</li><li>Linux and Windows privilege-escalation practice and post-exploitation analysis.</li><li>VulnHub, Hack The Box, OverTheWire and vulnerable pentesting VMs used as controlled practice environments.</li></ul><div class="modal-meta"><span>VulnHub</span><span>Hack The Box</span><span>Nmap</span><span>Metasploit</span><span>PrivEsc</span></div>` },
+        wireless: { kicker: 'Wireless Security · Controlled Lab', title: 'Wireless Security Assessment Lab', body: `<p>Controlled wireless-security research covering discovery, monitor mode, packet capture, protocol analysis, and security testing workflows.</p><h4>Focus</h4><ul><li>Aircrack-ng and Wireshark for wireless assessment and packet analysis.</li><li>Monitor mode, packet capture, and controlled wireless testing.</li><li>hcxdumptool requirements and driver capabilities investigated as part of wireless security engineering.</li></ul><div class="modal-meta"><span>Aircrack-ng</span><span>Wireshark</span><span>Monitor Mode</span><span>hcxdumptool</span></div>` },
+        buffer: { kicker: 'Exploit Development · Controlled Research', title: 'Buffer Overflow Exploit Development', body: `<p>Low-level security research focused on memory, stack behavior, control flow, and debugger-assisted proof-of-concept development in controlled environments.</p><h4>Tooling</h4><ul><li>GDB and WinDbg for debugging and memory inspection.</li><li>C for understanding low-level memory behavior.</li><li>Stack analysis, control-flow analysis, and controlled proof-of-concept workflows.</li></ul><div class="modal-meta"><span>C</span><span>GDB</span><span>WinDbg</span><span>Memory Analysis</span><span>PoC</span></div>` },
+        firmware: { kicker: 'Systems Security · Firmware Research', title: 'SPI Flash & BIOS Protection Research', body: `<p>Firmware research on a Lenovo G580 involving SPI flash/NVRAM protection analysis and Linux-based firmware investigation.</p><h4>Research record</h4><ul><li>Used flashrom to investigate internal programmer access and read-protection behavior.</li><li>Acquired an 8 MB full-flash image and extracted the BIOS region for analysis.</li><li>Used dmidecode and dmesg to correlate platform and firmware-loading observations.</li></ul><div class="modal-meta"><span>flashrom</span><span>SPI Flash</span><span>NVRAM</span><span>BIOS</span><span>dmidecode</span></div>` },
+        automation: { kicker: 'Security Development · Automation', title: 'Security Automation & PoC Tooling', body: `<p>Python- and Bash-based security development supporting reconnaissance, vulnerability assessment, network analysis, research, and repeatable proof-of-concept workflows.</p><h4>Engineering approach</h4><ul><li>Automate repeatable reconnaissance and validation steps where it improves consistency.</li><li>Build small proof-of-concept tools to understand vulnerabilities and security behavior.</li><li>Document inputs, outputs, limitations, and defensive considerations rather than treating automation as a substitute for validation.</li></ul><div class="modal-meta"><span>Python</span><span>Bash</span><span>SQL</span><span>Automation</span><span>PoC</span></div>` },
+        website: { kicker: 'Web Engineering · Portfolio System', title: 'Cybersecurity Portfolio Engineering', body: `<p>This portfolio itself is a technical project: a static web system designed to present security research, assessment work, engineering projects, and evidence in a usable interface.</p><h4>What I built</h4><ul><li>Semantic HTML structure with responsive layouts and a terminal-inspired visual system.</li><li>JavaScript-driven project filtering, technical-detail modals, theme switching, navigation behavior, counters, and UI feedback.</li><li>Accessibility-oriented controls, keyboard interaction, reduced-motion support, SEO/social metadata, and GitHub Pages deployment structure.</li></ul><div class="modal-meta"><span>HTML5</span><span>CSS3</span><span>JavaScript</span><span>Accessibility</span><span>SEO</span><span>GitHub Pages</span></div><a class="modal-source" href="https://github.com/Chandrashekar-Bala" target="_blank" rel="noopener noreferrer">View GitHub profile <i class="fab fa-github"></i></a>` }
+    };
+
+    /* Registry populated on DOMContentLoaded from the DOM's data-project attributes. */
+    const registry = new Map();
+
+    function normalize(input) {
+        return String(input == null ? '' : input)
+            .trim()
+            .toLowerCase()
+            .replace(/&amp;/g, '&')
+            .replace(/\s+/g, ' ');
+    }
+
+    function hydrateFromDOM() {
+        document.querySelectorAll('#projects .project-card[data-project]').forEach(card => {
+            const id = card.dataset.project;
+            if (!IDS.includes(id)) return;
+            const title = card.querySelector('h3')?.textContent.trim() || id;
+            const kicker = card.querySelector('.project-kicker')?.textContent.trim() || '';
+            const categories = (card.dataset.category || '').split(/\s+/).filter(Boolean);
+            const bodyData = BODIES[id] || { kicker, title, body: '<p>Case file content pending.</p>' };
+            registry.set(id, {
+                id,
+                title: bodyData.title || title,
+                kicker: bodyData.kicker || kicker,
+                body: bodyData.body,
+                category: categories,
+                cardTitle: title
+            });
+        });
+        // Ensure any IDs we know about but that lack a card still register (defensive).
+        IDS.forEach(id => {
+            if (!registry.has(id) && BODIES[id]) {
+                registry.set(id, {
+                    id,
+                    title: BODIES[id].title,
+                    kicker: BODIES[id].kicker,
+                    body: BODIES[id].body,
+                    category: [],
+                    cardTitle: BODIES[id].title
+                });
             }
         });
-        perfObserver.observe({ type: 'largest-contentful-paint', buffered: true });
-    } catch (_) { /* Optional browser API. */ }
+    }
+
+    function resolve(input, source) {
+        const n = normalize(input);
+        if (!n) return null;
+        if (registry.has(n)) return n;
+        if (ALIASES[n] && registry.has(ALIASES[n])) return ALIASES[n];
+        // Title match.
+        for (const [id, entry] of registry) {
+            if (normalize(entry.title) === n) return id;
+            if (normalize(entry.cardTitle) === n) return id;
+        }
+        console.warn(`[Cases] Unresolved project reference "${input}" from source: ${source || 'unknown'}`);
+        return null;
+    }
+
+    function get(id) {
+        const canonical = resolve(id, 'Cases.get');
+        return canonical ? registry.get(canonical) : null;
+    }
+
+    function list() {
+        return Array.from(registry.values());
+    }
+
+    function open(id, options) {
+        options = options || {};
+        const source = options.from || 'unknown';
+        const canonical = resolve(id, source);
+        if (!canonical) {
+            if (window.CBModal && CBModal.roots && CBModal.roots['projectModal']) {
+                // Fall through — the caller will see a null return.
+            }
+            if (typeof window.__cbNotify === 'function') {
+                window.__cbNotify(`Case file not found: "${id}"`);
+            }
+            return false;
+        }
+        const entry = registry.get(canonical);
+        if (!entry) return false;
+        if (!window.CBModal) { console.warn('[Cases] CBModal not ready'); return false; }
+        CBModal.push('projectModal', {
+            render: () => renderCaseFile(entry),
+            focus: '[data-close-modal]',
+            breadcrumb: null  // breadcrumb is composed by CBModal from the stack
+        });
+        return true;
+    }
+
+    function renderCaseFile(entry) {
+        return `<button aria-label="Close project details" class="modal-close" data-close-modal type="button">×</button>
+            <span class="modal-kicker">${entry.kicker}</span>
+            <h2 id="modalTitle">${entry.title}</h2>
+            <div class="modal-body">${entry.body}</div>`;
+    }
+
+    return { register: () => {}, hydrateFromDOM, resolve, get, list, open, IDS, ALIASES };
+})();
+
+/* ============================================================
+   PART 3 — MODAL STACK MANAGER (window.CBModal)
+   Single owner of: open/close, stack, Escape, focus, scroll
+   lock, aria-hidden, Back, Close.
+   ============================================================ */
+
+window.CBModal = (function () {
+    'use strict';
+
+    const roots = {};               // id -> element
+    const stack = [];               // [{id, render, focus, breadcrumb}]
+    let lockCount = 0;
+    let lastFocused = null;
+
+    function register() {
+        document.querySelectorAll('[data-cb-modal-root]').forEach(el => {
+            roots[el.id] = el;
+        });
+    }
+
+    function lock() {
+        lockCount += 1;
+        if (lockCount === 1) {
+            lastFocused = document.activeElement;
+            document.body.classList.add('cb-scroll-lock');
+        }
+    }
+    function unlock() {
+        if (lockCount > 0) lockCount -= 1;
+        if (lockCount === 0) {
+            document.body.classList.remove('cb-scroll-lock');
+            if (lastFocused && typeof lastFocused.focus === 'function') {
+                try { lastFocused.focus(); } catch (_) {}
+            }
+            lastFocused = null;
+        }
+    }
+
+    function hideAllExcept(id) {
+        Object.entries(roots).forEach(([oid, oel]) => {
+            if (oid !== id && oel.classList.contains('open')) {
+                oel.classList.remove('open');
+                oel.setAttribute('aria-hidden', 'true');
+            }
+        });
+    }
+
+    function show(el) {
+        el.classList.add('open');
+        el.setAttribute('aria-hidden', 'false');
+    }
+    function hide(el) {
+        el.classList.remove('open');
+        el.setAttribute('aria-hidden', 'true');
+    }
+
+    function push(id, options) {
+        options = options || {};
+        const el = roots[id];
+        if (!el) { console.warn('[CBModal] unknown layer id:', id); return; }
+        hideAllExcept(id);
+        if (typeof options.render === 'function') el.innerHTML = options.render();
+        show(el);
+        stack.push({ id, render: options.render, focus: options.focus, breadcrumb: options.breadcrumb });
+        lock();
+        renderBreadcrumb();
+        trapFocus(el);
+        if (options.focus) {
+            setTimeout(() => { const f = el.querySelector(options.focus); if (f) f.focus(); }, 30);
+        }
+    }
+
+    function pop() {
+        if (!stack.length) return false;
+        const layer = stack.pop();
+        const el = roots[layer.id];
+        if (el) hide(el);
+        unlock();
+        const prev = stack[stack.length - 1];
+        if (prev) {
+            const pel = roots[prev.id];
+            if (prev.render) pel.innerHTML = prev.render();
+            show(pel);
+            trapFocus(pel);
+            if (prev.focus) setTimeout(() => { const f = pel.querySelector(prev.focus); if (f) f.focus(); }, 30);
+        }
+        renderBreadcrumb();
+        return true;
+    }
+
+    function closeAll() {
+        while (stack.length) {
+            const layer = stack.pop();
+            const el = roots[layer.id];
+            if (el) hide(el);
+            unlock();
+        }
+        renderBreadcrumb();
+    }
+
+    function top() { return stack[stack.length - 1] || null; }
+    function isOpen(id) { return stack.some(l => l.id === id); }
+
+    /* --- Focus trap --- */
+    function focusables(el) {
+        return Array.from(el.querySelectorAll('button,a[href],input,select,textarea,[tabindex]:not([tabindex="-1"])'))
+            .filter(x => !x.disabled && x.offsetParent !== null);
+    }
+    function trapFocus(el) {
+        const first = focusables(el)[0];
+        if (first) setTimeout(() => first.focus(), 20);
+    }
+    function trapTab(e, el) {
+        const list = focusables(el);
+        if (!list.length) return;
+        const first = list[0], last = list[list.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+
+    /* --- Breadcrumb --- */
+    function renderBreadcrumb() {
+        const bc = document.getElementById('cbBreadcrumb');
+        if (!bc) return;
+        if (!stack.length) { bc.classList.remove('show'); bc.innerHTML = ''; return; }
+        const labels = stack.map(l => l.breadcrumb || l.id).filter(Boolean);
+        bc.innerHTML = `<span class="cb-bc-prefix">0xCB</span>` +
+            labels.map(l => `<span class="cb-bc-sep">/</span><span class="cb-bc-label">${l}</span>`).join('');
+        bc.classList.add('show');
+    }
+
+    /* --- Global Escape + Tab --- */
+    document.addEventListener('keydown', e => {
+        if (!stack.length) return;
+        const layer = top();
+        const el = roots[layer.id];
+        if (e.key === 'Escape') { e.preventDefault(); pop(); return; }
+        if (e.key === 'Tab') { e.preventDefault(); trapTab(e, el); }
+    });
+
+    /* --- Delegated close click (one handler for the entire app) --- */
+    document.addEventListener('click', e => {
+        if (e.target.closest('[data-close-modal]')) { e.preventDefault(); pop(); return; }
+        if (e.target.closest('[data-cb-pop]')) { e.preventDefault(); pop(); return; }
+    });
+
+    return { register, push, pop, closeAll, top, isOpen, roots, stack };
+})();
+
+/* ============================================================
+   PART 4 — RESEARCH ENVIRONMENT DATA + RENDERERS
+   Data preserved verbatim from v5.1 (first env IIFE + hard-wired
+   fallback IIFE, de-duplicated). No wiring lives here.
+   ============================================================ */
+
+window.ResearchData = (function () {
+    'use strict';
+
+    const ENVS = {
+        portswigger: { k:'01 · WEB APPLICATION SECURITY', t:'PortSwigger Web Security Academy', lead:'50+ labs supporting sustained application-security practice and manual attack-path reasoning.', focus:['Authentication & authorization','Access control','SQL injection & server-side vulnerabilities','SSRF, request manipulation & HTTP behavior'], signals:['50+ labs','Burp Suite','HTTP','OWASP-aligned testing'], flow:'Discover → Manipulate → Validate → Explain', related:[['mediroza','Mediroza Web Application Security Assessment','8+ findings and a demonstrated SQLi/authentication-bypass chain.'],['web','Web Application Security Lab','50+ PortSwigger application-security labs.']] },
+        bugbounty: { k:'02 · BUG BOUNTY & RESPONSIBLE DISCLOSURE', t:'Bug Bounty & Responsible Disclosure', lead:'Web-focused vulnerability research built around discovery, manual validation, impact reasoning, clear reporting, remediation and responsible disclosure thinking.', focus:['Attack-surface discovery and web asset analysis','Authentication, authorization and access-control testing','Manual vulnerability validation and impact reasoning','Clear technical reporting, remediation and retest thinking'], signals:['Web Security','Burp Suite','HTTP','OWASP','Responsible Disclosure'], flow:'Discover → Validate → Assess Impact → Report → Retest', related:[['web','Web Application Security Lab','50+ application-security labs.'],['mediroza','Mediroza Web Application Security Assessment','Authorized assessment with 8+ findings.']] },
+        htb: { k:'03 · OFFENSIVE SECURITY', t:'Hack The Box', lead:'Hands-on environments for attack-path reasoning and practical security testing.', focus:['Reconnaissance & enumeration','Service exploitation','Linux / Windows privilege escalation','Post-exploitation analysis'], signals:['Pentesting','Linux','Windows','Attack paths'], flow:'Recon → Enumerate → Exploit → Escalate', related:[['vulnhub','Vulnerability Assessment & Privilege Escalation','Controlled vulnerable-environment research.'],['buffer','Buffer Overflow Exploit Development','Low-level controlled exploitation.']] },
+        vulnhub: { k:'04 · VULNERABLE ENVIRONMENTS', t:'VulnHub', lead:'Self-contained vulnerable systems used to reproduce attack chains and validate security assumptions.', focus:['Service discovery','Vulnerability validation','Controlled exploitation','Privilege escalation & post-exploitation'], signals:['VAPT','Exploitation','PrivEsc','Validation'], flow:'Map → Validate → Exploit → Document', related:[['vulnhub','Vulnerability Assessment & Privilege Escalation','Repeatable vulnerable-environment practice.']] },
+        overthewire: { k:'05 · LINUX SECURITY', t:'OverTheWire', lead:'Command-line environments that sharpen Linux security reasoning and problem solving.', focus:['Permissions','Authentication','Filesystem behavior','Shell and command-line analysis'], signals:['Linux','Bash','CLI','Problem solving'], flow:'Observe → Reason → Execute → Verify', related:[['vulnhub','Vulnerability Assessment & Privilege Escalation','Linux security and privilege-escalation environments.']] },
+        kali: { k:'06 · SECURITY OPERATING ENVIRONMENTS', t:'Kali / Parrot', lead:'Primary Linux environments used for security research, assessment and technical troubleshooting.', focus:['Reconnaissance & enumeration','Web and network testing','Wireless security','Packet analysis and tooling'], signals:['Nmap','Burp','Wireshark','Aircrack-ng'], flow:'Prepare → Test → Capture → Analyze', related:[['recon','Network Reconnaissance & Attack-Surface Mapping','Reconnaissance, enumeration and service validation.'],['web','Web Application Security Lab','Application-security testing and HTTP analysis.'],['wireless','Wireless Security Assessment Lab','Wireless packet analysis and controlled testing.'],['driver','RTL8812BU Linux Driver Modernization','Linux wireless driver engineering on real hardware.']] },
+        crossplatform: { k:'07 · CROSS-PLATFORM ANALYSIS', t:'Windows / Linux', lead:'Cross-platform environments for security testing, investigation and forensic analysis.', focus:['Windows artifacts','Linux security analysis','Network behavior','Filesystem and evidence review'], signals:['DFIR','Networking','Windows','Linux'], flow:'Acquire → Analyze → Correlate → Report', related:[['malware','Malware Analysis & Windows Forensics Research','Windows artifacts, suspicious files and evidence-oriented investigation.'],['threat','Network Traffic Analysis & Threat Hunting','Packet analysis and IOC-oriented investigation.']] },
+        virtualbox: { k:'08 · RESEARCH INFRASTRUCTURE', t:'VirtualBox', lead:'Isolated virtual infrastructure for repeatable and controlled security experimentation.', focus:['Vulnerable virtual machines','Attack-path reproduction','Network isolation','Snapshot-driven testing'], signals:['Virtualization','Isolation','Labs','Reproducibility'], flow:'Build → Isolate → Test → Reset', related:[['vulnhub','Vulnerability Assessment & Privilege Escalation','Controlled vulnerable systems.'],['buffer','Buffer Overflow Exploit Development','Controlled low-level research.']] },
+        github: { k:'09 · ENGINEERING ARCHIVE', t:'GitHub', lead:'Public proof of technical work, engineering projects and documented security research.', focus:['RTL8812BU / RTL8822BU driver engineering','Security automation & PoCs','Technical project documentation','Versioned research artifacts'], signals:['Git','C','Python','Linux'], flow:'Build → Version → Validate → Publish', related:[['driver','RTL8812BU Linux Driver Modernization','13+ source files and real-hardware validation.'],['firmware','SPI Flash & BIOS Protection Research','Firmware protection and flash-analysis research.'],['automation','Security Automation & PoC Tooling','Python/Bash security tooling and repeatable research workflows.'],['website','Cybersecurity Portfolio Engineering','The Research OS itself as a technical web-engineering project.']] },
+        networkwalks: { k:'10 · PROFESSIONAL SECURITY WORK', t:'Networkwalks', lead:'Professional cybersecurity work spanning assessment, offensive, defensive, adversary and engineering activities.', focus:['VAPT & security assessment','Offensive and defensive analysis','Threat and adversary research','Technical project execution'], signals:['VAPT','Offensive','Defensive','Engineering'], flow:'Assess → Investigate → Coordinate → Deliver', related:[['mediroza','Mediroza Web Application Security Assessment','Authorized assessment with 8+ documented findings.'],['recon','Network Reconnaissance & Attack-Surface Mapping','Structured reconnaissance and attack-surface analysis.'],['web','Web Application Security Lab','50+ PortSwigger labs and application-security research.'],['driver','RTL8812BU Linux Driver Modernization','Security engineering and systems research.']] },
+        underground: { k:'11 · ADVERSARY & UNDERGROUND INTELLIGENCE', t:'Dark Web & Underground Intelligence', lead:'Research into underground ecosystems as intelligence sources: hidden forums and communities, threat-actor activity, criminal-service ecosystems, exposed information, data-dump reporting, infrastructure and evolving threat activity.', focus:['Underground forums and ecosystem monitoring','Threat-actor activity, behavior and service models','Infrastructure relationships and operational patterns','Leak, exposure and data-dump reporting as intelligence signals'], signals:['OSINT','CTI','Tor / I2P','Underground Forums','TTPs'], flow:'Discover → Correlate → Contextualize → Map', related:[['threat','Network Traffic Analysis & Threat Hunting','Adversary-behavior and IOC investigation.'],['recon','Network Reconnaissance & Attack-Surface Mapping','Infrastructure discovery and evidence correlation.']] },
+        osint: { k:'12 · THREAT INTELLIGENCE', t:'OSINT & Threat Intelligence', lead:'Open-source intelligence collection and correlation used to build context around infrastructure, actors and campaigns.', focus:['Infrastructure discovery','Source correlation','IOC research','Threat-report and TTP analysis'], signals:['OSINT','IOC','Infrastructure','ATT&CK'], flow:'Collect → Correlate → Assess → Inform', related:[['recon','Network Reconnaissance & Attack-Surface Mapping','DNS, certificates, infrastructure and web-fingerprinting research.'],['threat','Network Traffic Analysis & Threat Hunting','IOC and attacker-behavior investigation.']] }
+    };
+
+    const DEPTH = {
+        portswigger:{skills:['Web Application Security','Authentication & Authorization','Access Control','Injection Analysis','SSRF & Request Manipulation','Attack-Path Analysis'],tools:['Burp Suite','HTTP / HTTPS','OWASP','OWASP ZAP','PortSwigger Web Security Academy','Browser DevTools']},
+        bugbounty:{skills:['Attack-Surface Discovery','Vulnerability Discovery','Manual Validation','Impact Analysis','Responsible Disclosure','Retest Thinking'],tools:['Burp Suite','HTTP / HTTPS','Browser DevTools','OWASP','Nmap','Responsible Disclosure Workflows']},
+        htb:{skills:['Reconnaissance','Enumeration','Exploitation','Linux / Windows Privilege Escalation','Post-Exploitation','Attack-Path Reasoning'],tools:['Hack The Box','Nmap','Metasploit','Linux','Windows','Burp Suite']},
+        vulnhub:{skills:['Vulnerability Validation','Service Enumeration','Exploitation','Privilege Escalation','Post-Exploitation','Evidence Capture'],tools:['VulnHub','Nmap','Metasploit','VirtualBox','Linux','Windows']},
+        overthewire:{skills:['Linux Security','Permissions','Authentication','Filesystem Analysis','Shell Reasoning','Command-Line Problem Solving'],tools:['OverTheWire','Bash','Linux CLI','SSH','Core Unix Utilities']},
+        kali:{skills:['Security Testing','Network Analysis','Wireless Security','Reconnaissance','Packet Analysis','Technical Troubleshooting'],tools:['Kali Linux','Parrot OS','Nmap','Burp Suite','Wireshark','Aircrack-ng']},
+        crossplatform:{skills:['Digital Forensics','Windows Artifact Analysis','Linux Security','Network Investigation','Filesystem Review','Evidence Correlation'],tools:['Windows','Linux','Wireshark','Volatility','Autopsy','PowerShell']},
+        virtualbox:{skills:['Lab Isolation','Attack-Path Reproduction','Snapshot Testing','Environment Design','Network Segmentation','Repeatability'],tools:['VirtualBox','Vulnerable VMs','Host-Only Networking','Snapshots','NAT / Bridged Networking']},
+        github:{skills:['Security Engineering','Version Control','Technical Documentation','Research Publishing','PoC Development','Reproducibility'],tools:['GitHub','Git','C','Python','Bash','Linux']},
+        networkwalks:{skills:['VAPT','Offensive Security','Defensive Security','Adversary Research','Security Engineering','Technical Project Execution'],tools:['Security Assessments','Technical Reporting','Network Analysis','Security Tooling','Evidence Handling']},
+        underground:{skills:['Underground Ecosystem Research','Threat-Actor Research','Forum / Community Monitoring','Leak & Exposure Research','Infrastructure Correlation','Adversary Behaviour','TTP Analysis'],tools:['Tor Browser (research access)','Dread / underground forum observation','OSINT','Maltego','Threat Reports','IOC / TTP Mapping','WHOIS / DNS Research']},
+        osint:{skills:['Infrastructure Discovery','Source Correlation','IOC Research','Threat Context','Certificate Intelligence','Adversary Research'],tools:['WHOIS','DNSRecon','crt.sh','CertSpotter','Subfinder','theHarvester','MITRE ATT&CK']}
+    };
+
+    const GROUPS = {
+        web: { title:'WEB APPLICATION', kicker:'01 · WEB APPLICATION SECURITY', lead:'Application-security environments used to understand HTTP behavior, validate vulnerabilities and build attack-path reasoning.', envs:['portswigger','bugbounty'], signals:['50+ PortSwigger labs','Bug bounty research','Burp Suite','HTTP','OWASP'], related:['mediroza','web'] },
+        bugbounty: { title:'BUG BOUNTY & RESPONSIBLE DISCLOSURE', kicker:'02 · BUG BOUNTY & RESPONSIBLE DISCLOSURE', lead:'A practical web-security research mindset focused on finding, validating, documenting and responsibly communicating vulnerabilities.', envs:['bugbounty'], signals:['Vulnerability Research','Burp Suite','HTTP','OWASP','Disclosure'], related:['web','mediroza'] },
+        offensive: { title:'OFFENSIVE SECURITY', kicker:'03 · OFFENSIVE SECURITY', lead:'Controlled environments used to practice reconnaissance, exploitation, privilege escalation and post-exploitation reasoning.', envs:['htb','vulnhub','overthewire','kali'], signals:['HTB','VulnHub','OverTheWire','Kali / Parrot'], related:['vulnhub','buffer'] },
+        systems: { title:'SYSTEMS & FORENSICS', kicker:'04 · SYSTEMS & FORENSICS', lead:'Cross-platform environments for operating-system analysis, evidence review, network investigation and isolated testing.', envs:['crossplatform','virtualbox'], signals:['Windows','Linux','VirtualBox','DFIR'], related:['malware','threat','vulnhub','firmware'] },
+        engineering: { title:'SECURITY ENGINEERING', kicker:'05 · SECURITY ENGINEERING', lead:'The build-and-validate side of the Research OS: code, systems, repositories, tooling and hardware-backed engineering.', envs:['github','kali'], signals:['C','Python','Linux','Git','RTL8812BU'], related:['driver','automation','firmware','website'] },
+        adversary: { title:'ADVERSARY & UNDERGROUND INTELLIGENCE', kicker:'06 · ADVERSARY & UNDERGROUND INTELLIGENCE', lead:'Intelligence-oriented research spanning open, deep and underground sources, infrastructure relationships, actor behavior and TTPs.', envs:['underground','osint'], signals:['Dark Web','OSINT','CTI','Infrastructure','TTPs'], related:['recon','threat'] },
+        professional: { title:'PROFESSIONAL ENVIRONMENT', kicker:'07 · PROFESSIONAL SECURITY WORK', lead:'The professional environment where assessment, offensive, defensive, adversary research and engineering work come together.', envs:['networkwalks'], signals:['VAPT','Offensive','Defensive','Adversary','Engineering'], related:['mediroza','recon','driver','web'] }
+    };
+
+    const EXTERNAL_LINKS = {
+        portswigger:['https://portswigger.net/web-security','Open PortSwigger Web Security Academy'],
+        htb:['https://www.hackthebox.com/','Open Hack The Box'],
+        vulnhub:['https://www.vulnhub.com/','Open VulnHub'],
+        overthewire:['https://overthewire.org/wargames/','Open OverTheWire'],
+        kali:['https://www.kali.org/','Open Kali Linux'],
+        virtualbox:['https://www.virtualbox.org/','Open VirtualBox'],
+        github:['https://github.com/Chandrashekar-Bala','Open GitHub'],
+        networkwalks:['https://networkwalks.com/','Open Networkwalks']
+    };
+
+    /* Domain-level dossier data for Security Command Center — preserved verbatim. */
+    const SECURITY_DOMAINS = {
+        offensive:{k:'01 · OFFENSIVE SECURITY',t:'Offensive Security',summary:'Controlled security assessment work focused on understanding attack surfaces, validating weaknesses, reconstructing attack paths, and documenting defensible impact.',tools:['Nmap','Nessus','Metasploit','Burp Suite','OWASP ZAP','GDB','John the Ripper'],methods:['Reconnaissance','Service enumeration','Vulnerability validation','Controlled exploitation','Privilege escalation','Post-exploitation analysis'],projects:[['Mediroza Web Application Security Assessment','Authorized black-box assessment with demonstrated SQLi/authentication-bypass chain.','assessment','mediroza'],['Vulnerability Assessment & Privilege Escalation','Controlled vulnerable-environment practice using VulnHub/HTB/VMs.','offensive','vulnhub'],['Web Application Security Lab','50+ PortSwigger application-security labs.','web','web'],['Buffer Overflow Exploit Development','Debugger-assisted low-level research.','exploit','buffer']]},
+        web:{k:'02 · WEB & APPLICATION SECURITY',t:'Web & Application Security',summary:'Manual application-security analysis centered on HTTP behavior, authentication, authorization, access control, request manipulation, and vulnerability validation.',tools:['Burp Suite','OWASP ZAP','Nmap','cURL','WhatWeb','WAFW00F','SQLMap'],methods:['Request/response analysis','Authentication testing','Authorization and access control','SQL injection','XSS / CSRF / SSRF','Session and parameter analysis'],projects:[['Mediroza Web Application Security Assessment','Flagship assessment with manual validation and CVSS/CWE reporting.','assessment','mediroza'],['Web Application Security Lab','50+ PortSwigger labs across application-security scenarios.','web','web']]},
+        defensive:{k:'03 · DEFENSIVE SECURITY',t:'Defensive Security',summary:'Defensive investigation connecting network visibility, SIEM workflows, indicators, threat hunting, incident response, and detection logic.',tools:['Splunk','Google Chronicle','Wireshark','Tcpdump','Volatility'],methods:['Security monitoring','Log analysis','Alert triage','IOC analysis','Threat hunting','Incident-response thinking'],projects:[['Network Traffic Analysis & Threat Hunting','Packet-level investigation and ATT&CK-aligned threat hunting.','defensive','threat'],['Malware Analysis & Windows Forensics Research','Evidence-focused malware and forensic research.','forensics','malware']]},
+        adversary:{k:'04 · ADVERSARY & UNDERGROUND INTELLIGENCE',t:'Adversary & Underground Intelligence',summary:'Research into threat actors, underground ecosystems, adversary infrastructure, exposed information, operational behavior, and TTPs — connecting intelligence collection with defensive insight.',tools:['OSINT','Maltego','theHarvester','Subfinder','crt.sh','WHOIS','Tor / I2P research','MITRE ATT&CK'],methods:['Underground ecosystem research','Threat-actor research','Infrastructure correlation','Leak / exposure research','TTP analysis','Threat-report analysis','Adversary behavior mapping'],projects:[['Network Reconnaissance & Attack-Surface Mapping','Infrastructure discovery, DNS, certificates, web fingerprinting and service validation.','network','recon'],['Network Traffic Analysis & Threat Hunting','Network evidence and attacker-behavior investigation.','threat','threat']]},
+        network:{k:'05 · NETWORK & WIRELESS SECURITY',t:'Network & Wireless Security',summary:'Network discovery, protocol behavior, packet analysis, wireless assessment, DNS/TLS investigation, and hardware-backed wireless research.',tools:['Nmap','Wireshark','Aircrack-ng','DNSRecon','dig','NSE','iw'],methods:['Reconnaissance','Service/version validation','TCP/IP and DNS analysis','TLS inspection','Packet analysis','Monitor mode','Controlled Wi-Fi testing'],projects:[['Network Reconnaissance & Attack-Surface Mapping','Structured reconnaissance and service validation.','network','recon'],['Network Traffic Analysis & Threat Hunting','Traffic analysis and IOC-oriented investigation.','defensive','threat'],['RTL8812BU Linux Driver Modernization','Kernel compatibility work validated on real hardware.','engineering','driver']]},
+        mobile:{k:'06 · MOBILE SECURITY',t:'Mobile Security',summary:'Android-focused security research spanning APK inspection, static/dynamic analysis, runtime observation, logging, and reverse engineering.',tools:['ADB','Logcat','Dex2jar','JD-GUI','Ghidra'],methods:['APK inspection','Decompilation','Static analysis','Dynamic analysis','Runtime observation','Reverse engineering'],projects:[['Android Security Analysis','APK inspection, static/dynamic analysis and runtime behavior review.','mobile','android']]},
+        exploit:{k:'07 · EXPLOIT DEVELOPMENT',t:'Exploit Development',summary:'Low-level research into memory behavior, stack state, control flow, debugging, and controlled proof-of-concept development.',tools:['C','GDB','WinDbg'],methods:['Memory and stack analysis','Debugger-assisted investigation','Control-flow analysis','Controlled PoC development'],projects:[['Buffer Overflow Exploit Development','C and debugger-assisted low-level research.','exploit','buffer']]},
+        forensics:{k:'08 · MALWARE ANALYSIS & DIGITAL FORENSICS',t:'Malware Analysis & Digital Forensics',summary:'Static and dynamic malware analysis combined with Windows forensic artifacts, memory/disk evidence, suspicious-file investigation, and indicator extraction.',tools:['Ghidra','IDA Pro','GDB','Volatility','Autopsy','Wireshark'],methods:['Static analysis','Dynamic analysis','Binary investigation','Windows artifact review','Memory/disk investigation','IOC extraction','Timeline-oriented review'],projects:[['Malware Analysis & Windows Forensics Research','Hands-on static/dynamic and evidence-analysis exercises.','forensics','malware'],['Network Traffic Analysis & Threat Hunting','Network evidence and IOC correlation.','defensive','threat']]},
+        engineering:{k:'09 · SECURITY ENGINEERING',t:'Security Engineering',summary:'Engineering work close to the system: Linux, kernel-facing C, driver compatibility, build troubleshooting, security tooling, firmware research, and real-hardware validation.',tools:['C','Python','Bash','GCC','Git','Linux kernel headers','flashrom','GDB'],methods:['Kernel/API compatibility','Build troubleshooting','Security tooling','PoC development','Hardware validation','Technical documentation'],projects:[['RTL8812BU Linux Driver Modernization','13-source-file kernel compatibility project validated on real hardware.','engineering','driver'],['SPI Flash & BIOS Protection Research','Firmware protection and flash analysis.','forensics','firmware'],['Security Automation & PoC Tooling','Python/Bash tooling for repeatable security workflows.','engineering','automation']]},
+        systems:{k:'10 · SYSTEMS & VIRTUALIZATION',t:'Systems & Virtualization',summary:'Linux and Windows environments, virtual labs, network configuration, system troubleshooting, and platform security work.',tools:['Kali Linux','Windows','VirtualBox','Docker','PowerShell','Linux networking'],methods:['Linux/Windows security analysis','Virtual lab construction','Network configuration','System troubleshooting','Platform security'],projects:[['Vulnerability Assessment & Privilege Escalation','Linux/Windows vulnerable environments.','offensive','vulnhub'],['RTL8812BU Linux Driver Modernization','Linux kernel and hardware-backed engineering.','engineering','driver']]},
+        automation:{k:'11 · SECURITY AUTOMATION & DEVELOPMENT',t:'Security Automation & Development',summary:'Python, Bash, C, SQL, and web engineering used to make security research repeatable and to build focused proof-of-concept tooling.',tools:['Python','Bash','C','C++','SQL','HTML5','CSS3','JavaScript','Git/GitHub'],methods:['Security automation','Recon tooling','Vulnerability assessment tooling','PoC development','Data analysis','Web engineering'],projects:[['Security Automation & PoC Tooling','Repeatable security workflows and proof-of-concept development.','engineering','automation'],['Cybersecurity Portfolio Engineering','Static web engineering with interactive security content.','engineering','website']]},
+        research:{k:'12 · EVIDENCE & SECURITY REPORTING',t:'Evidence & Security Reporting',summary:'Turning technical activity into defensible security records through evidence handling, severity context, root-cause analysis, remediation mapping, and retest planning.',tools:['CVSS','CWE','SHA-256','Burp Suite','Wireshark','Nmap','Technical reporting'],methods:['Evidence preservation','Finding classification','Root-cause analysis','Impact analysis','Remediation mapping','Retest planning'],projects:[['Mediroza Web Application Security Assessment','Eight documented findings with CVSS/CWE context and evidence organization.','assessment','mediroza'],['Network Reconnaissance & Attack-Surface Mapping','Evidence-vs-hypothesis discipline in reconnaissance.','network','recon']]}
+    };
+
+    const ROLES = {
+        teamlead:{k:'CURRENT ROLE · NETWORKWALKS',t:'TEAM LEAD — CYBERSECURITY',what:'Lead and contribute to multidisciplinary cybersecurity work across VAPT, offensive security, defensive security, adversary research, security engineering, and technical project execution.',how:['Understand the objective, system and attack surface before choosing a technique','Coordinate technical work while staying close to hands-on validation and investigation','Review findings and deliverables for accuracy, evidence, impact and remediation value','Connect offensive observations with defensive and engineering decisions','Keep technical work reproducible, documented and defensible'],skills:['VAPT','Offensive Security','Defensive Security','Adversary Research','Security Engineering','Technical Projects'],tools:['Burp Suite','Nmap','Wireshark','Linux','Python','Git','Security Tooling'],related:[['mediroza','Mediroza Web Application Security Assessment','8+ documented findings'],['driver','RTL8812BU Linux Driver Modernization','13+ source files and hardware validation'],['recon','Network Reconnaissance & Attack-Surface Mapping','Evidence-led reconnaissance']]},
+        vapt:{k:'01 · ROLE SCOPE',t:'VAPT — ASSESSMENT MINDSET',what:'Assess attack surfaces, validate vulnerabilities, reconstruct practical attack paths and translate evidence into defensible findings.',how:['Reconnaissance before assumptions','Manual validation of observable behavior','Impact and risk analysis','Evidence preservation and technical reporting','Remediation mapping and retest thinking'],skills:['Reconnaissance','Vulnerability Validation','CVSS / CWE','Attack Paths','Evidence','Reporting'],tools:['Nmap','Burp Suite','Nessus','CVSS / CWE','Technical Reporting'],related:[['mediroza','Mediroza Web Application Security Assessment','8+ documented findings']]},
+        offensive:{k:'02 · ROLE SCOPE',t:'OFFENSIVE SECURITY — ATTACKER PERSPECTIVE',what:'Reason through how systems can be attacked, where trust boundaries fail and how individual weaknesses combine into meaningful attack paths.',how:['Attack-surface mapping','Enumeration and service analysis','Controlled exploitation','Privilege escalation reasoning','Post-exploitation impact analysis'],skills:['Attack-Surface Analysis','Enumeration','Controlled Exploitation','Privilege Escalation','Post-Exploitation','Attack Paths'],tools:['Nmap','Burp Suite','Metasploit','Kali Linux','Linux / Windows'],related:[['vulnhub','Vulnerability Assessment & Privilege Escalation','Controlled attack-path research'],['web','Web Application Security Lab','50+ PortSwigger labs']]},
+        defensive:{k:'03 · ROLE SCOPE',t:'DEFENSIVE SECURITY — INVESTIGATION MINDSET',what:'Use technical evidence to understand suspicious activity, correlate indicators and think from the perspective of detection and response.',how:['Network and endpoint observation','IOC correlation','Log and traffic analysis','Evidence-driven investigation','Detection and hardening considerations'],skills:['Network Analysis','IOC Correlation','Threat Hunting','Forensic Review','Detection Thinking','Incident Investigation'],tools:['Wireshark','Splunk','Google Chronicle','Volatility','Tcpdump'],related:[['threat','Network Traffic Analysis & Threat Hunting','Packet-level investigation'],['malware','Malware Analysis & Windows Forensics','Evidence-focused research']]},
+        adversary:{k:'04 · ROLE SCOPE',t:'ADVERSARY RESEARCH — INTELLIGENCE MINDSET',what:'Study threat actors, infrastructure, underground ecosystems and TTPs to connect fragmented observations into useful intelligence.',how:['Source collection and correlation','Infrastructure research','Actor and campaign context','Underground ecosystem research','TTP mapping and defensive context'],skills:['OSINT','CTI','Dark Web Research','Infrastructure Research','MITRE ATT&CK','TTP Analysis'],tools:['WHOIS','DNSRecon','crt.sh','Subfinder','Maltego','Tor / I2P research'],related:[['threat','Network Traffic Analysis & Threat Hunting','Threat intelligence and actor analysis'],['recon','Network Reconnaissance & Attack-Surface Mapping','Infrastructure discovery']]},
+        engineering:{k:'05 · ROLE SCOPE',t:'SECURITY ENGINEERING — BUILD & VALIDATE',what:'Stay hands-on with systems, code, networking, wireless and tooling to understand security at the implementation level.',how:['Kernel-facing C analysis','Compatibility troubleshooting','Security automation','Proof-of-concept development','Real-system validation and reproducibility'],skills:['Kernel-Facing C','Linux Systems','Wireless Security','Compatibility Analysis','Security Tooling','Hardware Validation'],tools:['C','Python','GCC','Git','Linux','RTL8812BU'],related:[['driver','RTL8812BU Linux Driver Modernization','13+ source files'],['automation','Security Automation & PoC Tooling','Python / Bash tooling']]},
+        projects:{k:'06 · ROLE SCOPE',t:'TECHNICAL PROJECTS — EXECUTION',what:'Work across multiple security projects and connect technical execution to evidence, documentation and defensible outcomes.',how:['Break objectives into technical work','Select the right research environment','Validate rather than assume','Document evidence and limitations','Connect work to remediation or engineering outcomes'],skills:['Research','PoC Development','Documentation','Evidence','Project Execution','Technical Review'],tools:['GitHub','Python','Bash','C','Burp Suite','Nmap'],related:[['mediroza','Web Application Security Assessment','Security assessment evidence'],['driver','RTL8812BU Driver Engineering','Systems engineering'],['automation','Security Automation & PoC Tooling','Security tooling']]}
+    };
+
+    return { ENVS, DEPTH, GROUPS, EXTERNAL_LINKS, SECURITY_DOMAINS, ROLES };
+})();
+
+/* ============================================================
+   PART 5 — RENDERERS (pure functions; no event wiring)
+   ============================================================ */
+
+function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 }
 
+function renderResearchMap() {
+    const G = ResearchData.GROUPS;
+    const cards = Object.entries(G).map(([key, g]) => `
+        <button class="research-map-card map-${esc(key)}" data-research-group="${esc(key)}" type="button">
+            <span>${esc(g.kicker.split('·')[0].trim())}</span>
+            <i class="fas fa-cubes"></i>
+            <h3>${esc(g.title)}</h3>
+            <p>${esc(g.signals.slice(0,3).join(' · '))}</p>
+            <strong>${esc(String(g.envs.length).padStart(2,'0'))} environments</strong>
+        </button>`).join('');
+    return `
+        <button class="modal-close" type="button" aria-label="Close research environment" data-close-modal><i class="fas fa-xmark"></i></button>
+        <div class="research-map-top">
+            <div>
+                <span class="modal-kicker">0xCB // HANDS-ON SECURITY ENVIRONMENT</span>
+                <h2 id="researchMapTitle">Research Environment</h2>
+                <p>Platforms, operating environments, repositories and intelligence ecosystems used to build, test, investigate and validate security work.</p>
+            </div>
+            <div class="research-map-status"><i class="fas fa-circle"></i><span>RESEARCH MODE</span><small>ACTIVE</small></div>
+        </div>
+        <div class="research-path"><span>LEARN</span><b>→</b><span>REPRODUCE</span><b>→</b><span>VALIDATE</span><b>→</b><span>INVESTIGATE</span><b>→</b><span>DOCUMENT</span><b>→</b><span>ENGINEER</span></div>
+        <div class="research-map-grid">${cards}</div>
+        <div class="research-map-footer">
+            <span><i class="fas fa-link"></i> Every environment connects to evidence, projects or the relevant technical discipline.</span>
+            <button type="button" class="btn btn-secondary" data-open-case-index><i class="fas fa-folder-open"></i> View Case Files</button>
+        </div>`;
+}
 
-/* ===== RESEARCH ENVIRONMENT // 0xCB INTERACTIVE MAP ===== */
-document.addEventListener('DOMContentLoaded',()=>{
-  const envModal=document.getElementById('envModal'), envContent=document.getElementById('envModalContent');
-  const envProjectModal=document.getElementById('envProjectModal'), envProjectContent=document.getElementById('envProjectModalContent'), envProjectTitle=document.getElementById('envProjectModalTitle'), envProjectLead=document.getElementById('envProjectModalLead');
-  const mapModal=document.getElementById('researchMapModal');
-  const roleModal=document.getElementById('roleDossierModal');
-  const roleContent=document.getElementById('roleDossierContent');
-  if(!envModal||!envContent) return;
-  const envData={
-    portswigger:{k:'01 · WEB APPLICATION SECURITY',t:'PortSwigger Web Security Academy',lead:'50+ labs supporting sustained application-security practice and manual attack-path reasoning.',focus:['Authentication & authorization','Access control','SQL injection & server-side vulnerabilities','SSRF, request manipulation & HTTP behavior'],signals:['50+ labs','Burp Suite','HTTP','OWASP-aligned testing'],flow:'Discover → Manipulate → Validate → Explain',related:[['Web Application Security Assessment','Flagship assessment evidence','assessment'],['Web Application Security Lab','50+ application-security labs','web']]},
-    bugbounty:{k:'02 · BUG BOUNTY & RESPONSIBLE DISCLOSURE',t:'Bug Bounty & Responsible Disclosure',lead:'Web-focused vulnerability research built around discovery, manual validation, impact reasoning, clear reporting, remediation and responsible disclosure thinking.',focus:['Attack-surface discovery and web asset analysis','Authentication, authorization and access-control testing','Manual vulnerability validation and impact reasoning','Clear technical reporting, remediation and retest thinking'],signals:['Web Security','Burp Suite','HTTP','OWASP','Responsible Disclosure'],flow:'Discover → Validate → Assess Impact → Report → Retest',related:[['Web Application Security Lab','50+ application-security labs','web'],['Mediroza Web Application Security Assessment','Authorized assessment with 8+ findings','assessment']]},
-    htb:{k:'03 · OFFENSIVE SECURITY',t:'Hack The Box',lead:'Hands-on environments for attack-path reasoning and practical security testing.',focus:['Reconnaissance & enumeration','Service exploitation','Linux / Windows privilege escalation','Post-exploitation analysis'],signals:['Pentesting','Linux','Windows','Attack paths'],flow:'Recon → Enumerate → Exploit → Escalate',related:[['Vulnerability Assessment & Privilege Escalation','Controlled vulnerable-environment research','offensive'],['Enterprise Network Penetration Testing','Network attack-path work','network']]},
-    vulnhub:{k:'04 · VULNERABLE ENVIRONMENTS',t:'VulnHub',lead:'Self-contained vulnerable systems used to reproduce attack chains and validate security assumptions.',focus:['Service discovery','Vulnerability validation','Controlled exploitation','Privilege escalation & post-exploitation'],signals:['VAPT','Exploitation','PrivEsc','Validation'],flow:'Map → Validate → Exploit → Document',related:[['Vulnerability Assessment & Privilege Escalation','Attack-path validation','offensive']]},
-    overthewire:{k:'05 · LINUX SECURITY',t:'OverTheWire',lead:'Command-line environments that sharpen Linux security reasoning and problem solving.',focus:['Permissions','Authentication','Filesystem behavior','Shell and command-line analysis'],signals:['Linux','Bash','CLI','Problem solving'],flow:'Observe → Reason → Execute → Verify',related:[['Linux Security Engineering','Linux and systems work','engineering']]},
-    kali:{k:'06 · SECURITY OPERATING ENVIRONMENTS',t:'Kali / Parrot',lead:'Primary Linux environments used for security research, assessment and technical troubleshooting.',focus:['Reconnaissance & enumeration','Web and network testing','Wireless security','Packet analysis and tooling'],signals:['Nmap','Burp','Wireshark','Aircrack-ng'],flow:'Prepare → Test → Capture → Analyze',related:[['Network Reconnaissance','Reconnaissance and attack-surface analysis','network'],['Web Application Security Lab','Application-security research','web'],['RTL8812BU Driver Engineering','Wireless security engineering','engineering']]},
-    crossplatform:{k:'07 · CROSS-PLATFORM ANALYSIS',t:'Windows / Linux',lead:'Cross-platform environments for security testing, investigation and forensic analysis.',focus:['Windows artifacts','Linux security analysis','Network behavior','Filesystem and evidence review'],signals:['DFIR','Networking','Windows','Linux'],flow:'Acquire → Analyze → Correlate → Report',related:[['Malware Analysis & Windows Forensics','Evidence-focused research','forensics']]},
-    virtualbox:{k:'08 · RESEARCH INFRASTRUCTURE',t:'VirtualBox',lead:'Isolated virtual infrastructure for repeatable and controlled security experimentation.',focus:['Vulnerable virtual machines','Attack-path reproduction','Network isolation','Snapshot-driven testing'],signals:['Virtualization','Isolation','Labs','Reproducibility'],flow:'Build → Isolate → Test → Reset',related:[['Vulnerability Assessment & Privilege Escalation','Controlled vulnerable systems','offensive']]},
-    github:{k:'09 · ENGINEERING ARCHIVE',t:'GitHub',lead:'Public proof of technical work, engineering projects and documented security research.',focus:['RTL8812BU / RTL8822BU driver engineering','Security automation & PoCs','Technical project documentation','Versioned research artifacts'],signals:['Git','C','Python','Linux'],flow:'Build → Version → Validate → Publish',related:[['RTL8812BU Driver Engineering','13+ source files and real-hardware validation','engineering'],['Security Automation & PoC Tooling','Python / Bash security tooling','automation']]},
-    networkwalks:{k:'10 · PROFESSIONAL SECURITY WORK',t:'Networkwalks',lead:'Professional cybersecurity work spanning assessment, offensive, defensive, adversary and engineering activities.',focus:['VAPT & security assessment','Offensive and defensive analysis','Threat and adversary research','Technical project execution'],signals:['VAPT','Offensive','Defensive','Engineering'],flow:'Assess → Investigate → Coordinate → Deliver',related:[['Team Lead Experience','Current professional scope','experience'],['Mediroza Assessment','Authorized security assessment','assessment']]},
-    underground:{k:'11 · ADVERSARY & UNDERGROUND INTELLIGENCE',t:'Dark Web & Underground Intelligence',lead:'Research into underground ecosystems as intelligence sources: hidden forums and communities, threat-actor activity, criminal-service ecosystems, exposed information, data-dump reporting, infrastructure and evolving threat activity.',focus:['Underground forums and ecosystem monitoring','Threat-actor activity, behavior and service models','Infrastructure relationships and operational patterns','Leak, exposure and data-dump reporting as intelligence signals'],signals:['OSINT','CTI','Tor / I2P','Underground Forums','TTPs'],flow:'Discover → Correlate → Contextualize → Map',related:[['Adversary Research','Threat intelligence and TTP analysis','threat'],['Network Reconnaissance & Attack-Surface Mapping','Infrastructure intelligence','network']]},
-    osint:{k:'12 · THREAT INTELLIGENCE',t:'OSINT & Threat Intelligence',lead:'Open-source intelligence collection and correlation used to build context around infrastructure, actors and campaigns.',focus:['Infrastructure discovery','Source correlation','IOC research','Threat-report and TTP analysis'],signals:['OSINT','IOC','Infrastructure','ATT&CK'],flow:'Collect → Correlate → Assess → Inform',related:[['Network Reconnaissance','Infrastructure discovery','network'],['Adversary Research','TTP and actor analysis','threat']]}
-  };
-  const envDepth={
-    portswigger:{skills:['Web Application Security','Authentication & Authorization','Access Control','Injection Analysis','SSRF & Request Manipulation','Attack-Path Analysis'],tools:['Burp Suite','HTTP / HTTPS','OWASP','OWASP ZAP','PortSwigger Web Security Academy','Browser DevTools']},
-    bugbounty:{skills:['Attack-Surface Discovery','Vulnerability Discovery','Manual Validation','Impact Analysis','Responsible Disclosure','Retest Thinking'],tools:['Burp Suite','HTTP / HTTPS','Browser DevTools','OWASP','Nmap','Responsible Disclosure Workflows']},
-    htb:{skills:['Reconnaissance','Enumeration','Exploitation','Linux / Windows Privilege Escalation','Post-Exploitation','Attack-Path Reasoning'],tools:['Hack The Box','Nmap','Metasploit','Linux','Windows','Burp Suite']},
-    vulnhub:{skills:['Vulnerability Validation','Service Enumeration','Exploitation','Privilege Escalation','Post-Exploitation','Evidence Capture'],tools:['VulnHub','Nmap','Metasploit','VirtualBox','Linux','Windows']},
-    overthewire:{skills:['Linux Security','Permissions','Authentication','Filesystem Analysis','Shell Reasoning','Command-Line Problem Solving'],tools:['OverTheWire','Bash','Linux CLI','SSH','Core Unix Utilities']},
-    kali:{skills:['Security Testing','Network Analysis','Wireless Security','Reconnaissance','Packet Analysis','Technical Troubleshooting'],tools:['Kali Linux','Parrot OS','Nmap','Burp Suite','Wireshark','Aircrack-ng']},
-    crossplatform:{skills:['Digital Forensics','Windows Artifact Analysis','Linux Security','Network Investigation','Filesystem Review','Evidence Correlation'],tools:['Windows','Linux','Wireshark','Volatility','Autopsy','PowerShell']},
-    virtualbox:{skills:['Lab Isolation','Attack-Path Reproduction','Snapshot Testing','Environment Design','Network Segmentation','Repeatability'],tools:['VirtualBox','Vulnerable VMs','Host-Only Networking','Snapshots','NAT / Bridged Networking']},
-    github:{skills:['Security Engineering','Version Control','Technical Documentation','Research Publishing','PoC Development','Reproducibility'],tools:['GitHub','Git','C','Python','Bash','Linux']},
-    networkwalks:{skills:['VAPT','Offensive Security','Defensive Security','Adversary Research','Security Engineering','Technical Project Execution'],tools:['Security Assessments','Technical Reporting','Network Analysis','Security Tooling','Evidence Handling']},
-    underground:{skills:['Underground Ecosystem Research','Threat-Actor Research','Forum / Community Monitoring','Leak & Exposure Research','Infrastructure Correlation','Adversary Behaviour','TTP Analysis'],tools:['Tor Browser (research access)','Dread / underground forum observation','OSINT','Maltego','Threat Reports','IOC / TTP Mapping','WHOIS / DNS Research']},
-    osint:{skills:['Infrastructure Discovery','Source Correlation','IOC Research','Threat Context','Certificate Intelligence','Adversary Research'],tools:['WHOIS','DNSRecon','crt.sh','CertSpotter','Subfinder','theHarvester','MITRE ATT&CK']}
-  };
-  const groups={
-    web:{title:'WEB APPLICATION',kicker:'01 · WEB APPLICATION SECURITY',lead:'Application-security environments used to understand HTTP behavior, validate vulnerabilities and build attack-path reasoning.',envs:['portswigger','bugbounty'],signals:['50+ PortSwigger labs','Bug bounty research','Burp Suite','HTTP','OWASP'],related:[['Web Application Security Assessment','Flagship assessment','assessment'],['Web Application Security Lab','50+ labs','web']]},
-    bugbounty:{title:'BUG BOUNTY & RESPONSIBLE DISCLOSURE',kicker:'02 · BUG BOUNTY & RESPONSIBLE DISCLOSURE',lead:'A practical web-security research mindset focused on finding, validating, documenting and responsibly communicating vulnerabilities.',envs:['bugbounty'],signals:['Vulnerability Research','Burp Suite','HTTP','OWASP','Disclosure'],related:[['Web Application Security Lab','50+ application-security labs','web'],['Mediroza Web Application Security Assessment','Authorized assessment','assessment']]},
-    offensive:{title:'OFFENSIVE SECURITY',kicker:'03 · OFFENSIVE SECURITY',lead:'Controlled environments used to practice reconnaissance, exploitation, privilege escalation and post-exploitation reasoning.',envs:['htb','vulnhub','overthewire','kali'],signals:['HTB','VulnHub','OverTheWire','Kali / Parrot'],related:[['Vulnerability Assessment & Privilege Escalation','Attack-path validation','offensive'],['Enterprise Network Penetration Testing','Network testing','network']]},
-    systems:{title:'SYSTEMS & FORENSICS',kicker:'04 · SYSTEMS & FORENSICS',lead:'Cross-platform environments for operating-system analysis, evidence review, network investigation and isolated testing.',envs:['crossplatform','virtualbox'],signals:['Windows','Linux','VirtualBox','DFIR'],related:[['Malware Analysis & Windows Forensics','Forensic research','forensics'],['Network Traffic Analysis & Threat Hunting','Network investigation','defensive']]},
-    engineering:{title:'SECURITY ENGINEERING',kicker:'05 · SECURITY ENGINEERING',lead:'The build-and-validate side of the Research OS: code, systems, repositories, tooling and hardware-backed engineering.',envs:['github','kali'],signals:['C','Python','Linux','Git','RTL8812BU'],related:[['RTL8812BU Driver Engineering','13+ source files','engineering'],['Security Automation & PoC Tooling','Repeatable security tooling','automation']]},
-    adversary:{title:'ADVERSARY & UNDERGROUND INTELLIGENCE',kicker:'06 · ADVERSARY & UNDERGROUND INTELLIGENCE',lead:'Intelligence-oriented research spanning open, deep and underground sources, infrastructure relationships, actor behavior and TTPs.',envs:['underground','osint'],signals:['Dark Web','OSINT','CTI','Infrastructure','TTPs'],related:[['Adversary Research','Threat and actor research','threat'],['Network Reconnaissance','Infrastructure intelligence','network']]},
-    professional:{title:'PROFESSIONAL ENVIRONMENT',kicker:'07 · PROFESSIONAL SECURITY WORK',lead:'The professional environment where assessment, offensive, defensive, adversary research and engineering work come together.',envs:['networkwalks'],signals:['VAPT','Offensive','Defensive','Adversary','Engineering'],related:[['Team Lead Experience','Current professional scope','experience'],['Mediroza Assessment','Authorized assessment','assessment']]}
-  };
-  const groupDepth={
-    web:{what:['Analyze HTTP behavior and application trust boundaries','Validate authentication, authorization and access-control weaknesses','Reproduce web vulnerabilities and reason about practical impact','Turn findings into remediation and retest considerations'],tools:['Burp Suite','HTTP / HTTPS','OWASP','OWASP ZAP','Nmap','PortSwigger']},
-    bugbounty:{what:['Discover web attack surfaces and test realistic vulnerability hypotheses','Manually validate findings before treating them as reportable issues','Assess exploitability, impact and affected trust boundaries','Write concise, reproducible reports with remediation and retest guidance'],tools:['Burp Suite','HTTP / HTTPS','Browser DevTools','OWASP','Nmap','Responsible Disclosure']},
-    offensive:{what:['Map attack surfaces and enumerate exposed services','Validate vulnerabilities through controlled exploitation','Reason through privilege escalation and post-exploitation paths','Document attack chains and security impact'],tools:['Nmap','Metasploit','Burp Suite','Kali / Parrot','VulnHub','Hack The Box']},
-    systems:{what:['Investigate Windows and Linux behavior at system and artifact level','Analyze filesystems, memory, network activity and forensic evidence','Build isolated virtual environments for repeatable testing','Correlate system observations into defensible investigation timelines'],tools:['Windows','Linux','VirtualBox','Wireshark','Volatility','Autopsy']},
-    engineering:{what:['Work close to code, operating systems and hardware','Troubleshoot kernel/API/compiler and build compatibility','Build security tooling and focused proof-of-concept workflows','Validate engineering changes on reproducible systems and real hardware'],tools:['C','Python','Bash','GCC','Git','Linux Kernel','RTL8812BU','flashrom']},
-    adversary:{what:['Research threat actors and underground ecosystems as intelligence sources','Monitor forum/community signals, leak reporting and adversary activity for context','Correlate infrastructure, indicators, reports and observed behavior without treating stolen data as an operational objective','Map adversary behavior to TTPs and defensive context'],tools:['OSINT','CTI','Tor / I2P research','Maltego','theHarvester','Subfinder','MITRE ATT&CK']},
-    professional:{what:['Contribute to multidisciplinary cybersecurity work across assessment and research','Coordinate technical execution while staying close to hands-on validation','Connect offensive observations with defensive and engineering decisions','Deliver documented, evidence-driven technical outcomes'],tools:['VAPT','Security Assessment','Technical Reporting','Network Analysis','Security Tooling','Project Execution']}
-  };
-  const envNarrative={
-    portswigger:{what:['Study application behavior through HTTP requests, sessions, parameters and trust boundaries.','Validate authentication, authorization, injection, SSRF and access-control weaknesses manually.','Use controlled labs to turn vulnerability mechanics into reusable attack-path reasoning.'],analysis:['Request/response comparison','Parameter and session behavior','Exploitability and impact reasoning','Evidence and remediation notes'],output:'Reproducible application-security findings, attack-path understanding and remediation-oriented analysis.'},
-    bugbounty:{what:['Approach web targets from an attack-surface and vulnerability-research perspective.','Prioritize manual validation before treating an observation as reportable.','Reason about impact, affected trust boundaries, report quality and responsible disclosure.'],analysis:['Asset discovery','Manual validation','Impact analysis','Clear reproduction steps','Disclosure and retest thinking'],output:'Concise, defensible vulnerability reports with reproducible evidence and remediation context.'},
-    htb:{what:['Use realistic environments to practice reconnaissance, enumeration and attack-path construction.','Move from exposed services to controlled exploitation and privilege-escalation reasoning.','Review what changed after exploitation instead of stopping at initial access.'],analysis:['Service enumeration','Exploit selection','Privilege boundaries','Post-exploitation impact','Attack-path reconstruction'],output:'A complete attack narrative rather than an isolated tool result.'},
-    vulnhub:{what:['Reproduce vulnerable systems in controlled virtual environments.','Validate exploitability and privilege-escalation paths without relying on assumptions.','Capture the sequence from discovery to impact for repeatable analysis.'],analysis:['Service discovery','Vulnerability validation','Controlled exploitation','Privilege escalation','Evidence capture'],output:'Repeatable vulnerable-system research and documented attack chains.'},
-    overthewire:{what:['Strengthen Linux command-line reasoning through constrained security problems.','Analyze permissions, authentication, filesystems and shell behavior.','Use deliberate problem solving rather than trial-and-error command execution.'],analysis:['Permissions','Authentication','Filesystem behavior','Shell reasoning','Command-line verification'],output:'Stronger Linux intuition that transfers into offensive, defensive and engineering work.'},
-    kali:{what:['Use Kali and Parrot as practical security workstations rather than as a list of tools.','Move between reconnaissance, web testing, network analysis and wireless workflows.','Troubleshoot the operating environment when the tooling itself becomes the problem.'],analysis:['Reconnaissance','Web testing','Packet analysis','Wireless assessment','Linux troubleshooting'],output:'A repeatable Linux-based security workspace for controlled technical research.'},
-    crossplatform:{what:['Investigate security behavior across Windows and Linux rather than treating either platform in isolation.','Review filesystem, registry, memory, network and suspicious-file evidence according to the scenario.','Correlate technical artifacts into an investigation timeline.'],analysis:['Windows artifacts','Linux behavior','Network evidence','Filesystem activity','Evidence correlation'],output:'Cross-platform investigation and forensic reasoning grounded in observable artifacts.'},
-    virtualbox:{what:['Build isolated environments where vulnerable systems and security tooling can be tested safely.','Use snapshots, network modes and repeatable configurations to reproduce an attack path.','Separate experiments from the host environment to preserve clean evidence.'],analysis:['Lab topology','Isolation','Snapshots','Network segmentation','Reproducibility'],output:'Controlled infrastructure for repeatable security research.'},
-    github:{what:['Use GitHub as the public engineering trail behind technical work.','Document code, experiments, security tooling and system-level changes so others can inspect the work.','Use version control to preserve reproducibility and trace technical decisions.'],analysis:['Version history','Code review','Documentation','Reproducibility','Public technical record'],output:'Public evidence that technical work was built, documented and maintained.'},
-    networkwalks:{what:['Work across VAPT, offensive security, defensive analysis, adversary research and security engineering.','Coordinate technical execution while remaining close to hands-on validation.','Connect individual project work to evidence, reporting and defensible outcomes.'],analysis:['Assessment delivery','Technical coordination','Evidence review','Research execution','Project delivery'],output:'Professional cybersecurity experience connecting breadth with hands-on technical work.'},
-    underground:{what:['Study underground ecosystems as intelligence sources rather than as an end in themselves.','Observe public or research-accessible forum activity, threat-actor behavior, service models and exposed information.','Correlate underground observations with OSINT, infrastructure and threat reporting to build context.'],analysis:['Forum/community observation','Threat-actor behavior','Leak and exposure intelligence','Data-dump reporting as signals','Infrastructure correlation','TTP mapping'],output:'Adversary context that can inform threat intelligence, detection and security decisions.'},
-    osint:{what:['Collect public intelligence from domains, certificates, DNS, reports and other observable sources.','Correlate independent sources before drawing conclusions about infrastructure or actors.','Turn fragmented observations into a structured threat picture.'],analysis:['Domain and DNS discovery','Certificate intelligence','Source correlation','IOC research','Threat-report analysis','TTP context'],output:'Context-rich intelligence that connects infrastructure, indicators and adversary behavior.'}
-  };
-  const envInsights={
-    portswigger:{objective:'Application-security practice with emphasis on request-level reasoning and reproducible vulnerability validation.',approach:['Map the application behavior before testing individual weaknesses.','Manipulate requests, parameters and sessions manually to understand trust boundaries.','Validate exploitability and impact, then record the security consequence and remediation direction.'],artifacts:['HTTP request/response pairs','Authentication and session behavior','Reproduction steps','Impact and remediation notes'],outcome:'Builds practical web-security judgment that transfers into real assessment work.'},
-    bugbounty:{objective:'Vulnerability-research discipline focused on finding meaningful web weaknesses and communicating them responsibly.',approach:['Start with the attack surface and observable behavior rather than assumptions.','Manually reproduce a suspected weakness and determine the affected trust boundary.','Separate a technical observation from a reportable security impact and document the evidence clearly.'],artifacts:['Reproduction requests','Affected parameters/endpoints','Impact reasoning','Disclosure-quality notes'],outcome:'Turns web testing into concise, defensible vulnerability research.'},
-    htb:{objective:'Attack-path practice across realistic Linux and Windows targets where enumeration has to lead to a coherent exploitation narrative.',approach:['Enumerate services and identify the most promising attack surface.','Validate the weakness in a controlled manner and understand why the path works.','Follow privilege boundaries and post-exploitation consequences instead of stopping at initial access.'],artifacts:['Enumeration results','Service/version observations','Attack-path steps','Privilege-escalation notes'],outcome:'Strengthens attacker-perspective reasoning and complete attack-chain analysis.'},
-    vulnhub:{objective:'Reproducible vulnerable-system research where the complete chain from exposure to privilege is observable.',approach:['Build or restore the vulnerable environment in isolation.','Reproduce the weakness and verify the actual exploitation condition.','Document the path, privilege boundary and security lesson so the result can be repeated.'],artifacts:['Lab topology','Enumeration output','Exploit validation','Privilege-escalation path'],outcome:'Provides controlled evidence for VAPT and attack-path reasoning.'},
-    overthewire:{objective:'Command-line security problem solving that strengthens Linux intuition used throughout offensive and engineering work.',approach:['Read the environment and constraints before issuing commands.','Reason about permissions, filesystems, authentication and process behavior.','Verify the result and understand the mechanism rather than memorizing a command sequence.'],artifacts:['Shell commands','Permission observations','Filesystem state','Verified solution path'],outcome:'Sharpens low-level Linux reasoning that transfers into larger security investigations.'},
-    kali:{objective:'A practical Linux security workstation used to move between reconnaissance, application testing, network analysis and wireless work.',approach:['Prepare the environment and validate interfaces, routes and tooling.','Select the smallest toolset necessary for the security question.','Troubleshoot the platform itself when drivers, networking or tooling become part of the problem.'],artifacts:['Scan results','HTTP captures','Packet captures','Wireless observations','System diagnostics'],outcome:'Provides a repeatable workspace for hands-on security research and troubleshooting.'},
-    crossplatform:{objective:'Cross-platform analysis that connects Windows and Linux behavior, artifacts and network evidence.',approach:['Identify the relevant host, filesystem, registry, memory or network evidence.','Preserve and correlate artifacts rather than treating one indicator as conclusive.','Build an investigation timeline that explains what happened and why it matters.'],artifacts:['Windows artifacts','Filesystem evidence','Network captures','Investigation timelines'],outcome:'Builds evidence-driven investigation skills across the two dominant desktop/server ecosystems.'},
-    virtualbox:{objective:'Controlled research infrastructure for reproducible vulnerable systems, isolated testing and clean resets.',approach:['Design the virtual topology around the research question.','Use isolation, snapshots and repeatable configurations to control variables.','Reset and reproduce the same path when validating a finding or technique.'],artifacts:['VM configurations','Network topology','Snapshots','Reproduction states'],outcome:'Makes security experiments repeatable without contaminating the primary environment.'},
-    github:{objective:'Public engineering trail where code, documentation and technical decisions become inspectable evidence.',approach:['Version technical changes instead of presenting only the final result.','Document compatibility issues, implementation decisions and validation.','Keep research reproducible enough for another engineer to inspect the work.'],artifacts:['Source code','Commit history','README documentation','Build/validation notes'],outcome:'Demonstrates that technical security work is built, maintained and documented—not merely claimed.'},
-    networkwalks:{objective:'Professional cybersecurity environment combining assessment, research, investigation, engineering and technical project execution.',approach:['Translate assigned objectives into structured technical work.','Stay hands-on with validation and evidence while coordinating execution.','Connect findings and project output to defensible security decisions and documentation.'],artifacts:['Assessment evidence','Technical reports','Research outputs','Project deliverables'],outcome:'Connects multidisciplinary security practice with professional execution and technical responsibility.'},
-    underground:{objective:'Adversary and underground intelligence research focused on understanding ecosystems, actors, infrastructure and exposed information.',approach:['Observe research-accessible underground communities and threat reporting for context.','Correlate aliases, infrastructure, service models, leak/exposure signals and behavior across sources.','Translate observations into threat context, indicators and TTP-oriented understanding rather than treating a source in isolation.'],artifacts:['Forum observations','Threat-actor context','Infrastructure relationships','Leak/exposure indicators','TTP mappings'],outcome:'Adds adversary context to OSINT and threat intelligence without confusing observation with attribution.'},
-    osint:{objective:'Open-source intelligence collection that turns fragmented public observations into structured infrastructure and adversary context.',approach:['Collect domains, DNS, certificates, reports and other observable indicators.','Cross-check independent sources before drawing conclusions.','Connect infrastructure, indicators and behavior into a coherent intelligence picture.'],artifacts:['Domains and DNS records','Certificate relationships','IOC sets','Threat-report references','TTP context'],outcome:'Builds a disciplined foundation for reconnaissance and threat intelligence.'}
-  };
-  const envProjects={
-    portswigger:[['web','Web Application Security Lab','50+ PortSwigger labs across application-security scenarios.'],['mediroza','Mediroza Web Application Security Assessment','Authorized black-box assessment with 8+ documented findings.']],
-    bugbounty:[['web','Web Application Security Lab','50+ labs supporting vulnerability discovery and manual validation.'],['mediroza','Mediroza Web Application Security Assessment','Authorized assessment demonstrating practical web-security validation.']],
-    htb:[['vulnhub','Vulnerability Assessment & Privilege Escalation','Controlled attack-path research across vulnerable environments.'],['buffer','Buffer Overflow Exploit Development','Low-level controlled exploitation and debugger-assisted research.']],
-    vulnhub:[['vulnhub','Vulnerability Assessment & Privilege Escalation','Vulnerable systems, service enumeration, exploitation and privilege escalation.']],
-    overthewire:[['vulnhub','Vulnerability Assessment & Privilege Escalation','Linux command-line reasoning connected to privilege-escalation practice.']],
-    kali:[['recon','Network Reconnaissance & Attack-Surface Mapping','Reconnaissance, enumeration and service validation.'],['web','Web Application Security Lab','Application-security testing and HTTP analysis.'],['wireless','Wireless Security Assessment Lab','Wireless packet analysis and controlled testing.'],['driver','RTL8812BU Linux Driver Modernization','Linux wireless driver engineering on real hardware.']],
-    crossplatform:[['malware','Malware Analysis & Windows Forensics Research','Windows artifacts, suspicious files and evidence-oriented investigation.'],['threat','Network Traffic Analysis & Threat Hunting','Packet analysis and IOC-oriented investigation.'],['vulnhub','Vulnerability Assessment & Privilege Escalation','Cross-platform vulnerable environments and privilege escalation.']],
-    virtualbox:[['vulnhub','Vulnerability Assessment & Privilege Escalation','Controlled vulnerable virtual machines and attack-path reproduction.'],['buffer','Buffer Overflow Exploit Development','Isolated low-level exploitation research.']],
-    github:[['driver','RTL8812BU Linux Driver Modernization','13+ source files, kernel compatibility work and real-hardware validation.'],['firmware','SPI Flash & BIOS Protection Research','Firmware protection and flash-analysis research.'],['automation','Security Automation & PoC Tooling','Python/Bash security tooling and repeatable research workflows.'],['website','Cybersecurity Portfolio Engineering','The Research OS itself as a technical web-engineering project.']],
-    networkwalks:[['mediroza','Mediroza Web Application Security Assessment','Authorized assessment with evidence-driven reporting.'],['recon','Network Reconnaissance & Attack-Surface Mapping','Structured reconnaissance and attack-surface analysis.'],['web','Web Application Security Lab','50+ PortSwigger labs and application-security research.'],['driver','RTL8812BU Linux Driver Modernization','Security engineering and systems research.']],
-    underground:[['recon','Network Reconnaissance & Attack-Surface Mapping','Infrastructure discovery and evidence correlation.'],['threat','Network Traffic Analysis & Threat Hunting','Adversary-behavior and IOC investigation.']],
-    osint:[['recon','Network Reconnaissance & Attack-Surface Mapping','DNS, certificates, infrastructure and web-fingerprinting research.'],['threat','Network Traffic Analysis & Threat Hunting','IOC and attacker-behavior investigation.']],
-  };
-  const groupProjects={
-    web:['web','mediroza'],bugbounty:['web','mediroza'],offensive:['vulnhub','buffer','web'],systems:['malware','threat','vulnhub','firmware'],engineering:['driver','automation','firmware','website'],adversary:['recon','threat'],professional:['mediroza','recon','driver','web']
-  };
-  const externalLinks={
-    portswigger:['https://portswigger.net/web-security','Open PortSwigger Web Security Academy'],
-    htb:['https://www.hackthebox.com/','Open Hack The Box'],
-    vulnhub:['https://www.vulnhub.com/','Open VulnHub'],
-    overthewire:['https://overthewire.org/wargames/','Open OverTheWire'],
-    kali:['https://www.kali.org/','Open Kali Linux'],
-    virtualbox:['https://www.virtualbox.org/','Open VirtualBox'],
-    github:['https://github.com/Chandrashekar-Bala','Open GitHub'],
-    networkwalks:['https://networkwalks.com/','Open Networkwalks'],
-    web:['https://portswigger.net/web-security','Open PortSwigger Web Security Academy']
-  };
-  const roleData={
-    teamlead:{k:'CURRENT ROLE · NETWORKWALKS',t:'TEAM LEAD — CYBERSECURITY',accent:'professional',what:'Lead and contribute to multidisciplinary cybersecurity work across VAPT, offensive security, defensive security, adversary research, security engineering, and technical project execution.',how:['Understand the objective, system and attack surface before choosing a technique','Coordinate technical work while staying close to hands-on validation and investigation','Review findings and deliverables for accuracy, evidence, impact and remediation value','Connect offensive observations with defensive and engineering decisions','Keep technical work reproducible, documented and defensible'],skills:['VAPT','Offensive Security','Defensive Security','Adversary Research','Security Engineering','Technical Projects'],tools:['Burp Suite','Nmap','Wireshark','Linux','Python','Git','Security Tooling'],related:[['Mediroza Web Application Security Assessment','8+ documented findings','assessment'],['RTL8812BU Driver Engineering','13+ source files and hardware validation','engineering'],['Network Reconnaissance & Attack-Surface Mapping','Evidence-led reconnaissance','network']]},
-    vapt:{k:'01 · ROLE SCOPE',t:'VAPT — ASSESSMENT MINDSET',accent:'vapt',what:'Assess attack surfaces, validate vulnerabilities, reconstruct practical attack paths and translate evidence into defensible findings.',how:['Reconnaissance before assumptions','Manual validation of observable behavior','Impact and risk analysis','Evidence preservation and technical reporting','Remediation mapping and retest thinking'],skills:['Reconnaissance','Vulnerability Validation','CVSS / CWE','Attack Paths','Evidence','Reporting'],tools:['Nmap','Burp Suite','Nessus','CVSS / CWE','Technical Reporting'],related:[['Mediroza Web Application Security Assessment','8+ documented findings','assessment']]},
-    offensive:{k:'02 · ROLE SCOPE',t:'OFFENSIVE SECURITY — ATTACKER PERSPECTIVE',accent:'offensive',what:'Reason through how systems can be attacked, where trust boundaries fail and how individual weaknesses combine into meaningful attack paths.',how:['Attack-surface mapping','Enumeration and service analysis','Controlled exploitation','Privilege escalation reasoning','Post-exploitation impact analysis'],skills:['Attack-Surface Analysis','Enumeration','Controlled Exploitation','Privilege Escalation','Post-Exploitation','Attack Paths'],tools:['Nmap','Burp Suite','Metasploit','Kali Linux','Linux / Windows'],related:[['Vulnerability Assessment & Privilege Escalation','Controlled attack-path research','offensive'],['Web Application Security Lab','50+ PortSwigger labs','web']]},
-    defensive:{k:'03 · ROLE SCOPE',t:'DEFENSIVE SECURITY — INVESTIGATION MINDSET',accent:'defensive',what:'Use technical evidence to understand suspicious activity, correlate indicators and think from the perspective of detection and response.',how:['Network and endpoint observation','IOC correlation','Log and traffic analysis','Evidence-driven investigation','Detection and hardening considerations'],skills:['Network Analysis','IOC Correlation','Threat Hunting','Forensic Review','Detection Thinking','Incident Investigation'],tools:['Wireshark','Splunk','Google Chronicle','Volatility','Tcpdump'],related:[['Network Traffic Analysis & Threat Hunting','Packet-level investigation','defensive'],['Malware Analysis & Windows Forensics','Evidence-focused research','forensics']]},
-    adversary:{k:'04 · ROLE SCOPE',t:'ADVERSARY RESEARCH — INTELLIGENCE MINDSET',accent:'adversary',what:'Study threat actors, infrastructure, underground ecosystems and TTPs to connect fragmented observations into useful intelligence.',how:['Source collection and correlation','Infrastructure research','Actor and campaign context','Underground ecosystem research','TTP mapping and defensive context'],skills:['OSINT','CTI','Dark Web Research','Infrastructure Research','MITRE ATT&CK','TTP Analysis'],tools:['WHOIS','DNSRecon','crt.sh','Subfinder','Maltego','Tor / I2P research'],related:[['Adversary Research','Threat intelligence and actor analysis','threat'],['Network Reconnaissance','Infrastructure discovery','network']]},
-    engineering:{k:'05 · ROLE SCOPE',t:'SECURITY ENGINEERING — BUILD & VALIDATE',accent:'engineering',what:'Stay hands-on with systems, code, networking, wireless and tooling to understand security at the implementation level.',how:['Kernel-facing C analysis','Compatibility troubleshooting','Security automation','Proof-of-concept development','Real-system validation and reproducibility'],skills:['Kernel-Facing C','Linux Systems','Wireless Security','Compatibility Analysis','Security Tooling','Hardware Validation'],tools:['C','Python','GCC','Git','Linux','RTL8812BU'],related:[['RTL8812BU Driver Engineering','13+ source files','engineering'],['Security Automation & PoC Tooling','Python / Bash tooling','automation']]},
-    projects:{k:'06 · ROLE SCOPE',t:'TECHNICAL PROJECTS — EXECUTION',accent:'projects',what:'Work across multiple security projects and connect technical execution to evidence, documentation and defensible outcomes.',how:['Break objectives into technical work','Select the right research environment','Validate rather than assume','Document evidence and limitations','Connect work to remediation or engineering outcomes'],skills:['Research','PoC Development','Documentation','Evidence','Project Execution','Technical Review'],tools:['GitHub','Python','Bash','C','Burp Suite','Nmap'],related:[['Web Application Security Assessment','Security assessment evidence','assessment'],['RTL8812BU Driver Engineering','Systems engineering','engineering'],['Security Automation & PoC Tooling','Security tooling','automation']]}
-  };
-  let researchParentGroup=null;
-  let researchParentEnv=null;
-  let researchParentProject=null;
-  const envGroupModal=document.getElementById('envGroupModal');
-  const envGroupContent=document.getElementById('envGroupModalContent');
-  const envGroupTitle=document.getElementById('envGroupModalTitle');
-  const envGroupLead=document.getElementById('envGroupModalLead');
+function renderEnvGroup(groupKey) {
+    const g = ResearchData.GROUPS[groupKey];
+    if (!g) return '<p>Unknown research domain.</p>';
+    const envButtons = g.envs.map(k => {
+        const e = ResearchData.ENVS[k];
+        if (!e) return '';
+        return `<button type="button" class="group-env-chip" data-open-env="${esc(k)}" data-parent-group="${esc(groupKey)}">
+            <span>${esc(e.k.split(' · ')[0])}</span>
+            <strong>${esc(e.t)}</strong>
+            <small>${esc(e.signals.slice(0,3).join(' · '))}</small>
+            <i class="fas fa-arrow-up-right-from-square"></i>
+        </button>`;
+    }).join('');
+    const relatedButtons = (g.related || []).map(id => {
+        const c = Cases.get(id);
+        if (!c) return '';
+        return `<button type="button" class="env-related-project" data-open-case="${esc(id)}" data-from="research-group">
+            <strong>${esc(c.title)}</strong>
+            <span>${esc(c.kicker)}</span>
+            <i class="fas fa-arrow-right"></i>
+        </button>`;
+    }).join('');
+    return `
+        <button class="modal-close" type="button" aria-label="Close research domain" data-close-modal><i class="fas fa-xmark"></i></button>
+        <div class="env-group-head">
+            <div>
+                <span class="modal-kicker">${esc(g.kicker)}</span>
+                <h2 id="envGroupModalTitle">${esc(g.title)}</h2>
+                <p id="envGroupModalLead">${esc(g.lead)}</p>
+            </div>
+            <span class="env-project-index">DOMAIN DOSSIER</span>
+        </div>
+        <div class="group-dossier-grid">
+            <section>
+                <h4><i class="fas fa-brain"></i> What I Do</h4>
+                <ul class="group-focus-list">${g.signals.map(s => `<li>${esc(s)}</li>`).join('')}</ul>
+            </section>
+            <section>
+                <h4><i class="fas fa-screwdriver-wrench"></i> Skills &amp; Tools</h4>
+                <div class="env-signal-tags group-tool-tags">${g.signals.map(s => `<span>${esc(s)}</span>`).join('')}</div>
+                <div class="group-flow"><small>RESEARCH PATH</small><strong>Explore → Reproduce → Validate → Investigate → Engineer</strong></div>
+            </section>
+        </div>
+        <section class="group-environments-panel">
+            <h4><i class="fas fa-cubes"></i> Environments &amp; Practice</h4>
+            <div class="group-env-list">${envButtons}</div>
+        </section>
+        <section class="env-related">
+            <h4><i class="fas fa-file-shield"></i> Related Technical Record</h4>
+            <div class="env-related-grid">${relatedButtons || '<p class="env-empty-note">No dedicated public case file is currently mapped to this domain.</p>'}</div>
+        </section>
+        <div class="env-group-footer">
+            <button type="button" class="env-back-link" data-cb-pop><i class="fas fa-arrow-left"></i> Back to Research Environment</button>
+        </div>`;
+}
 
-  function openLayer(el){if(!el)return;el.classList.add('open');el.setAttribute('aria-hidden','false');document.body.classList.add('modal-open');}
-  function closeLayer(el){if(!el)return;el.classList.remove('open');el.setAttribute('aria-hidden','true');if(!document.querySelector('.research-map-modal.open,.env-group-modal.open,.role-dossier-modal.open,.env-modal.open,.env-project-modal.open')) document.body.classList.remove('modal-open');}
-  /* Central project resolver. Every interactive layer uses the same canonical IDs. */
-  const projectAliases={
-    assessment:'mediroza', mediroza:'mediroza', 'mediroza assessment':'mediroza',
-    engineering:'driver', driver:'driver', 'rtl8812bu driver engineering':'driver', 'rtl8812bu linux driver modernization':'driver',
-    network:'recon', recon:'recon', 'network reconnaissance':'recon', 'network reconnaissance & attack-surface mapping':'recon',
-    web:'web', 'web application security lab':'web', portswigger:'web',
-    offensive:'vulnhub', vulnhub:'vulnhub', 'vulnerability assessment & privilege escalation':'vulnhub',
-    defensive:'threat', threat:'threat', 'network traffic analysis & threat hunting':'threat',
-    forensics:'malware', malware:'malware', 'malware analysis & windows forensics research':'malware',
-    mobile:'android', android:'android', 'android security analysis':'android',
-    automation:'automation', 'security automation & poc tooling':'automation',
-    firmware:'firmware', 'spi flash & bios protection research':'firmware',
-    wireless:'wireless', 'wireless security assessment lab':'wireless',
-    password:'password', 'protected pdf & password security analysis':'password',
-    buffer:'buffer', 'buffer overflow exploit development':'buffer',
-    website:'website', 'cybersecurity portfolio engineering':'website',
-    experience:null, projects:null
-  };
-  function normalizeProjectKey(value){return String(value||'').trim().toLowerCase().replace(/&amp;/g,'&').replace(/\s+/g,' ');}
-  function projectRef(key){
-    const normalized=normalizeProjectKey(key);
-    return Object.prototype.hasOwnProperty.call(projectAliases,normalized)?projectAliases[normalized]:String(key||'').trim();
-  }
-  function resolveProjectFromLabel(label){
-    const direct=projectRef(label); if(direct && document.querySelector(`#projects .project-card[data-project=\"${CSS.escape?CSS.escape(direct):direct}\"]`)) return direct;
-    const wanted=normalizeProjectKey(label);
-    const card=[...document.querySelectorAll('#projects .project-card')].find(c=>normalizeProjectKey(c.querySelector('h3')?.textContent)===wanted);
-    return card?.dataset.project||null;
-  }
-  window.resolveProjectKey=projectRef;
-  window.resolveProjectFromLabel=resolveProjectFromLabel;
+function renderEnvDossier(envKey, parentGroup) {
+    const e = ResearchData.ENVS[envKey];
+    if (!e) return '<p>Unknown environment.</p>';
+    const d = ResearchData.DEPTH[envKey] || { skills: e.focus, tools: e.signals };
+    const ext = ResearchData.EXTERNAL_LINKS[envKey];
+    const relatedButtons = (e.related || []).map(([id, title, desc]) => {
+        const c = Cases.get(id);
+        return `<button type="button" class="env-evidence-card" data-open-case="${esc(id)}" data-from="research-env">
+            <span>RELATED EVIDENCE</span>
+            <strong>${esc(c ? c.title : title)}</strong>
+            <small>${esc(desc)}</small>
+            <i class="fas fa-arrow-right"></i>
+        </button>`;
+    }).join('');
+    const extHtml = ext ? `<a class="env-external-link" href="${esc(ext[0])}" target="_blank" rel="noopener noreferrer"><i class="fas fa-arrow-up-right-from-square"></i> ${esc(ext[1])}</a>` : '';
+    const backHtml = parentGroup
+        ? `<button type="button" class="env-back-link" data-cb-pop><i class="fas fa-arrow-left"></i> Back to ${esc(ResearchData.GROUPS[parentGroup]?.title || 'Research Domain')}</button>`
+        : `<button type="button" class="env-back-link" data-cb-pop><i class="fas fa-arrow-left"></i> Back to Research Environment</button>`;
+    return `
+        <button class="modal-close" type="button" aria-label="Close research environment" data-close-modal>×</button>
+        <div class="env-modal-head"><span class="modal-kicker">0xCB · RESEARCH ENVIRONMENT</span><span class="security-command-live"><i class="fas fa-circle"></i> HANDS-ON</span></div>
+        <div class="env-dossier-identity">
+            <div>
+                <span class="modal-kicker">${esc(e.k)}</span>
+                <h2 id="envModalTitle">${esc(e.t)}</h2>
+                <p class="env-modal-lead">${esc(e.lead)}</p>
+            </div>
+            <span class="env-dossier-status">HANDS-ON · ${esc(String(e.signals.length).padStart(2,'0'))} SIGNALS</span>
+        </div>
+        ${backHtml}
+        <section class="env-deep-intro env-objective-panel">
+            <div><span class="modal-kicker">RESEARCH OBJECTIVE</span><h4>Why this environment matters</h4></div>
+            <p>${esc(e.lead)}</p>
+        </section>
+        <div class="env-modal-grid">
+            <section>
+                <h4><i class="fas fa-crosshairs"></i> What I Actually Do</h4>
+                <ul>${e.focus.map(f => `<li>${esc(f)}</li>`).join('')}</ul>
+            </section>
+            <section>
+                <h4><i class="fas fa-route"></i> Working Method</h4>
+                <div class="env-flow"><small>WORKFLOW</small><strong>${esc(e.flow)}</strong></div>
+            </section>
+        </div>
+        <section class="env-analysis-panel">
+            <div><span class="modal-kicker">RESEARCH LENS</span><h4>What I inspect, test or correlate</h4></div>
+            <div class="env-analysis-tags">${e.signals.map(s => `<span>${esc(s)}</span>`).join('')}</div>
+        </section>
+        <section class="env-depth-panel">
+            <div class="env-depth-head">
+                <div><span class="modal-kicker">PRACTICAL DEPTH</span><h4><i class="fas fa-screwdriver-wrench"></i> Skills &amp; Tools</h4></div>
+                <span class="env-depth-count">${d.skills.length + d.tools.length} signals</span>
+            </div>
+            <div class="env-depth-columns">
+                <div><small>SKILLS</small><div class="env-signal-tags">${d.skills.map(x => `<span>${esc(x)}</span>`).join('')}</div></div>
+                <div><small>TOOLS / PLATFORMS</small><div class="env-signal-tags">${d.tools.map(x => `<span>${esc(x)}</span>`).join('')}</div></div>
+            </div>
+        </section>
+        <section class="env-related env-evidence-record">
+            <div class="env-related-head">
+                <div><span class="modal-kicker">CONNECTED WORK</span><h4><i class="fas fa-link"></i> Related Projects &amp; Case Files</h4></div>
+                <small>Open the evidence behind this environment.</small>
+            </div>
+            <div class="env-evidence-grid">${relatedButtons || '<p class="env-empty-note">No dedicated public case file is currently mapped to this environment.</p>'}</div>
+        </section>
+        <div class="env-modal-actions">
+            ${parentGroup ? `<button type="button" class="env-domain-link" data-open-group="${esc(parentGroup)}"><i class="fas fa-sitemap"></i> Explore ${esc(ResearchData.GROUPS[parentGroup]?.title || 'Domain')}</button>` : ''}
+            ${extHtml}
+        </div>`;
+}
 
-  function renderEnv(key){
-    const d=envData[key]||envData.portswigger;
-    const depth=envDepth[key]||{skills:d.focus,tools:d.signals};
-    const narrative=envNarrative[key]||{what:d.focus,analysis:d.signals,output:'Practical security research connected to the broader technical record.'};
-    const ext=externalLinks[key];
-    const extHtml=ext?`<a class="env-external-link" href="${ext[0]}" target="_blank" rel="noopener noreferrer"><i class="fas fa-arrow-up-right-from-square"></i> ${escapeHtml(ext[1])}</a>`:'';
-    const backHtml=researchParentGroup?`<button type="button" class="env-back-link" data-back-env-group="${escapeHtml(researchParentGroup)}"><i class="fas fa-arrow-left"></i> Back to ${escapeHtml(groups[researchParentGroup]?.title||'Research Domain')}</button>`:'';
-    const what=narrative.what.map(x=>`<li>${escapeHtml(x)}</li>`).join('');
-    const analysis=narrative.analysis.map(x=>`<span>${escapeHtml(x)}</span>`).join('');
-    const insight=envInsights[key]||{objective:narrative.output,approach:narrative.what,artifacts:narrative.analysis,outcome:narrative.output};
-    const related=envProjects[key]||[];
-    const relatedHtml=related.length?related.map(x=>{const ref=projectRef(x[0]);return `<button type="button" class="env-evidence-card" data-env-evidence-project="${escapeHtml(ref)}"><span>RELATED EVIDENCE</span><strong>${escapeHtml(x[1])}</strong><small>${escapeHtml(x[2])}</small><i class="fas fa-arrow-right"></i></button>`}).join(''):'<p class="env-empty-note">No dedicated public case file is currently mapped to this environment.</p>';
-    const domainKey=Object.entries(groups).find(([,g])=>g.envs.includes(key))?.[0]||null;
-    const domainTitle=domainKey?groups[domainKey].title:'Research Environment';
-    const domainBtn=domainKey?`<button type="button" class="env-domain-link" data-open-domain-from-env="${escapeHtml(domainKey)}"><i class="fas fa-sitemap"></i> Explore ${escapeHtml(domainTitle)}</button>`:'';
-    envContent.innerHTML=`<div class="env-dossier-identity"><div><span class="modal-kicker">${escapeHtml(d.k)}</span><h2 id="envModalTitle">${escapeHtml(d.t)}</h2><p class="env-modal-lead">${escapeHtml(d.lead)}</p></div><span class="env-dossier-status">HANDS-ON · ${escapeHtml(String(d.signals.length).padStart(2,'0'))} SIGNALS</span></div>${backHtml}
-      <section class="env-deep-intro env-objective-panel"><div><span class="modal-kicker">RESEARCH OBJECTIVE</span><h4>Why this environment matters</h4></div><p>${escapeHtml(insight.objective)}</p></section>
-      <div class="env-modal-grid"><section><h4><i class="fas fa-crosshairs"></i> What I Actually Do</h4><ul>${insight.approach.map(x=>`<li>${escapeHtml(x)}</li>`).join('')}</ul></section><section><h4><i class="fas fa-route"></i> Working Method</h4><div class="env-flow"><small>WORKFLOW</small><strong>${escapeHtml(d.flow)}</strong></div><p class="env-modal-note">${escapeHtml(insight.outcome)}</p></section></div>
-      <section class="env-analysis-panel"><div><span class="modal-kicker">RESEARCH LENS</span><h4>What I inspect, test or correlate</h4></div><div class="env-analysis-tags">${analysis}</div></section>
-      <section class="env-evidence-panel"><div class="env-depth-head"><div><span class="modal-kicker">TECHNICAL RECORD</span><h4><i class="fas fa-file-shield"></i> Evidence &amp; Outputs</h4></div><span class="env-depth-count">${insight.artifacts.length} focus points</span></div><div class="env-artifact-grid">${insight.artifacts.map(x=>`<span>${escapeHtml(x)}</span>`).join('')}</div></section>
-      <section class="env-depth-panel"><div class="env-depth-head"><div><span class="modal-kicker">PRACTICAL DEPTH</span><h4><i class="fas fa-screwdriver-wrench"></i> Skills &amp; Tools</h4></div><span class="env-depth-count">${depth.skills.length + depth.tools.length} signals</span></div><div class="env-depth-columns"><div><small>SKILLS</small><div class="env-signal-tags">${depth.skills.map(x=>`<span>${escapeHtml(x)}</span>`).join('')}</div></div><div><small>TOOLS / PLATFORMS</small><div class="env-signal-tags">${depth.tools.map(x=>`<span>${escapeHtml(x)}</span>`).join('')}</div></div></div></section>
-      <section class="env-related env-evidence-record"><div class="env-related-head"><div><span class="modal-kicker">CONNECTED WORK</span><h4><i class="fas fa-link"></i> Related Projects &amp; Case Files</h4></div><small>Open the evidence behind this environment.</small></div><div class="env-evidence-grid">${relatedHtml}</div></section>
-      <section class="env-modal-actions">${domainBtn}<button type="button" class="env-project-record-trigger" data-open-env-projects="${escapeHtml(key)}"><i class="fas fa-folder-open"></i> Open Project Record</button>${extHtml}</section>`;
-  }
+function renderSecurityDomain(domainKey) {
+    const d = ResearchData.SECURITY_DOMAINS[domainKey];
+    if (!d) return '<p>Unknown security domain.</p>';
+    const related = d.projects.map(p => {
+        const key = p[3] || p[2];
+        const c = Cases.get(key);
+        return `<button type="button" class="security-related-case" data-open-case="${esc(key)}" data-from="security-map">
+            <strong>${esc(p[0])}</strong>
+            <span>${esc(p[1])}</span>
+            <i class="fas fa-arrow-right"></i>
+        </button>`;
+    }).join('');
+    const tabKeys = Object.keys(ResearchData.SECURITY_DOMAINS);
+    const activeIndex = tabKeys.indexOf(domainKey) + 1;
+    return `
+        <button class="modal-close" aria-label="Close security command center" data-close-modal type="button">×</button>
+        <div class="security-command-modal-head">
+            <span class="modal-kicker">0xCB · TECHNICAL COMMAND CENTER</span>
+            <span class="security-command-live"><i class="fas fa-circle"></i> LIVE MAP</span>
+        </div>
+        <h2 id="securityCommandModalTitle">Security Practice Map</h2>
+        <p class="security-command-modal-lead">A single technical index connecting disciplines to methods, tooling, evidence, and the case work where those skills are applied.</p>
+        <div class="security-command-tabs" id="securityCommandTabs"></div>
+        <div class="security-command-modal-content" id="securityCommandModalContent">
+            <div class="sc-domain-head">
+                <div>
+                    <span class="modal-kicker">${esc(d.k)}</span>
+                    <h3>${esc(d.t)}</h3>
+                    <p>${esc(d.summary)}</p>
+                </div>
+                <div class="sc-domain-index">${String(activeIndex).padStart(2,'0')} / ${tabKeys.length}</div>
+            </div>
+            <section class="sc-method-panel">
+                <h4><i class="fas fa-route"></i> Methods &amp; Practice</h4>
+                <ul>${d.methods.map(m => `<li>${esc(m)}</li>`).join('')}</ul>
+            </section>
+            <section class="sc-depth-note">
+                <div><span class="modal-kicker">HOW THIS SHOWS UP IN MY WORK</span><h4>${esc(d.t)} in practice</h4></div>
+                <p>${esc(d.summary)} I connect the methods below to documented technical work, then follow the evidence into a case file where available.</p>
+            </section>
+            <section class="sc-related">
+                <div class="sc-related-head">
+                    <h4><i class="fas fa-file-shield"></i> Related Case Files</h4>
+                    <small>Open a record to launch its full technical dossier.</small>
+                </div>
+                <div class="sc-related-grid">${related}</div>
+            </section>
+            <section class="sc-tools-panel">
+                <div class="sc-tools-head">
+                    <div><span class="modal-kicker">TECHNICAL DEPTH</span><h4><i class="fas fa-screwdriver-wrench"></i> Skills &amp; Tools</h4></div>
+                    <span class="env-depth-count">${d.tools.length} tools / technologies</span>
+                </div>
+                <div class="modal-meta">${d.tools.map(x => `<span>${esc(x)}</span>`).join('')}</div>
+            </section>
+        </div>`;
+}
 
-  function openEnv(key='portswigger',parentGroup=null){researchParentGroup=parentGroup;researchParentEnv=key;if(envGroupModal?.classList.contains('open'))closeLayer(envGroupModal);renderEnv(key);openLayer(envModal);}
+function renderRoleDossier(roleKey) {
+    const d = ResearchData.ROLES[roleKey];
+    if (!d) return '<p>Unknown role scope.</p>';
+    const related = d.related.map(([id, label, desc]) => {
+        const c = Cases.get(id);
+        return `<button type="button" data-open-case="${esc(id)}" data-from="role-dossier">
+            <strong>${esc(c ? c.title : label)}</strong>
+            <span>${esc(desc)}</span>
+            <i class="fas fa-arrow-right"></i>
+        </button>`;
+    }).join('');
+    return `
+        <button class="modal-close" type="button" aria-label="Close role dossier" data-close-modal><i class="fas fa-xmark"></i></button>
+        <span class="modal-kicker">${esc(d.k)}</span>
+        <div class="role-dossier-head">
+            <div>
+                <h2 id="roleDossierTitle">${esc(d.t)}</h2>
+                <p>${esc(d.what)}</p>
+            </div>
+            <span class="role-dossier-index">${roleKey === 'teamlead' ? 'TEAM LEAD' : 'ROLE SCOPE'}</span>
+        </div>
+        <div class="role-dossier-grid">
+            <section>
+                <h4><i class="fas fa-brain"></i> How I Work</h4>
+                <ul>${d.how.map(x => `<li>${esc(x)}</li>`).join('')}</ul>
+                <div class="role-dossier-principle"><small>DECISION PRINCIPLE</small><strong>Understand → Validate → Correlate → Improve</strong></div>
+            </section>
+            <section>
+                <h4><i class="fas fa-bullseye"></i> What This Looks Like</h4>
+                <p class="role-dossier-explanation">I stay close to the technical problem: understand the system, validate observable behaviour, follow the evidence, connect it to impact, and turn the result into a defensible security or engineering decision.</p>
+                <div class="role-thinking-flow"><span>OBSERVE</span><b>→</b><span>VALIDATE</span><b>→</b><span>INVESTIGATE</span><b>→</b><span>IMPROVE</span></div>
+            </section>
+        </div>
+        <section class="role-related">
+            <h4><i class="fas fa-link"></i> Related Work</h4>
+            <div class="role-related-grid">${related}</div>
+        </section>
+        <section class="role-depth-panel">
+            <div class="role-depth-head">
+                <div><span class="modal-kicker">TECHNICAL DEPTH</span><h4><i class="fas fa-layer-group"></i> Skills &amp; Tools</h4></div>
+                <span class="env-depth-count">${d.skills.length + d.tools.length} signals</span>
+            </div>
+            <div class="role-depth-columns">
+                <div><small>SKILLS</small><div class="role-dossier-tags">${d.skills.map(x => `<span>${esc(x)}</span>`).join('')}</div></div>
+                <div><small>TOOLS / PLATFORMS</small><div class="role-dossier-tags">${d.tools.map(x => `<span>${esc(x)}</span>`).join('')}</div></div>
+            </div>
+        </section>`;
+}
 
-  function renderGroup(key){
-    const d=groups[key]; if(!d||!envGroupContent)return;
-    const depth=groupDepth[key]||{what:[d.lead],tools:d.signals};
-    const envButtons=d.envs.map(k=>{const e=envData[k];return `<button type="button" class="group-env-chip" data-open-env-from-group="${escapeHtml(k)}" data-parent-group="${escapeHtml(key)}"><span>${escapeHtml(e.k.split(' · ')[0])}</span><strong>${escapeHtml(e.t)}</strong><small>${e.signals.slice(0,3).map(escapeHtml).join(' · ')}</small><i class="fas fa-arrow-up-right-from-square"></i></button>`}).join('');
-    const related=(groupProjects[key]||[]).map(k=>{const source=Object.values(envProjects).flat().find(x=>x[0]===k);return source?`<button type="button" class="env-related-project" data-open-group-project-record="${escapeHtml(k)}" data-parent-group="${escapeHtml(key)}"><strong>${escapeHtml(source[1])}</strong><span>${escapeHtml(source[2])}</span><i class="fas fa-arrow-right"></i></button>`:''}).join('');
-    envGroupTitle.textContent=d.title;envGroupLead.textContent=d.lead;
-    envGroupContent.innerHTML=`<div class="group-dossier-grid"><section><h4><i class="fas fa-brain"></i> What I Do</h4><ul class="group-focus-list">${depth.what.map(x=>`<li>${escapeHtml(x)}</li>`).join('')}</ul></section><section><h4><i class="fas fa-screwdriver-wrench"></i> Skills &amp; Tools</h4><div class="env-signal-tags group-tool-tags">${depth.tools.map(x=>`<span>${escapeHtml(x)}</span>`).join('')}</div><div class="group-flow"><small>RESEARCH PATH</small><strong>Explore → Reproduce → Validate → Investigate → Engineer</strong></div></section></div><section class="group-environments-panel"><h4><i class="fas fa-cubes"></i> Environments &amp; Practice</h4><div class="group-env-list">${envButtons}</div></section><section class="env-related"><h4><i class="fas fa-file-shield"></i> Related Technical Record</h4><div class="env-related-grid">${related || '<p class="env-empty-note">No dedicated public case file is currently mapped to this domain.</p>'}</div></section><div class="env-group-footer"><button type="button" class="env-back-link" data-back-to-research-map><i class="fas fa-arrow-left"></i> Back to Research Environment</button></div>`;
-  }
-  function openGroup(key){researchParentGroup=key;researchParentEnv=null;researchParentProject=null;if(mapModal?.classList.contains('open'))closeLayer(mapModal);renderGroup(key);openLayer(envGroupModal);}
-  window.__cbOpenResearchGroup=openGroup;
-  window.__cbOpenResearchEnvironment=openEnv;
+function renderCaseIndex() {
+    const list = Cases.list();
+    const entries = list.map(c => `
+        <div class="case-index-item">
+            <div class="case-item-copy">
+                <strong>${esc(c.cardTitle || c.title)}</strong>
+                <small>${esc(c.kicker)}</small>
+            </div>
+            <button class="case-open-btn" type="button" data-open-case="${esc(c.id)}" data-from="case-index">OPEN DOSSIER →</button>
+        </div>`).join('');
+    return `
+        <button aria-label="Close case index" class="modal-close" data-close-modal type="button">×</button>
+        <span class="modal-kicker">TECHNICAL RECORD</span>
+        <h2 id="caseIndexTitle">Full case file index</h2>
+        <p class="case-index-lead">The complete project record remains available here without turning the main page into a wall of cards. Select any case file to open its technical dossier.</p>
+        <div class="case-index-list" id="caseIndexList">${entries}</div>`;
+}
 
-  function renderProjectRecord(title,lead,keys,sourceType='environment',parentKey=null){
-    if(!envProjectContent||!envProjectTitle||!envProjectLead)return;
-    const details=keys.map(k=>{const source=Object.values(envProjects).flat().find(x=>x[0]===k);if(!source)return '';return `<button type="button" class="env-project-item" data-env-project-key="${escapeHtml(k)}"><span class="env-project-item-kicker">CASE FILE</span><strong>${escapeHtml(source[1])}</strong><span>${escapeHtml(source[2]||'Technical project record.')}</span><i class="fas fa-arrow-right"></i></button>`;}).join('');
-    const back=sourceType==='group'?`<button type="button" class="env-back-link" data-back-to-group="${escapeHtml(parentKey||'web')}"><i class="fas fa-arrow-left"></i> Back to ${escapeHtml(groups[parentKey]?.title||'Research Domain')}</button>`:`<button type="button" class="env-back-link" data-back-to-env="${escapeHtml(parentKey||'portswigger')}"><i class="fas fa-arrow-left"></i> Back to ${escapeHtml(envData[parentKey]?.t||'Research Environment')}</button>`;
-    envProjectTitle.textContent=title;envProjectLead.textContent=lead;
-    envProjectContent.innerHTML=`${back}${keys.length?`<div class="env-project-list">${details}</div><div class="env-project-footer"><span><i class="fas fa-link"></i> Each record opens the existing technical case-file system.</span></div>`:`<div class="env-project-empty"><strong>Research record is still developing.</strong><span>This environment is represented as hands-on practice and currently has no dedicated public case file.</span></div>`}`;
-    openLayer(envProjectModal);
-  }
-  function openEnvProjects(key){const d=envData[key];researchParentProject=key;closeLayer(envModal);renderProjectRecord(`${d?.t||'Related Work'} · Project Record`,`Selected projects and technical evidence connected to this environment.`,envProjects[key]||[],'environment',key);}
-  function openGroupProjects(key){const d=groups[key];researchParentProject=key;closeLayer(envGroupModal);renderProjectRecord(`${d?.title||'Research Domain'} · Project Record`,`Projects and case files connected to this research domain.`,groupProjects[key]||[],'group',key);}
+function renderSecurityTabs(domainKey) {
+    return Object.entries(ResearchData.SECURITY_DOMAINS).map(([k, d]) =>
+        `<button class="security-command-tab${k === domainKey ? ' active' : ''}" type="button" data-security-domain-tab="${esc(k)}">${esc(d.t.replace(/ &.*$/, ''))}</button>`
+    ).join('');
+}
 
-  function renderRole(key){const d=roleData[key];if(!d)return;roleContent.innerHTML=`<span class="modal-kicker">${d.k}</span><div class="role-dossier-head"><div><h2 id="roleDossierTitle">${d.t}</h2><p>${d.what}</p></div><span class="role-dossier-index">TEAM LEAD</span></div><div class="role-dossier-grid"><section><h4><i class="fas fa-brain"></i> How I Work</h4><ul>${d.how.map(x=>`<li>${x}</li>`).join('')}</ul><div class="role-dossier-principle"><small>DECISION PRINCIPLE</small><strong>Understand → Validate → Correlate → Improve</strong></div></section><section><h4><i class="fas fa-bullseye"></i> What This Looks Like</h4><p class="role-dossier-explanation">I stay close to the technical problem: understand the system, validate observable behaviour, follow the evidence, connect it to impact, and turn the result into a defensible security or engineering decision.</p><div class="role-thinking-flow"><span>OBSERVE</span><b>→</b><span>VALIDATE</span><b>→</b><span>INVESTIGATE</span><b>→</b><span>IMPROVE</span></div></section></div><section class="role-related"><h4><i class="fas fa-link"></i> Related Work</h4><div class="role-related-grid">${d.related.map(x=>`<button type="button" data-env-related="${x[2]}"><strong>${x[0]}</strong><span>${x[1]}</span><i class="fas fa-arrow-right"></i></button>`).join('')}</div></section><section class="role-depth-panel"><div class="role-depth-head"><div><span class="modal-kicker">TECHNICAL DEPTH</span><h4><i class="fas fa-layer-group"></i> Skills &amp; Tools</h4></div><span class="env-depth-count">${d.skills.length+d.tools.length} signals</span></div><div class="role-depth-columns"><div><small>SKILLS</small><div class="role-dossier-tags">${d.skills.map(x=>`<span>${x}</span>`).join('')}</div></div><div><small>TOOLS / PLATFORMS</small><div class="role-dossier-tags">${d.tools.map(x=>`<span>${x}</span>`).join('')}</div></div></div></section>`;openLayer(roleModal);}
-  document.getElementById('heroResearchEnvironment')?.addEventListener('click',()=>openLayer(mapModal));
-  document.getElementById('openResearchEnvironment')?.addEventListener('click',()=>openLayer(mapModal));
-  document.querySelectorAll('[data-close-research-map]').forEach(el=>el.addEventListener('click',()=>closeLayer(mapModal)));
-  document.querySelectorAll('[data-close-env]').forEach(el=>el.addEventListener('click',()=>closeLayer(envModal)));
-  document.querySelectorAll('[data-close-env-group]').forEach(el=>el.addEventListener('click',()=>closeLayer(envGroupModal)));
-  document.querySelectorAll('[data-close-env-project]').forEach(el=>el.addEventListener('click',()=>closeLayer(envProjectModal)));
-  document.querySelectorAll('.env-card').forEach(card=>card.addEventListener('click',()=>openEnv(card.dataset.env)));
-  document.querySelectorAll('.role-scope-trigger').forEach(b=>b.addEventListener('click',()=>renderRole(b.dataset.roleScope)));
-  document.querySelectorAll('[data-role-skill]').forEach(b=>b.addEventListener('click',()=>{ const key=b.dataset.roleSkill; if(roleData[key]) renderRole(key); else if(typeof window.openSecurityCommand==='function') window.openSecurityCommand(key); else document.getElementById('security-command')?.scrollIntoView({behavior:'smooth'}); }));
-  document.querySelectorAll('[data-close-role-dossier]').forEach(el=>el.addEventListener('click',()=>closeLayer(roleModal)));
-  document.addEventListener('click',e=>{
-    const group=e.target.closest('[data-research-group]'); if(group){openGroup(group.dataset.researchGroup);return;}
-    const envFromGroup=e.target.closest('[data-open-env-from-group]'); if(envFromGroup){openEnv(envFromGroup.dataset.openEnvFromGroup,envFromGroup.dataset.parentGroup);return;}
-    const env=e.target.closest('[data-open-env]'); if(env){openEnv(env.dataset.openEnv);return;}
-    const envProjectsButton=e.target.closest('[data-open-env-projects]'); if(envProjectsButton){openEnvProjects(envProjectsButton.dataset.openEnvProjects);return;}
-    const groupProjectsButton=e.target.closest('[data-open-group-projects]'); if(groupProjectsButton){openGroupProjects(groupProjectsButton.dataset.openGroupProjects);return;}
-    const groupProjectRecord=e.target.closest('[data-open-group-project-record]'); if(groupProjectRecord){
-      const projectKey=groupProjectRecord.dataset.openGroupProjectRecord;
-      const parent=groupProjectRecord.dataset.parentGroup||researchParentGroup||'web';
-      const source=Object.values(envProjects).flat().find(x=>x[0]===projectKey);
-      closeLayer(envGroupModal);
-      if(source){ renderProjectRecord(source[1]+' · Technical Record', source[2]+' Select the case file below to open the full technical dossier.', [projectKey], 'group', parent); }
-      return;
-    }
-    const groupProject=e.target.closest('[data-open-group-project]'); if(groupProject){openGroupProjects(groupProject.dataset.openGroupProject);return;}
-    const backMap=e.target.closest('[data-back-to-research-map]'); if(backMap){closeLayer(envGroupModal);openLayer(mapModal);return;}
-    const backGroup=e.target.closest('[data-back-to-group]'); if(backGroup){closeLayer(envProjectModal);renderGroup(backGroup.dataset.backToGroup);openLayer(envGroupModal);return;}
-    const backEnv=e.target.closest('[data-back-to-env]'); if(backEnv){closeLayer(envProjectModal);openEnv(backEnv.dataset.backToEnv,researchParentGroup);return;}
-    const backEnvGroup=e.target.closest('[data-back-env-group]'); if(backEnvGroup){closeLayer(envModal);openGroup(backEnvGroup.dataset.backEnvGroup);return;}
-    const evidence=e.target.closest('[data-env-evidence-project]'); if(evidence){const key=projectRef(evidence.dataset.envEvidenceProject);closeLayer(envModal);setTimeout(()=>{if(window.__cbOpenCase)window.__cbOpenCase(key);else if(window.openProjectModal)window.openProjectModal(key);},90);return;}
-    const domain=e.target.closest('[data-open-domain-from-env]'); if(domain){closeLayer(envModal);setTimeout(()=>openGroup(domain.dataset.openDomainFromEnv),90);return;}
-    const envProject=e.target.closest('[data-env-project-key]'); if(envProject){closeLayer(envProjectModal);setTimeout(()=>{const key=projectRef(envProject.dataset.envProjectKey);if(window.__cbOpenCase)window.__cbOpenCase(key);else if(window.openProjectModal&&key)window.openProjectModal(key);},120);return;}
-    const related=e.target.closest('[data-env-related]'); if(related){
-      const filter=related.dataset.envRelated;
-      closeLayer(envModal);closeLayer(roleModal);
-      if(filter==='experience'){document.getElementById('experience')?.scrollIntoView({behavior:'smooth'});}
-      else if(filter==='services'){document.getElementById('services')?.scrollIntoView({behavior:'smooth'});}
-      else if(filter==='profile'||filter==='security-command'||filter==='projects'){document.getElementById(filter)?.scrollIntoView({behavior:'smooth'});}
-      else if(['assessment','offensive','defensive','threat','engineering','forensics','web','network','automation','mobile'].includes(filter)){
-        const btn=document.querySelector(`.project-filter[data-filter="${filter}"]`); if(btn) btn.click(); document.getElementById('projects')?.scrollIntoView({behavior:'smooth'});
-      }
-    }
-    const jump=e.target.closest('[data-research-jump]'); if(jump){
-      closeLayer(mapModal);
-      const caseModal=document.getElementById('caseIndexModal');
-      if(caseModal){caseModal.classList.add('open');caseModal.setAttribute('aria-hidden','false');document.body.classList.add('modal-open');}
-    }
-  });
-  document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;[envProjectModal,envModal,envGroupModal,mapModal,roleModal].forEach(m=>{if(m?.classList.contains('open'))closeLayer(m);});});
-});
+/* ============================================================
+   PART 6 — SINGLE DELEGATED INTERACTION ROUTER
+   One click handler. One keydown handler. Every route resolved
+   through Cases.open() or CBModal.push().
+   ============================================================ */
 
-/* ===== FINAL PROJECT + ARSENAL INTERACTIONS ===== */
 document.addEventListener('DOMContentLoaded', () => {
-    // Project filtering — includes featured and comprehensive project cards.
-    const filterButtons = document.querySelectorAll('.project-filter');
-    const projectCards = document.querySelectorAll('#projects .project-card');
-    const jumpToProjects = (filter = 'all') => {
-        const projects = document.getElementById('projects');
-        const targetButton = document.querySelector(`.project-filter[data-filter="${filter}"]`);
-        if (targetButton) targetButton.click();
-        if (projects) projects.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    };
-    filterButtons.forEach(button => button.addEventListener('click', () => {
-        filterButtons.forEach(b => b.classList.remove('active'));
-        button.classList.add('active');
-        const filter = button.dataset.filter;
-        projectCards.forEach(card => {
-            const categories = (card.dataset.category || '').split(/\s+/);
-            const matches = filter === 'all' || categories.includes(filter);
-            card.classList.toggle('project-hidden', !matches);
-            if (matches && card.classList.contains('case-secondary')) card.style.display = filter === 'all' ? '' : 'block';
-            if (!matches) card.style.display = 'none';
-        });
-        const toggle = document.getElementById('caseIndexToggle');
-        if (toggle && filter !== 'all') { toggle.style.display = 'none'; } else if (toggle) { toggle.style.display = 'inline-flex'; }
-    }));
-    document.querySelectorAll('[data-project-filter]').forEach(button => {
-        button.addEventListener('click', () => jumpToProjects(button.dataset.projectFilter || 'all'));
+    // Register all modal roots declared in the DOM.
+    CBModal.register();
+
+    // Hydrate the case registry from the actual DOM.
+    Cases.hydrateFromDOM();
+
+    // Open the research map from the hero or the section button.
+    ['heroResearchEnvironment', 'openResearchEnvironment'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('click', () => CBModal.push('researchMapModal', {
+            render: renderResearchMap,
+            focus: '[data-close-modal]',
+            breadcrumb: 'RESEARCH ENVIRONMENT'
+        }));
     });
 
-    // Project detail modal.
-    const modal = document.getElementById('projectModal');
-    const content = document.getElementById('modalContent');
-    const projectDetails = {
-        mediroza: {kicker:'Authorized External Assessment · Authorized Assessment', title:'Mediroza Web Application Security Assessment', body:`<p>An authorized black-box web application assessment documented as a technical security investigation rather than a claim of real-world compromise.</p><h4>Attack path</h4><div class="attack-path"><span>Recon</span><b>→</b><span>SQL Injection</span><b>→</b><span>Authentication Bypass</span><b>→</b><span>Patient Portal</span><b>→</b><span>Protected Report Retrieval</span></div><h4>Documented findings</h4><ul><li>08 findings spanning directory exposure, database backup exposure, SQL injection, verbose error disclosure, sensitive report retrieval, predictable storage, log metadata disclosure, and server fingerprinting.</li><li>Highest documented severity: CVSS 9.8 / CWE-89 for the demonstrated SQL injection authentication-bypass chain.</li><li>Manual differential testing, Burp evidence, browser behavior, and application responses were used when automated SQLi confirmation was inconclusive.</li></ul><h4>Evidence &amp; remediation</h4><ul><li>65 source evidence files, 58 unique SHA-256 contents, and 25 screenshots were preserved and organized for traceability.</li><li>Findings were translated into root cause, impact, CVSS/CWE context, remediation recommendations, and retest considerations.</li><li>Public materials intentionally exclude passwords, patient documents, raw sensitive databases, and other restricted evidence.</li></ul><div class="modal-meta"><span>Black-box</span><span>Burp Suite</span><span>Nmap</span><span>CVSS / CWE</span><span>Evidence Engineering</span></div><a class="modal-source" href="https://github.com/Chandrashekar-Bala/Independent-Web-Application-Security-Assessment-Mediroza-General-Hospital" target="_blank" rel="noopener noreferrer">View public assessment repository <i class="fab fa-github"></i></a>`},
-        driver: {kicker:'Linux Kernel · Driver Compatibility · Real Hardware', title:'RTL8812BU Linux Driver Modernization', body:`<p>Modernized an upstream RTL8812BU/RTL8822BU Linux USB Wi-Fi driver for newer kernel environments through kernel-facing C analysis, compatibility changes, build troubleshooting, and hardware validation.</p><h4>Engineering record</h4><ul><li>Targeted compatibility-sensitive Linux kernel interfaces across 13 source files.</li><li>Investigated compiler, kernel API, module-build, USB callback, timer, filesystem-access, and regulatory-related compatibility issues.</li><li>Built and validated the resulting module on Kali Linux using TP-Link Archer T4U v3 hardware (USB ID 2357:0115).</li><li>Preserved upstream attribution and maintained traceability between the upstream and modified code.</li></ul><div class="modal-meta"><span>C</span><span>Linux Kernel</span><span>GCC</span><span>Git</span><span>RTL8812BU</span><span>Real Hardware</span></div><div class="modal-links"><a class="modal-source" href="https://github.com/Chandrashekar-Bala/RTL8812BU-Linux-7.0.12" target="_blank" rel="noopener noreferrer">My repository <i class="fab fa-github"></i></a><a class="modal-source" href="https://github.com/morrownr/88x2bu-20210702" target="_blank" rel="noopener noreferrer">Upstream repository <i class="fas fa-external-link-alt"></i></a></div>`},
-        recon: {kicker:'Reconnaissance Research · Reconnaissance', title:'Network Reconnaissance & Attack-Surface Mapping', body:`<p>Structured reconnaissance work focused on collecting, validating, and interpreting external attack-surface information before making security conclusions.</p><h4>Coverage</h4><ul><li>WHOIS, nslookup/dig, DNSRecon, WhatWeb, cURL, WAFW00F, certificate discovery, crt.sh, CertSpotter, Subfinder and theHarvester.</li><li>Nmap/NSE service enumeration, version detection, OS detection, HTTP/HTTPS and TLS validation, and Zenmap-supported review.</li><li>Evidence-first workflow separating observed exposure from assumptions and hypotheses.</li></ul><div class="modal-meta"><span>OSINT</span><span>DNS</span><span>Nmap/NSE</span><span>TLS</span><span>Web Fingerprinting</span></div>`},
-        password: {kicker:'Controlled Password Security Analysis · Controlled Offline Analysis', title:'Protected PDF & Password Security Analysis', body:`<p>Controlled offline password-security analysis of protected PDF artifacts using purpose-built extraction and validation workflows.</p><h4>Workflow</h4><ul><li>Used pdf2john and John the Ripper with RockYou-based testing.</li><li>Compared local recovery results with Networkwalks-provided tooling and documented limitations.</li><li>Validated recovered files with QPDF and correlated evidence rather than treating a password hit alone as the complete result.</li></ul><div class="modal-meta"><span>pdf2john</span><span>John the Ripper</span><span>RockYou</span><span>QPDF</span></div>`},
-        web: {kicker:'Application Security · PortSwigger', title:'Web Application Security Lab', body:`<p>Hands-on PortSwigger Web Security Academy practice focused on understanding application behavior through manual request/response analysis and controlled exploitation.</p><h4>Coverage</h4><ul><li>SQL injection, XSS, CSRF, SSRF, authentication, authorization and access-control weaknesses.</li><li>Parameter and session behavior, HTTP request manipulation, validation, and remediation-oriented notes.</li><li>Burp Suite and OWASP ZAP used to support repeatable application-security testing.</li></ul><div class="modal-meta"><span>50+ Labs</span><span>Burp Suite</span><span>OWASP ZAP</span><span>OWASP Top 10</span></div><a class="modal-source" href="https://portswigger.net/web-security" target="_blank" rel="noopener noreferrer">PortSwigger Web Security Academy <i class="fas fa-external-link-alt"></i></a>`},
-        threat: {kicker:'Defensive Security · Threat Hunting', title:'Network Traffic Analysis & Threat Hunting', body:`<p>Network investigation work connecting packet-level observations with defensive hypotheses, indicators, and ATT&amp;CK-aligned analysis.</p><h4>Focus</h4><ul><li>Wireshark packet capture and protocol analysis.</li><li>Suspicious-connection investigation and IOC-oriented review.</li><li>Threat-hunting hypotheses around attacker communication and potential command-and-control behavior.</li><li>Translation of network observations into detection and investigation opportunities.</li></ul><div class="modal-meta"><span>Wireshark</span><span>Tcpdump</span><span>Zeek</span><span>IOC Analysis</span><span>MITRE ATT&amp;CK</span></div>`},
-        malware: {kicker:'Malware Analysis · Digital Forensics · Research', title:'Malware Analysis & Windows Forensics Research', body:`<p>Hands-on research spanning suspicious-file investigation, binary analysis, execution behavior, indicator extraction, and Windows forensic artifacts.</p><h4>Static + dynamic analysis</h4><ul><li>Static inspection of suspicious files and binaries, including structure and behavior-oriented analysis.</li><li>Dynamic analysis exercises focused on execution behavior and observable indicators.</li><li>Reverse-engineering methods using C, GDB, memory/stack analysis, control-flow analysis and debugging.</li></ul><h4>Forensics</h4><ul><li>Windows Registry artifacts, filesystem activity, disk artifacts, suspicious-file evidence, and timeline-oriented investigation.</li><li>Volatility, Autopsy and network-analysis tooling used according to the research scenario.</li></ul><div class="modal-meta"><span>Ghidra</span><span>IDA Pro</span><span>GDB</span><span>Volatility</span><span>Autopsy</span><span>Wireshark</span></div>`},
-        android: {kicker:'Mobile Security · Android', title:'Android Security Analysis', body:`<p>Android application security research combining APK inspection, decompilation, static review, runtime logging, and dynamic analysis.</p><h4>Tooling</h4><ul><li>Dex2jar and JD-GUI for decompilation and code inspection.</li><li>Drozer for dynamic security-testing practice.</li><li>Logcat for runtime observation and troubleshooting.</li><li>Android Studio for application and emulator workflows.</li></ul><div class="modal-meta"><span>APK Analysis</span><span>Reverse Engineering</span><span>Static Analysis</span><span>Dynamic Analysis</span></div>`},
-        vulnhub: {kicker:'Controlled Offensive Practice · VulnHub / HTB', title:'Vulnerability Assessment & Privilege Escalation', body:`<p>Repeatable security practice across vulnerable virtual environments, moving from enumeration through validation and post-exploitation analysis.</p><h4>Workflow</h4><ul><li>Service and version enumeration with Nmap.</li><li>Vulnerability identification and controlled exploit validation with Metasploit.</li><li>Linux and Windows privilege-escalation practice and post-exploitation analysis.</li><li>VulnHub, Hack The Box, OverTheWire and vulnerable pentesting VMs used as controlled practice environments.</li></ul><div class="modal-meta"><span>VulnHub</span><span>Hack The Box</span><span>Nmap</span><span>Metasploit</span><span>PrivEsc</span></div>`},
-        wireless: {kicker:'Wireless Security · Controlled Lab', title:'Wireless Security Assessment Lab', body:`<p>Controlled wireless-security research covering discovery, monitor mode, packet capture, protocol analysis, and security testing workflows.</p><h4>Focus</h4><ul><li>Aircrack-ng and Wireshark for wireless assessment and packet analysis.</li><li>Monitor mode, packet capture, and controlled wireless testing.</li><li>hcxdumptool requirements and driver capabilities investigated as part of wireless security engineering.</li></ul><div class="modal-meta"><span>Aircrack-ng</span><span>Wireshark</span><span>Monitor Mode</span><span>hcxdumptool</span></div>`},
-        buffer: {kicker:'Exploit Development · Controlled Research', title:'Buffer Overflow Exploit Development', body:`<p>Low-level security research focused on memory, stack behavior, control flow, and debugger-assisted proof-of-concept development in controlled environments.</p><h4>Tooling</h4><ul><li>GDB and WinDbg for debugging and memory inspection.</li><li>C for understanding low-level memory behavior.</li><li>Stack analysis, control-flow analysis, and controlled proof-of-concept workflows.</li></ul><div class="modal-meta"><span>C</span><span>GDB</span><span>WinDbg</span><span>Memory Analysis</span><span>PoC</span></div>`},
-        firmware: {kicker:'Systems Security · Firmware Research', title:'SPI Flash & BIOS Protection Research', body:`<p>Firmware research on a Lenovo G580 involving SPI flash/NVRAM protection analysis and Linux-based firmware investigation.</p><h4>Research record</h4><ul><li>Used flashrom to investigate internal programmer access and read-protection behavior.</li><li>Acquired an 8 MB full-flash image and extracted the BIOS region for analysis.</li><li>Used dmidecode and dmesg to correlate platform and firmware-loading observations.</li></ul><div class="modal-meta"><span>flashrom</span><span>SPI Flash</span><span>NVRAM</span><span>BIOS</span><span>dmidecode</span></div>`},
-        automation: {kicker:'Security Development · Automation', title:'Security Automation & PoC Tooling', body:`<p>Python- and Bash-based security development supporting reconnaissance, vulnerability assessment, network analysis, research, and repeatable proof-of-concept workflows.</p><h4>Engineering approach</h4><ul><li>Automate repeatable reconnaissance and validation steps where it improves consistency.</li><li>Build small proof-of-concept tools to understand vulnerabilities and security behavior.</li><li>Document inputs, outputs, limitations, and defensive considerations rather than treating automation as a substitute for validation.</li></ul><div class="modal-meta"><span>Python</span><span>Bash</span><span>SQL</span><span>Automation</span><span>PoC</span></div>`},
-        website: {kicker:'Web Engineering · Portfolio System', title:'Cybersecurity Portfolio Engineering', body:`<p>This portfolio itself is a technical project: a static web system designed to present security research, assessment work, engineering projects, and evidence in a usable interface.</p><h4>What I built</h4><ul><li>Semantic HTML structure with responsive layouts and a terminal-inspired visual system.</li><li>JavaScript-driven project filtering, technical-detail modals, theme switching, navigation behavior, counters, and UI feedback.</li><li>Accessibility-oriented controls, keyboard interaction, reduced-motion support, SEO/social metadata, and GitHub Pages deployment structure.</li></ul><div class="modal-meta"><span>HTML5</span><span>CSS3</span><span>JavaScript</span><span>Accessibility</span><span>SEO</span><span>GitHub Pages</span></div><a class="modal-source" href="https://github.com/Chandrashekar-Bala" target="_blank" rel="noopener noreferrer">View GitHub profile <i class="fab fa-github"></i></a>`}
-    };
-    if (modal && content) {
-        const openProject = key => { const item = projectDetails[key]; if (!item) return; content.innerHTML = `<span class="modal-kicker">${item.kicker}</span><h2 id="modalTitle">${item.title}</h2><div class="modal-body">${item.body}</div>`; modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.classList.add('modal-open'); };
-        const closeProject = () => { modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); document.body.classList.remove('modal-open'); };
-        document.querySelectorAll('#projects .project-open').forEach(button => button.addEventListener('click', () => openProject(button.closest('.project-card')?.dataset.project)));
-        window.openProjectModal = openProject;
-        modal.querySelectorAll('[data-close-modal]').forEach(el => el.addEventListener('click', closeProject));
-        document.addEventListener('keydown', event => { if (event.key === 'Escape' && modal.classList.contains('open')) closeProject(); });
+    // Open the security command center from its launch buttons.
+    ['openSecurityCommand', 'openSecurityCommandBottom'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('click', () => CBModal.push('securityCommandModal', {
+            render: () => {
+                const base = renderSecurityDomain('web');
+                // Insert tabs after they are rendered.
+                setTimeout(() => {
+                    const tabsHost = document.getElementById('securityCommandTabs');
+                    if (tabsHost) tabsHost.innerHTML = renderSecurityTabs('web');
+                }, 0);
+                return base;
+            },
+            focus: '[data-close-modal]',
+            breadcrumb: 'SECURITY PRACTICE MAP'
+        }));
+    });
+
+    // Practice Map cards on the main page.
+    document.querySelectorAll('.unified-domain-card[data-security-domain]').forEach(card => {
+        card.addEventListener('click', () => {
+            const key = card.dataset.securityDomain;
+            CBModal.push('securityCommandModal', {
+                render: () => {
+                    const html = renderSecurityDomain(key);
+                    setTimeout(() => {
+                        const tabsHost = document.getElementById('securityCommandTabs');
+                        if (tabsHost) tabsHost.innerHTML = renderSecurityTabs(key);
+                    }, 0);
+                    return html;
+                },
+                focus: '[data-close-modal]',
+                breadcrumb: 'SECURITY PRACTICE MAP'
+            });
+        });
+    });
+
+    // Case index toggle at the section level.
+    const caseToggle = document.getElementById('caseIndexToggle');
+    if (caseToggle) {
+        caseToggle.addEventListener('click', () => {
+            CBModal.push('caseIndexModal', {
+                render: renderCaseIndex,
+                focus: '[data-close-modal]',
+                breadcrumb: 'CASE INDEX'
+            });
+        });
     }
 
-    // Security Arsenal command-center modal.
-    const arsenalModal = document.getElementById('arsenalModal');
-    const arsenalTitle = document.getElementById('arsenalModalTitle');
-    const arsenalKicker = document.getElementById('arsenalModalKicker');
-    const arsenalContent = document.getElementById('arsenalModalContent');
-    const arsenalDetails = {
-        offensive:{k:'01 · OFFENSIVE SECURITY',t:'Offensive Security',tools:['Nmap','Nessus','Metasploit','Burp Suite','OWASP ZAP','SQLMap','John the Ripper','Hydra','Medusa','GDB','WinDbg'],methods:['Reconnaissance','Service enumeration','Vulnerability validation','Controlled exploitation','Privilege escalation','Post-exploitation analysis'],projects:[['Mediroza Web Application Security Assessment','Authorized black-box assessment with demonstrated SQLi/authentication-bypass chain.','assessment','mediroza'],['Vulnerability Assessment & Privilege Escalation','Controlled vulnerable-environment practice using VulnHub/HTB/VMs.','offensive'],['Web Application Security Lab','PortSwigger application-security practice.','web'],['Buffer Overflow Exploit Development','Debugger-assisted low-level research.','engineering']]},
-        web:{k:'02 · WEB & APPLICATION SECURITY',t:'Web & Application Security',tools:['Burp Suite','OWASP ZAP','Nmap','cURL','WhatWeb','WAFW00F','SQLMap'],methods:['HTTP request/response analysis','Authentication testing','Authorization and access control','SQL injection','XSS / CSRF / SSRF','Session and parameter analysis'],projects:[['Mediroza Web Application Security Assessment','Flagship assessment with manual validation and CVSS/CWE reporting.','assessment'],['Web Application Security Lab','50+ PortSwigger labs across OWASP-aligned scenarios.','web']]},
-        defensive:{k:'03 · DEFENSIVE SECURITY',t:'Defensive Security',tools:['Splunk','Google Chronicle','Wireshark','Tcpdump','Zeek','Volatility'],methods:['Security monitoring','Log analysis','Alert triage','IOC analysis','Threat hunting','Incident-response thinking'],projects:[['Network Traffic Analysis & Threat Hunting','Packet-level investigation and ATT&CK-aligned threat hunting.','defensive','threat'],['Malware Analysis & Windows Forensics Research','Evidence-focused malware and forensic exercises.','forensics'],['Mediroza Assessment','Findings translated into remediation and detection considerations.','assessment']]},
-        adversary:{k:'04 · THREAT INTELLIGENCE & ADVERSARY RESEARCH',t:'Threat Intelligence & Adversary Research',tools:['Maltego','theHarvester','Subfinder','crt.sh','CertSpotter','WHOIS','MITRE ATT&CK'],methods:['OSINT','Infrastructure research','TTP analysis','Threat-report analysis','Adversary behavior mapping','OpSec research'],projects:[['Network Reconnaissance & Attack-Surface Mapping','Passive intelligence, DNS, certificates, web fingerprinting and service validation.','network','recon'],['Active Directory Attack-Path Research','Kerberoasting, Pass-the-Hash, ACL abuse and detection considerations.','threat'],['Network Traffic Analysis & Threat Hunting','IOC and attacker-behavior investigation.','defensive']]},
-        network:{k:'05 · NETWORK SECURITY',t:'Network Security',tools:['Nmap','Nessus','Wireshark','Tcpdump','Zeek','NSE','dig','DNSRecon','cURL'],methods:['Reconnaissance','Service/version validation','TCP/IP and DNS analysis','TLS inspection','Packet analysis','Suspicious-connection investigation'],projects:[['Network Reconnaissance & Attack-Surface Mapping','Reconnaissance Research structured reconnaissance.','network'],['Network Traffic Analysis & Threat Hunting','Traffic analysis and IOC-oriented investigation.','defensive'],['Vulnerability Assessment & Privilege Escalation','Network/service enumeration across controlled VMs.','offensive']]},
-        wireless:{k:'06 · WIRELESS SECURITY',t:'Wireless Security',tools:['Aircrack-ng','Wireshark','hcxdumptool','rtl88x2bu / 88x2bu','iw','Linux wireless tooling'],methods:['Monitor mode','Packet capture','Protocol analysis','Controlled Wi-Fi testing','Driver capability validation'],projects:[['Wireless Security Assessment Lab','Controlled wireless assessment and packet-analysis workflows.','wireless'],['RTL8812BU Linux Driver Modernization','Kernel compatibility work enabling real-hardware wireless testing.','engineering']]},
-        mobile:{k:'07 · MOBILE SECURITY',t:'Mobile Security',tools:['Drozer','Dex2jar','JD-GUI','Logcat','Android Studio'],methods:['APK inspection','Decompilation','Static analysis','Dynamic analysis','Runtime observation','Reverse engineering'],projects:[['Android Security Analysis','APK inspection, static/dynamic analysis and runtime behavior review.','mobile','android']]},
-        malware:{k:'08 · MALWARE ANALYSIS & REVERSE ENGINEERING',t:'Malware Analysis & Reverse Engineering',tools:['Ghidra','IDA Pro','GDB','Volatility','Wireshark'],methods:['Static analysis','Dynamic analysis','Binary investigation','Execution behavior','Memory / stack analysis','Control-flow analysis','IOC extraction'],projects:[['Malware Analysis & Windows Forensics Research','Hands-on static/dynamic and evidence-analysis exercises.','forensics'],['Buffer Overflow Exploit Development','C and debugger-assisted low-level research.','engineering','buffer']]},
-        forensics:{k:'09 · DIGITAL FORENSICS & INCIDENT RESPONSE',t:'Digital Forensics & Incident Response',tools:['Autopsy','Volatility','Windows Registry tools','Wireshark','Linux forensic utilities'],methods:['Registry artifact review','Filesystem analysis','Disk artifacts','Memory analysis','IOC correlation','Timeline-oriented investigation'],projects:[['Malware Analysis & Windows Forensics Research','Windows artifacts, suspicious files and timeline-oriented review.','forensics'],['Network Traffic Analysis & Threat Hunting','Network evidence and IOC correlation.','defensive'],['Mediroza Assessment','Evidence preservation and technical documentation.','assessment']]},
-        engineering:{k:'10 · SECURITY ENGINEERING',t:'Security Engineering',tools:['C','Python','Bash','GCC','Git','Linux kernel headers','flashrom','GDB'],methods:['Kernel/API compatibility','Build troubleshooting','Security tooling','Proof-of-concept development','Hardware validation','Technical documentation'],projects:[['RTL8812BU Linux Driver Modernization','13-source-file kernel compatibility project validated on real hardware.','engineering','driver'],['SPI Flash & BIOS Protection Research','Firmware protection and flash analysis.','forensics','firmware'],['Security Automation & PoC Tooling','Python/Bash tooling for repeatable security workflows.','engineering','automation']]},
-        systems:{k:'11 · CLOUD, SYSTEMS & VIRTUALIZATION',t:'Cloud, Systems & Virtualization',tools:['Kali Linux','Ubuntu','Windows','VirtualBox','Docker','Linux networking','PowerShell'],methods:['Linux/Windows administration','Virtual lab construction','Network configuration','System troubleshooting','Cloud security and systems architecture'],projects:[['Vulnerability Assessment & Privilege Escalation','Linux/Windows vulnerable environments.','offensive'],['RTL8812BU Driver Engineering','Linux kernel and hardware-backed engineering.','engineering']]},
-        automation:{k:'12 · AUTOMATION & SECURITY DEVELOPMENT',t:'Automation & Security Development',tools:['Python','Bash','C','C++','SQL','HTML5','CSS3','JavaScript','Git/GitHub'],methods:['Security automation','Recon tooling','Vulnerability assessment tooling','PoC development','Data analysis','Web engineering'],projects:[['Security Automation & PoC Tooling','Repeatable security workflows and proof-of-concept development.','engineering'],['Cybersecurity Portfolio Engineering','Static web engineering with interactive security content.','engineering','website'],['Fake News Detection System','Python/NLP/ML capstone engineering.','engineering']]}
-    };
-    if (arsenalModal && arsenalTitle && arsenalKicker && arsenalContent) {
-        const openArsenal = key => {
-            const item = arsenalDetails[key]; if (!item) return;
-            arsenalKicker.textContent = item.k;
-            arsenalTitle.textContent = item.t;
-            arsenalContent.innerHTML = `<div class="arsenal-detail-grid"><div><h4>Tools & Technologies</h4><div class="modal-meta">${item.tools.map(x=>`<span>${x}</span>`).join('')}</div></div><div><h4>Methods & Practice</h4><ul>${item.methods.map(x=>`<li>${x}</li>`).join('')}</ul></div></div><div class="arsenal-related"><h4>Relevant Projects</h4><div class="arsenal-related-list">${item.projects.map(p=>`<button type="button" class="arsenal-project-link" data-project-target="${p[2]}"><strong>${p[0]}</strong><span>${p[1]}</span><i class="fas fa-arrow-right"></i></button>`).join('')}</div></div>`;
-            arsenalModal.classList.add('open'); arsenalModal.setAttribute('aria-hidden','false'); document.body.classList.add('modal-open');
-            arsenalContent.querySelectorAll('[data-project-target]').forEach(btn => btn.addEventListener('click', () => { const target=btn.dataset.projectTarget; closeArsenal(); setTimeout(()=>{ const card=document.querySelector(`#projects .project-card[data-category~="${target}"] .project-open`); if(card) card.click(); else jumpToProjects(target); },180); }));
-        };
-        const closeArsenal = () => { arsenalModal.classList.remove('open'); arsenalModal.setAttribute('aria-hidden','true'); document.body.classList.remove('modal-open'); };
-        document.querySelectorAll('[data-arsenal]').forEach(card => card.addEventListener('click', () => openArsenal(card.dataset.arsenal)));
-        arsenalModal.querySelectorAll('[data-close-arsenal]').forEach(el => el.addEventListener('click', closeArsenal));
-        document.addEventListener('keydown', event => { if (event.key === 'Escape' && arsenalModal.classList.contains('open')) closeArsenal(); });
+    // Team Lead role-open trigger.
+    const roleOpenTrigger = document.querySelector('.role-open-trigger[data-role-scope]');
+    if (roleOpenTrigger) {
+        roleOpenTrigger.addEventListener('click', () => {
+            const key = roleOpenTrigger.dataset.roleScope;
+            CBModal.push('roleDossierModal', {
+                render: () => renderRoleDossier(key),
+                focus: '[data-close-modal]',
+                breadcrumb: 'TEAM LEAD · ' + key.toUpperCase()
+            });
+        });
+    }
+
+    // Project cards on the section: open case file.
+    document.querySelectorAll('#projects .project-open').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const card = btn.closest('.project-card');
+            if (card && card.dataset.project) Cases.open(card.dataset.project, { from: 'project-card-button' });
+        });
+    });
+    document.querySelectorAll('#projects .project-card').forEach(card => {
+        card.addEventListener('click', e => {
+            if (e.target.closest('button,a')) return;
+            if (card.dataset.project) Cases.open(card.dataset.project, { from: 'project-card-body' });
+        });
+    });
+
+    // Experience / role project links (buttons with data-role-project).
+    document.querySelectorAll('[data-role-project]').forEach(btn => {
+        btn.addEventListener('click', () => Cases.open(btn.dataset.roleProject, { from: 'role-project' }));
+    });
+
+    // Focus "view work" links.
+    document.querySelectorAll('.focus-project-link').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const filter = btn.dataset.projectFilter;
+            if (filter) {
+                const target = document.querySelector(`.project-filter[data-filter="${filter}"]`);
+                if (target) target.click();
+                document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });
+
+    // Conversation triggers.
+    document.querySelectorAll('.conversation-trigger, #navConversationTrigger').forEach(btn => {
+        btn.addEventListener('click', () => {
+            CBModal.push('conversationModal', {
+                render: renderConversation,
+                focus: '#conversationTopic',
+                breadcrumb: 'CONVERSATION'
+            });
+            setTimeout(() => bindConversationInteractions(), 30);
+        });
+    });
+
+    // Referral button.
+    const referralBtn = document.getElementById('referralButton');
+    if (referralBtn) {
+        referralBtn.addEventListener('click', () => {
+            CBModal.push('referralModal', {
+                render: renderReferral,
+                focus: '[data-close-modal]',
+                breadcrumb: 'REFERRAL'
+            });
+            setTimeout(() => bindReferralInteractions(), 30);
+        });
+    }
+
+    // Command palette triggers.
+    const commandTriggers = [
+        document.getElementById('commandTrigger'),
+        ...document.querySelectorAll('[data-command-action="command"]')
+    ].filter(Boolean);
+    commandTriggers.forEach(t => t.addEventListener('click', openCommandModal));
+
+    document.addEventListener('keydown', e => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openCommandModal(); }
+        if (e.key === '/' && !/input|textarea|select/i.test(document.activeElement?.tagName || '')) { e.preventDefault(); openCommandModal(); }
+        if (e.key === 't' && e.ctrlKey) { e.preventDefault(); document.querySelector('.theme-toggle')?.click(); }
+        if (e.key === 'Escape' && !CBModal.stack.length) {
+            document.querySelector('.nav-links')?.classList.remove('active');
+            document.querySelector('.hamburger')?.classList.remove('active');
+        }
+    });
+
+    // Ribbon actions and footer command actions.
+    document.querySelectorAll('[data-command-action]').forEach(btn => {
+        btn.addEventListener('click', () => executeCommandAction(btn.dataset.commandAction));
+    });
+
+    // Project filters.
+    document.querySelectorAll('.project-filter').forEach(btn => {
+        btn.addEventListener('click', () => applyProjectFilter(btn.dataset.filter));
+    });
+
+    // Resume buttons.
+    document.querySelectorAll('a[href="#"][onclick*="handleResumeClick"], .resume-action').forEach(el => {
+        el.removeAttribute('onclick');
+        el.addEventListener('click', e => handleResumeClick(e, /download/i.test(el.textContent)));
+    });
+
+    // Hash deep-linking for case files.
+    syncFromHash();
+    window.addEventListener('hashchange', syncFromHash);
+});
+
+/* ---- Single delegated click router for anything carrying data-open-case ---- */
+document.addEventListener('click', e => {
+    const caseBtn = e.target.closest('[data-open-case]');
+    if (caseBtn) {
+        e.preventDefault();
+        const id = caseBtn.dataset.openCase;
+        const from = caseBtn.dataset.from || 'delegated';
+        Cases.open(id, { from });
+        return;
+    }
+    const groupBtn = e.target.closest('[data-research-group]');
+    if (groupBtn) {
+        e.preventDefault();
+        const key = groupBtn.dataset.researchGroup;
+        CBModal.push('envGroupModal', {
+            render: () => renderEnvGroup(key),
+            focus: '[data-close-modal]',
+            breadcrumb: 'RESEARCH / ' + key.toUpperCase()
+        });
+        return;
+    }
+    const envBtn = e.target.closest('[data-open-env]');
+    if (envBtn) {
+        e.preventDefault();
+        const envKey = envBtn.dataset.openEnv;
+        const parentGroup = envBtn.dataset.parentGroup || null;
+        CBModal.push('envModal', {
+            render: () => renderEnvDossier(envKey, parentGroup),
+            focus: '[data-close-modal]',
+            breadcrumb: 'RESEARCH / ' + (parentGroup ? parentGroup.toUpperCase() + ' / ' : '') + envKey.toUpperCase()
+        });
+        return;
+    }
+    const groupLink = e.target.closest('[data-open-group]');
+    if (groupLink) {
+        e.preventDefault();
+        const key = groupLink.dataset.openGroup;
+        CBModal.push('envGroupModal', {
+            render: () => renderEnvGroup(key),
+            focus: '[data-close-modal]',
+            breadcrumb: 'RESEARCH / ' + key.toUpperCase()
+        });
+        return;
+    }
+    const tabBtn = e.target.closest('[data-security-domain-tab]');
+    if (tabBtn) {
+        e.preventDefault();
+        const key = tabBtn.dataset.securityDomainTab;
+        const content = document.getElementById('securityCommandModalContent');
+        if (content) content.outerHTML = renderSecurityDomain(key).match(/<div class="security-command-modal-content"[\s\S]*<\/div>\s*$/)?.[0] || content.outerHTML;
+        // Simpler: replace via CBModal re-render of top layer with same tabs.
+        const tabsHost = document.getElementById('securityCommandTabs');
+        if (tabsHost) tabsHost.innerHTML = renderSecurityTabs(key);
+        // Re-render the content body.
+        const host = CBModal.roots['securityCommandModal'];
+        if (host) {
+            // Regenerate the whole modal HTML to reflect active tab.
+            host.innerHTML = renderSecurityDomain(key);
+            setTimeout(() => {
+                const newTabs = document.getElementById('securityCommandTabs');
+                if (newTabs) newTabs.innerHTML = renderSecurityTabs(key);
+            }, 0);
+        }
+        return;
+    }
+    const caseIndexOpen = e.target.closest('[data-open-case-index]');
+    if (caseIndexOpen) {
+        e.preventDefault();
+        CBModal.push('caseIndexModal', { render: renderCaseIndex, focus: '[data-close-modal]', breadcrumb: 'CASE INDEX' });
+        return;
     }
 });
 
+/* ============================================================
+   PART 7 — CONVERSATION / REFERRAL / COMMAND RENDERERS
+   (HTML preserved from v5.1; wiring reattached after render)
+   ============================================================ */
 
-/* ===== Executive v4 interaction layer ===== */
-(function(){
-  const $ = (s,root=document) => root.querySelector(s);
-  const $$ = (s,root=document) => [...root.querySelectorAll(s)];
+function renderConversation() {
+    return `
+        <button class="modal-close" type="button" aria-label="Close" data-close-modal><i class="fas fa-xmark"></i></button>
+        <span class="modal-kicker">0xCB / COMMUNICATION CHANNEL</span>
+        <h2 id="conversationTitle">Start a Conversation</h2>
+        <p class="enhanced-lead">Choose the reason for reaching out and I'll prepare a focused message. No form submission is sent to a third-party service — the final action opens your own email client.</p>
+        <div class="conversation-grid">
+            <label><span>Conversation type</span>
+                <select id="conversationTopic">
+                    <option value="Cybersecurity opportunity">Cybersecurity opportunity</option>
+                    <option value="Security research collaboration">Security research collaboration</option>
+                    <option value="Security assessment discussion">Security assessment discussion</option>
+                    <option value="Threat intelligence / CTI">Threat intelligence / CTI</option>
+                    <option value="Technical project discussion">Technical project discussion</option>
+                    <option value="General introduction">General introduction</option>
+                </select>
+            </label>
+            <label><span>Your name</span><input id="conversationName" autocomplete="name" placeholder="Your name" /></label>
+        </div>
+        <label class="conversation-field"><span>Message</span><textarea id="conversationMessage" placeholder="Tell me what you would like to discuss..."></textarea></label>
+        <div class="conversation-preview" id="conversationPreview"><span>MAIL</span><strong>Subject: Cybersecurity opportunity</strong><small>Ready to open in your email client.</small></div>
+        <div class="enhanced-actions">
+            <button class="btn btn-primary" id="sendConversation" type="button"><i class="fas fa-paper-plane"></i> Open Email Draft</button>
+            <button class="btn btn-outline" id="copyConversation" type="button"><i class="fas fa-copy"></i> Copy Draft</button>
+            <a class="btn btn-secondary" href="https://www.linkedin.com/in/chandrashekar-bala/" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin"></i> Continue on LinkedIn</a>
+        </div>`;
+}
 
-  // Curated case index: secondary projects remain available without overwhelming the page.
-  const caseToggle = $('#caseIndexToggle');
-  if(caseToggle){
-    caseToggle.addEventListener('click',()=>{
-      const open = caseToggle.classList.toggle('open');
-      caseToggle.setAttribute('aria-expanded',String(open));
-      $$('.case-secondary').forEach(c=>{ c.style.display = open ? '' : 'none'; });
-      caseToggle.childNodes[0].nodeValue = open ? 'Collapse extended case record ' : 'Browse full technical case index ';
+function bindConversationInteractions() {
+    const topic = document.getElementById('conversationTopic');
+    const name = document.getElementById('conversationName');
+    const message = document.getElementById('conversationMessage');
+    const preview = document.getElementById('conversationPreview');
+    const defaults = {
+        'Cybersecurity opportunity':'Hello Chandrashekar, I came across your portfolio and would like to discuss a cybersecurity opportunity.',
+        'Security research collaboration':'Hello Chandrashekar, I would like to discuss a potential security research collaboration.',
+        'Security assessment discussion':'Hello Chandrashekar, I would like to discuss a security assessment or application-security engagement.',
+        'Threat intelligence / CTI':'Hello Chandrashekar, I would like to discuss threat intelligence, CTI, or adversary-research work.',
+        'Technical project discussion':'Hello Chandrashekar, I would like to discuss a technical cybersecurity project or engineering opportunity.',
+        'General introduction':'Hello Chandrashekar, I came across your portfolio and would like to connect.'
+    };
+    function update() {
+        const t = topic?.value || 'Cybersecurity opportunity';
+        if (message && (!message.dataset.edited || !message.value.trim())) message.value = defaults[t] || defaults['General introduction'];
+        const who = name?.value.trim();
+        if (preview) preview.innerHTML = `<span>MAIL</span><strong>Subject: ${esc(t)}</strong><small>${who ? 'Prepared for ' + esc(who) + '. ' : ' '}Ready to open in your email client.</small>`;
+    }
+    if (message) message.addEventListener('input', () => message.dataset.edited = 'true');
+    [topic, name].forEach(el => el && el.addEventListener('input', update));
+    update();
+
+    document.getElementById('sendConversation')?.addEventListener('click', () => {
+        const subject = topic?.value || 'Cybersecurity opportunity';
+        const who = name?.value.trim();
+        const body = (message?.value.trim() || defaults[subject] || defaults['General introduction']) + (who ? '\n\nName: ' + who : '') + '\n\nPortfolio: ' + location.href.split('#')[0];
+        location.href = 'mailto:chandrashekar-bala@protonmail.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+        notify('Email draft prepared.');
     });
-  }
-
-  // Full case index modal.
-  const caseModal=$('#caseIndexModal'), caseList=$('#caseIndexList');
-  if(caseModal && caseList){
-    $$('#projects .project-card').forEach(card=>{
-      const key=card.dataset.project, title=$('h3',card)?.textContent.trim()||key;
-      const kicker=$('.project-kicker',card)?.textContent.trim()||'';
-      const item=document.createElement('div'); item.className='case-index-item';
-      item.innerHTML=`<div class="case-item-copy"><strong>${title}</strong><small>${kicker}</small></div><button class="case-open-btn" type="button" data-case-open="${key}">OPEN DOSSIER →</button>`;
-      caseList.appendChild(item);
+    document.getElementById('copyConversation')?.addEventListener('click', async () => {
+        const subject = topic?.value || 'Cybersecurity opportunity';
+        const who = name?.value.trim();
+        const draft = 'Subject: ' + subject + '\n\n' + (message?.value.trim() || defaults[subject] || defaults['General introduction']) + (who ? '\n\nName: ' + who : '');
+        try { await navigator.clipboard.writeText(draft); notify('Conversation draft copied to clipboard.'); }
+        catch { notify('Clipboard access was unavailable.'); }
     });
-    const close=()=>{caseModal.classList.remove('open');caseModal.setAttribute('aria-hidden','true');document.body.classList.remove('modal-open');};
-    $$('[data-close-case-index]').forEach(x=>x.addEventListener('click',close));
-    caseList.addEventListener('click',e=>{const b=e.target.closest('[data-case-open]');if(!b)return;close(); if(window.openProjectModal) window.openProjectModal(b.dataset.caseOpen);});
-    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&caseModal.classList.contains('open'))close();});
-  }
+}
 
-  // If a project card has a secondary index entry, make the full card visually actionable.
-  $$('#projects .project-card').forEach(card=>{
-    card.addEventListener('click',e=>{
-      if(e.target.closest('button,a')) return;
-      if(window.openProjectModal && card.dataset.project) window.openProjectModal(card.dataset.project);
-    });
-  });
+function renderReferral() {
+    return `
+        <button class="modal-close" type="button" aria-label="Close" data-close-modal><i class="fas fa-xmark"></i></button>
+        <span class="modal-kicker">0xCB / REFERRAL CHANNEL</span>
+        <h2 id="referralTitle">Know someone hiring for security?</h2>
+        <p class="enhanced-lead">Share the portfolio directly or copy a short referral note. The wording stays factual and points the recipient toward the technical record rather than generic claims.</p>
+        <div class="referral-grid">
+            <button class="referral-card" type="button" data-referral="copy"><i class="fas fa-copy"></i><strong>Copy referral note</strong><span>Copies a recruiter-friendly introduction.</span></button>
+            <button class="referral-card" type="button" data-referral="share"><i class="fas fa-share-nodes"></i><strong>Share portfolio</strong><span>Uses native sharing where supported.</span></button>
+            <a class="referral-card" href="mailto:?subject=Cybersecurity%20Candidate%20Referral&body=I%27d%20like%20to%20recommend%20Chandrashekar%20Bala%20for%20a%20cybersecurity%20opportunity.%20His%20portfolio%20covers%20security%20assessment%2C%20web%20security%2C%20threat%20intelligence%2C%20DFIR%2C%20wireless%20security%2C%20and%20security%20engineering."><i class="fas fa-envelope"></i><strong>Send by email</strong><span>Open a prefilled referral email.</span></a>
+            <a class="referral-card" href="https://www.linkedin.com/in/chandrashekar-bala/" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin"></i><strong>Refer on LinkedIn</strong><span>Open the professional profile.</span></a>
+        </div>
+        <div class="referral-note">Referral text is intentionally evidence-led: security assessment, research, engineering, and documented technical work.</div>`;
+}
 
-  // Expertise domain dossiers. These are deliberately separate from the technical-capability modal system.
-  const expertise={
-    adversary:{title:'Adversary Research & Simulation',kicker:'01 · ADVERSARY RESEARCH',summary:'Research focused on adversary behavior, operational security, infrastructure, TTPs, and controlled simulation—then translating those observations into defensive insight.',methods:['Threat-intelligence gathering and infrastructure research','MITRE ATT&CK-aligned TTP analysis','OpSec and controlled adversary-simulation research','Active Directory attack-path analysis'],tools:['MITRE ATT&CK','OSINT','Maltego','theHarvester','Subfinder'],projects:['threat','recon']},
-    network:{title:'Network & Wireless Security',kicker:'02 · NETWORK SECURITY',summary:'Security work across network discovery, protocol behavior, packet analysis, wireless assessment, and infrastructure exposure.',methods:['Service and version discovery','TCP/IP, DNS and TLS analysis','Packet capture and traffic investigation','Wireless assessment, monitor mode and packet analysis'],tools:['Nmap','NSE','Wireshark','Aircrack-ng','DNSRecon','cURL'],projects:['recon','network','wireless','driver']},
-    web:{title:'Web & Application Security',kicker:'03 · APPLICATION SECURITY',summary:'Manual application-security testing centered on HTTP behavior, trust boundaries, authentication, authorization, access control, and vulnerability validation.',methods:['Request/response analysis','Authentication and authorization testing','SQL injection and server-side validation','Access-control, session and parameter analysis'],tools:['Burp Suite','OWASP ZAP','Nmap','cURL','WhatWeb','WAFW00F'],projects:['mediroza','web']},
-    mobile:{title:'Mobile Security',kicker:'04 · MOBILE SECURITY',summary:'Android-focused security research spanning APK inspection, static/dynamic analysis, runtime observation, logging, and reverse engineering.',methods:['APK inspection and decompilation','Static and dynamic analysis','Runtime and log observation','Reverse-engineering workflows'],tools:['Android tooling','ADB','Logcat','Ghidra','Dex2jar','JD-GUI'],projects:['android']},
-    exploit:{title:'Exploit Development',kicker:'05 · LOW-LEVEL SECURITY',summary:'Low-level research into memory behavior, stack state, control flow, debugging, and controlled proof-of-concept development.',methods:['Memory and stack analysis','Debugger-assisted investigation','Control-flow analysis','Controlled PoC development'],tools:['C','GDB','WinDbg'],projects:['buffer']},
-    systems:{title:'Systems & Platform Security',kicker:'06 · SYSTEMS SECURITY',summary:'Security research close to the operating system: Linux and Windows environments, privilege escalation, system troubleshooting, kernel-facing work, and platform behavior.',methods:['Linux and Windows security analysis','Privilege-escalation research','Kernel/API compatibility work','System troubleshooting and virtualization'],tools:['Kali Linux','Windows','PowerShell','VirtualBox','Linux kernel headers'],projects:['vulnhub','driver','firmware']},
-    defensive:{title:'Security Operations & Detection',kicker:'07 · DEFENSIVE SECURITY',summary:'Defensive investigation connecting network visibility, SIEM workflows, indicators, threat hunting, incident response, and ATT&CK-aligned detection logic.',methods:['Security monitoring and alert triage','IOC analysis and threat hunting','Network traffic analysis','Incident-response and forensic investigation'],tools:['Splunk','Google Chronicle','Wireshark','Volatility','Autopsy'],projects:['threat','network','malware']},
-    forensics:{title:'Malware Analysis & Digital Forensics',kicker:'08 · MALWARE / DFIR',summary:'Static and dynamic malware analysis combined with Windows forensic artifacts, binary investigation, memory and disk evidence, and indicator extraction.',methods:['Static analysis of suspicious files and binaries','Dynamic analysis of execution behavior','Windows artifact and filesystem review','Memory/disk investigation and IOC extraction'],tools:['Ghidra','IDA Pro','GDB','Volatility','Autopsy','Wireshark'],projects:['malware','android','buffer']}
-  };
-  const em=$('#expertiseModal'), ec=$('#expertiseModalContent'), et=$('#expertiseModalTitle'), ek=$('#expertiseModalKicker');
-  const closeExpert=()=>{if(!em)return;em.classList.remove('open');em.setAttribute('aria-hidden','true');document.body.classList.remove('modal-open');};
-  if(em&&ec){
-    $$('.expertise-dossier-card').forEach(card=>card.addEventListener('click',()=>{
-      const d=expertise[card.dataset.expertise]; if(!d)return;
-      et.textContent=d.title; ek.textContent=d.kicker;
-      const toolHtml=d.tools.map(t=>`<span>${t}</span>`).join('');
-      const methodHtml=d.methods.map(m=>`<li>${m}</li>`).join('');
-      const projHtml=d.projects.map(k=>{const c=$(`#projects .project-card[data-project="${k}"]`); const title=$('h3',c)?.textContent.trim()||k; return `<button class="detail-project-btn" type="button" data-domain-project="${k}">${title} →</button>`;}).join('');
-      ec.innerHTML=`<p class="expertise-modal-summary">${d.summary}</p><div class="expertise-detail-grid"><div class="expertise-detail-panel"><h4>Methods & scope</h4><ul>${methodHtml}</ul><h4 style="margin-top:20px">Tooling</h4><div class="modal-meta">${toolHtml}</div></div><div class="expertise-detail-panel"><h4>Related case files</h4><div class="detail-project-list">${projHtml}</div></div></div>`;
-      em.classList.add('open');em.setAttribute('aria-hidden','false');document.body.classList.add('modal-open');
+function bindReferralInteractions() {
+    function referralText() {
+        return 'I\u2019d like to recommend Chandrashekar Bala for a cybersecurity opportunity. His portfolio documents security assessment, web application security, threat intelligence, DFIR, wireless security, and security engineering work. Portfolio: ' + location.href.split('#')[0];
+    }
+    document.querySelectorAll('[data-referral="copy"]').forEach(b => b.addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(referralText()); notify('Referral note copied.'); }
+        catch { notify('Clipboard access was unavailable.'); }
     }));
-    $$('[data-close-expertise]').forEach(x=>x.addEventListener('click',closeExpert));
-    ec.addEventListener('click',e=>{const b=e.target.closest('[data-domain-project]');if(!b)return;closeExpert();if(window.openProjectModal)window.openProjectModal(b.dataset.domainProject);});
-    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&em.classList.contains('open'))closeExpert();});
-  }
+    document.querySelectorAll('[data-referral="share"]').forEach(b => b.addEventListener('click', async () => {
+        const data = { title: 'Chandrashekar Bala — Cybersecurity Portfolio', text: 'Security research, assessment and engineering portfolio.', url: location.href.split('#')[0] };
+        if (navigator.share) {
+            try { await navigator.share(data); notify('Portfolio share sheet opened.'); }
+            catch (e) { if (e.name !== 'AbortError') notify('Share action was cancelled.'); }
+        } else {
+            try { await navigator.clipboard.writeText(data.url); notify('Portfolio link copied.'); }
+            catch { notify('Portfolio link: ' + data.url); }
+        }
+    }));
+}
 
-  // Role cards become direct entry points into evidence instead of dead-end filter buttons.
-  $$('.role-project-link').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      const key=(window.resolveProjectKey?window.resolveProjectKey(btn.dataset.projectKey):btn.dataset.projectKey);
-      if(key&&window.openProjectModal){window.openProjectModal(key);return;}
-      const filter=btn.dataset.projectFilter;
-      if(filter){const target=$(`#projects .project-card[data-category~="${filter}"]`);if(target&&window.openProjectModal)window.openProjectModal(target.dataset.project);else document.querySelector('#projects')?.scrollIntoView({behavior:'smooth'});}
+function renderCommand() {
+    return `
+        <button class="modal-close" type="button" aria-label="Close" data-close-modal><i class="fas fa-xmark"></i></button>
+        <span class="modal-kicker">0xCB / COMMAND CENTER</span>
+        <h2 id="commandTitle">Navigate the research record</h2>
+        <div class="command-search">
+            <i class="fas fa-terminal"></i>
+            <input id="commandSearch" type="search" placeholder="Search sections, actions, case files..." autocomplete="off" />
+            <kbd>ESC</kbd>
+        </div>
+        <div class="command-list" id="commandList"></div>
+        <p class="command-hint"><kbd>↑</kbd> <kbd>↓</kbd> move · <kbd>Enter</kbd> execute · <kbd>Esc</kbd> close</p>`;
+}
+
+const COMMANDS = [
+    ['Overview', 'Jump to the portfolio start', 'home', 'NAV'],
+    ['Profile', 'Whoami and professional profile', 'about', 'NAV'],
+    ['Security Command', 'Unified security disciplines, tooling and case work', 'security-command', 'NAV'],
+    ['Research Environment', 'Hands-on labs, platforms, research infrastructure and adversary intelligence', 'research-environment', 'NAV'],
+    ['Experience', 'Experience and research record', 'experience', 'NAV'],
+    ['Case Studies', 'Open the technical case index', 'cases', 'ACTION'],
+    ['Research Priorities', 'Current research focus', 'focus', 'NAV'],
+    ['Professional Record', 'Evidence and milestones', 'achievements', 'NAV'],
+    ['Credentials', 'Certifications and training', 'certs', 'NAV'],
+    ['Services', 'How I can contribute', 'services', 'NAV'],
+    ['Contact', 'Open the conversation channel', 'conversation', 'ACTION'],
+    ['Refer / Share', 'Open referral and sharing tools', 'referral', 'ACTION'],
+    ['Resume', 'Open the latest resume', 'resume', 'ACTION'],
+    ['GitHub', 'Open source portfolio profile', 'github', 'ACTION'],
+    ['LinkedIn', 'Open professional profile', 'linkedin', 'ACTION'],
+    ['Email', 'Open direct email', 'email', 'ACTION'],
+    ['Toggle Theme', 'Switch dark/light interface', 'theme', 'ACTION']
+];
+
+function openCommandModal() {
+    CBModal.push('commandModal', {
+        render: renderCommand,
+        focus: '#commandSearch',
+        breadcrumb: 'COMMAND CENTER'
     });
-  });
-})();
+    setTimeout(() => bindCommandInteractions(), 40);
+}
 
+function bindCommandInteractions() {
+    const search = document.getElementById('commandSearch');
+    const list = document.getElementById('commandList');
+    if (!list) return;
+    function render(filter = '') {
+        const f = filter.trim().toLowerCase();
+        const visible = COMMANDS.filter(x => (x[0] + ' ' + x[1] + ' ' + x[3]).toLowerCase().includes(f));
+        list.innerHTML = visible.length
+            ? visible.map((x, i) => `<button class="command-item${i === 0 ? ' active' : ''}" type="button" data-command="${esc(x[2])}"><span><strong>${esc(x[0])}</strong><small>${esc(x[1])}</small></span><b>${esc(x[3])}</b></button>`).join('')
+            : '<div class="command-empty">No matching command.</div>';
+    }
+    render();
+    search?.addEventListener('input', () => render(search.value));
+    search?.addEventListener('keydown', e => {
+        const items = list.querySelectorAll('.command-item');
+        if (!items.length) return;
+        let active = Math.max(0, Array.from(items).findIndex(x => x.classList.contains('active')));
+        if (e.key === 'ArrowDown') { e.preventDefault(); items[active].classList.remove('active'); active = (active + 1) % items.length; items[active].classList.add('active'); items[active].scrollIntoView({ block: 'nearest' }); }
+        if (e.key === 'ArrowUp') { e.preventDefault(); items[active].classList.remove('active'); active = (active - 1 + items.length) % items.length; items[active].classList.add('active'); items[active].scrollIntoView({ block: 'nearest' }); }
+        if (e.key === 'Enter') { e.preventDefault(); items[active].click(); }
+    });
+    list.addEventListener('click', e => {
+        const b = e.target.closest('[data-command]');
+        if (!b) return;
+        const key = b.dataset.command;
+        CBModal.closeAll();
+        executeCommandAction(key);
+    });
+    setTimeout(() => search?.focus(), 20);
+}
 
-/* ================================================================
-   0xCB v5 RESEARCH OS — human-written interaction engine
-   Adds conversation, referral, command navigation, share, deep links,
-   and stateful modal behavior without replacing Executive-v4 systems.
-   ================================================================ */
-(function(){
-  const $=(s,r=document)=>r.querySelector(s);
-  const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
-  const body=document.body;
-  const toast=$('#enhancedToast');
-  const modals=$$('.enhanced-modal');
-  let lastFocus=null;
+function executeCommandAction(key) {
+    switch (key) {
+        case 'command': openCommandModal(); return;
+        case 'conversation': {
+            CBModal.push('conversationModal', { render: renderConversation, focus: '#conversationTopic', breadcrumb: 'CONVERSATION' });
+            setTimeout(() => bindConversationInteractions(), 30);
+            return;
+        }
+        case 'referral': {
+            CBModal.push('referralModal', { render: renderReferral, focus: '[data-close-modal]', breadcrumb: 'REFERRAL' });
+            setTimeout(() => bindReferralInteractions(), 30);
+            return;
+        }
+        case 'share': document.querySelector('[data-referral="share"]')?.click(); return;
+        case 'cases': CBModal.push('caseIndexModal', { render: renderCaseIndex, focus: '[data-close-modal]', breadcrumb: 'CASE INDEX' }); return;
+        case 'capabilities':
+        case 'security-command': {
+            const el = document.getElementById('openSecurityCommand');
+            if (el) el.click();
+            return;
+        }
+        case 'resume': handleResumeClick({ preventDefault() {} }, false); return;
+        case 'github': window.open('https://github.com/Chandrashekar-Bala', '_blank', 'noopener'); return;
+        case 'linkedin': window.open('https://www.linkedin.com/in/chandrashekar-bala/', '_blank', 'noopener'); return;
+        case 'email': location.href = 'mailto:chandrashekar-bala@protonmail.com'; return;
+        case 'theme': document.querySelector('.theme-toggle')?.click(); return;
+        default: {
+            const target = document.getElementById(key);
+            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+}
 
-  function notify(message){
-    if(!toast)return;
-    toast.textContent=message;
+/* ============================================================
+   PART 8 — PROJECT FILTER (preserved)
+   ============================================================ */
+
+function applyProjectFilter(filter) {
+    document.querySelectorAll('.project-filter').forEach(b => b.classList.toggle('active', b.dataset.filter === filter));
+    document.querySelectorAll('#projects .project-card').forEach(card => {
+        const categories = (card.dataset.category || '').split(/\s+/);
+        const matches = filter === 'all' || categories.includes(filter);
+        card.classList.toggle('project-hidden', !matches);
+        if (matches && card.classList.contains('case-secondary')) card.style.display = filter === 'all' ? '' : 'block';
+        if (!matches) card.style.display = 'none';
+    });
+    const toggle = document.getElementById('caseIndexToggle');
+    if (toggle) toggle.style.display = (filter !== 'all') ? 'none' : 'inline-flex';
+}
+
+/* ============================================================
+   PART 9 — TOAST + HASH DEEP-LINKING
+   ============================================================ */
+
+window.__cbNotify = function (message) {
+    const toast = document.getElementById('enhancedToast');
+    if (!toast) return;
+    toast.textContent = message;
     toast.classList.add('show');
-    clearTimeout(notify.timer);
-    notify.timer=setTimeout(()=>toast.classList.remove('show'),2800);
-  }
-  function openModal(id, focusSelector){
-    const modal=$('#'+id); if(!modal)return;
-    lastFocus=document.activeElement;
-    modals.forEach(m=>{ if(m!==modal){m.classList.remove('open');m.setAttribute('aria-hidden','true');} });
-    modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); body.classList.add('enhanced-lock');
-    setTimeout(()=>$(focusSelector||'[data-close-enhanced],button,input,select,textarea',modal)?.focus(),30);
-  }
-  function closeModal(modal){
-    if(!modal)return;
-    modal.classList.remove('open'); modal.setAttribute('aria-hidden','true');
-    if(!modals.some(m=>m.classList.contains('open')))body.classList.remove('enhanced-lock');
-    if(lastFocus && typeof lastFocus.focus==='function')setTimeout(()=>lastFocus.focus(),0);
-  }
-  $$('[data-close-enhanced]').forEach(el=>el.addEventListener('click',()=>closeModal(el.closest('.enhanced-modal'))));
-  document.addEventListener('keydown',e=>{
-    if(e.key==='Escape'){
-      const active=modals.find(m=>m.classList.contains('open')); if(active)closeModal(active);
-    }
-    const mod=modals.find(m=>m.classList.contains('open')); if(!mod||e.key!=='Tab')return;
-    const focusables=$$('button,a,input,select,textarea,[tabindex]:not([tabindex="-1"])',mod).filter(x=>!x.disabled&&x.offsetParent!==null);
-    if(!focusables.length)return;
-    const first=focusables[0],last=focusables[focusables.length-1];
-    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
-    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
-  });
-
-  // Conversation composer
-  const topic=$('#conversationTopic'), name=$('#conversationName'), message=$('#conversationMessage'), preview=$('#conversationPreview');
-  const defaultMessages={
-    'Cybersecurity opportunity':'Hello Chandrashekar, I came across your portfolio and would like to discuss a cybersecurity opportunity.','Security research collaboration':'Hello Chandrashekar, I would like to discuss a potential security research collaboration.','Security assessment discussion':'Hello Chandrashekar, I would like to discuss a security assessment or application-security engagement.','Threat intelligence / CTI':'Hello Chandrashekar, I would like to discuss threat intelligence, CTI, or adversary-research work.','Technical project discussion':'Hello Chandrashekar, I would like to discuss a technical cybersecurity project or engineering opportunity.','General introduction':'Hello Chandrashekar, I came across your portfolio and would like to connect.'
-  };
-  function updateConversation(){
-    if(!topic||!message||!preview)return;
-    const t=topic.value||'Cybersecurity opportunity';
-    if(!message.dataset.edited || !message.value.trim())message.value=defaultMessages[t]||defaultMessages['General introduction'];
-    const who=name?.value.trim();
-    preview.innerHTML=`<span>MAIL</span><strong>Subject: ${escapeHtml(t)}</strong><small>${who?'Prepared for '+escapeHtml(who)+'. ':' '}Ready to open in your email client.</small>`;
-  }
-  function escapeHtml(s){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
-  if(message)message.addEventListener('input',()=>message.dataset.edited='true');
-  [topic,name].forEach(el=>el?.addEventListener('input',updateConversation));
-  $$('.conversation-trigger').forEach(btn=>btn.addEventListener('click',()=>{openModal('conversationModal','#conversationTopic');updateConversation();}));
-  $('#sendConversation')?.addEventListener('click',()=>{
-    const subject=topic?.value||'Cybersecurity opportunity';
-    const who=name?.value.trim();
-    const bodyText=(message?.value.trim()||defaultMessages[subject]||defaultMessages['General introduction'])+(who?'\n\nName: '+who:'')+'\n\nPortfolio: '+location.href.split('#')[0];
-    location.href='mailto:chandrashekar-bala@protonmail.com?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(bodyText);
-    notify('Email draft prepared.');
-  });
-  $('#copyConversation')?.addEventListener('click',async()=>{
-    const subject=topic?.value||'Cybersecurity opportunity';
-    const who=name?.value.trim();
-    const draft='Subject: '+subject+'\n\n'+(message?.value.trim()||defaultMessages[subject]||defaultMessages['General introduction'])+(who?'\n\nName: '+who:'');
-    try{await navigator.clipboard.writeText(draft);notify('Conversation draft copied to clipboard.');}
-    catch{notify('Clipboard access was unavailable.');}
-  });
-
-  // Referral / share
-  function referralText(){return 'I’d like to recommend Chandrashekar Bala for a cybersecurity opportunity. His portfolio documents security assessment, web application security, threat intelligence, DFIR, wireless security, and security engineering work. Portfolio: '+location.href.split('#')[0];}
-  $('#referralButton')?.addEventListener('click',()=>openModal('referralModal'));
-  $('#navConversationTrigger')?.addEventListener('click',()=>{openModal('conversationModal','#conversationTopic');updateConversation();});
-  $$('[data-referral="copy"]').forEach(b=>b.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(referralText());notify('Referral note copied.');}catch{notify('Clipboard access was unavailable.');}}));
-  $$('[data-referral="share"]').forEach(b=>b.addEventListener('click',async()=>{
-    const data={title:'Chandrashekar Bala — Cybersecurity Portfolio',text:'Security research, assessment and engineering portfolio.',url:location.href.split('#')[0]};
-    if(navigator.share){try{await navigator.share(data);notify('Portfolio share sheet opened.');}catch(e){if(e.name!=='AbortError')notify('Share action was cancelled.');}}
-    else {try{await navigator.clipboard.writeText(data.url);notify('Portfolio link copied.');}catch{notify('Portfolio link: '+data.url);}}
-  }));
-
-  // Unified Security Command Center: expertise + capabilities in one interface.
-  const securityDomainData={
-    offensive:{k:'01 · OFFENSIVE SECURITY',t:'Offensive Security',summary:'Controlled security assessment work focused on understanding attack surfaces, validating weaknesses, reconstructing attack paths, and documenting defensible impact.',tools:['Nmap','Nessus','Metasploit','Burp Suite','OWASP ZAP','GDB','John the Ripper'],methods:['Reconnaissance','Service enumeration','Vulnerability validation','Controlled exploitation','Privilege escalation','Post-exploitation analysis'],projects:[['Mediroza Web Application Security Assessment','Authorized black-box assessment with demonstrated SQLi/authentication-bypass chain.','assessment','mediroza'],['Vulnerability Assessment & Privilege Escalation','Controlled vulnerable-environment practice using VulnHub/HTB/VMs.','offensive','vulnhub'],['Web Application Security Lab','50+ PortSwigger application-security labs.','web','web'],['Buffer Overflow Exploit Development','Debugger-assisted low-level research.','exploit','buffer']]},
-    web:{k:'02 · WEB & APPLICATION SECURITY',t:'Web & Application Security',summary:'Manual application-security analysis centered on HTTP behavior, authentication, authorization, access control, request manipulation, and vulnerability validation.',tools:['Burp Suite','OWASP ZAP','Nmap','cURL','WhatWeb','WAFW00F','SQLMap'],methods:['Request/response analysis','Authentication testing','Authorization and access control','SQL injection','XSS / CSRF / SSRF','Session and parameter analysis'],projects:[['Mediroza Web Application Security Assessment','Flagship assessment with manual validation and CVSS/CWE reporting.','assessment','mediroza'],['Web Application Security Lab','50+ PortSwigger labs across application-security scenarios.','web','web']]},
-    defensive:{k:'03 · DEFENSIVE SECURITY',t:'Defensive Security',summary:'Defensive investigation connecting network visibility, SIEM workflows, indicators, threat hunting, incident response, and detection logic.',tools:['Splunk','Google Chronicle','Wireshark','Tcpdump','Volatility'],methods:['Security monitoring','Log analysis','Alert triage','IOC analysis','Threat hunting','Incident-response thinking'],projects:[['Network Traffic Analysis & Threat Hunting','Packet-level investigation and ATT&CK-aligned threat hunting.','defensive','threat'],['Malware Analysis & Windows Forensics Research','Evidence-focused malware and forensic research.','forensics','malware']]},
-    adversary:{k:'04 · ADVERSARY & UNDERGROUND INTELLIGENCE',t:'Adversary & Underground Intelligence',summary:'Research into threat actors, underground ecosystems, adversary infrastructure, exposed information, operational behavior, and TTPs — connecting intelligence collection with defensive insight.',tools:['OSINT','Maltego','theHarvester','Subfinder','crt.sh','WHOIS','Tor / I2P research','MITRE ATT&CK'],methods:['Underground ecosystem research','Threat-actor research','Infrastructure correlation','Leak / exposure research','TTP analysis','Threat-report analysis','Adversary behavior mapping'],projects:[['Network Reconnaissance & Attack-Surface Mapping','Infrastructure discovery, DNS, certificates, web fingerprinting and service validation.','network','recon'],['Network Traffic Analysis & Threat Hunting','Network evidence and attacker-behavior investigation.','threat','threat']]},
-    network:{k:'05 · NETWORK & WIRELESS SECURITY',t:'Network & Wireless Security',summary:'Network discovery, protocol behavior, packet analysis, wireless assessment, DNS/TLS investigation, and hardware-backed wireless research.',tools:['Nmap','Wireshark','Aircrack-ng','DNSRecon','dig','NSE','iw'],methods:['Reconnaissance','Service/version validation','TCP/IP and DNS analysis','TLS inspection','Packet analysis','Monitor mode','Controlled Wi-Fi testing'],projects:[['Network Reconnaissance & Attack-Surface Mapping','Structured reconnaissance and service validation.','network','recon'],['Network Traffic Analysis & Threat Hunting','Traffic analysis and IOC-oriented investigation.','defensive','threat'],['RTL8812BU Linux Driver Modernization','Kernel compatibility work validated on real hardware.','engineering','driver']]},
-    mobile:{k:'06 · MOBILE SECURITY',t:'Mobile Security',summary:'Android-focused security research spanning APK inspection, static/dynamic analysis, runtime observation, logging, and reverse engineering.',tools:['ADB','Logcat','Dex2jar','JD-GUI','Ghidra'],methods:['APK inspection','Decompilation','Static analysis','Dynamic analysis','Runtime observation','Reverse engineering'],projects:[['Android Security Analysis','APK inspection, static/dynamic analysis and runtime behavior review.','mobile','android']]},
-    exploit:{k:'07 · EXPLOIT DEVELOPMENT',t:'Exploit Development',summary:'Low-level research into memory behavior, stack state, control flow, debugging, and controlled proof-of-concept development.',tools:['C','GDB','WinDbg'],methods:['Memory and stack analysis','Debugger-assisted investigation','Control-flow analysis','Controlled PoC development'],projects:[['Buffer Overflow Exploit Development','C and debugger-assisted low-level research.','exploit','buffer']]},
-    forensics:{k:'08 · MALWARE ANALYSIS & DIGITAL FORENSICS',t:'Malware Analysis & Digital Forensics',summary:'Static and dynamic malware analysis combined with Windows forensic artifacts, memory/disk evidence, suspicious-file investigation, and indicator extraction.',tools:['Ghidra','IDA Pro','GDB','Volatility','Autopsy','Wireshark'],methods:['Static analysis','Dynamic analysis','Binary investigation','Windows artifact review','Memory/disk investigation','IOC extraction','Timeline-oriented review'],projects:[['Malware Analysis & Windows Forensics Research','Hands-on static/dynamic and evidence-analysis exercises.','forensics','malware'],['Network Traffic Analysis & Threat Hunting','Network evidence and IOC correlation.','defensive','threat']]},
-    engineering:{k:'09 · SECURITY ENGINEERING',t:'Security Engineering',summary:'Engineering work close to the system: Linux, kernel-facing C, driver compatibility, build troubleshooting, security tooling, firmware research, and real-hardware validation.',tools:['C','Python','Bash','GCC','Git','Linux kernel headers','flashrom','GDB'],methods:['Kernel/API compatibility','Build troubleshooting','Security tooling','PoC development','Hardware validation','Technical documentation'],projects:[['RTL8812BU Linux Driver Modernization','13-source-file kernel compatibility project validated on real hardware.','engineering','driver'],['SPI Flash & BIOS Protection Research','Firmware protection and flash analysis.','forensics','firmware'],['Security Automation & PoC Tooling','Python/Bash tooling for repeatable security workflows.','engineering','automation']]},
-    systems:{k:'10 · SYSTEMS & VIRTUALIZATION',t:'Systems & Virtualization',summary:'Linux and Windows environments, virtual labs, network configuration, system troubleshooting, and platform security work.',tools:['Kali Linux','Windows','VirtualBox','Docker','PowerShell','Linux networking'],methods:['Linux/Windows security analysis','Virtual lab construction','Network configuration','System troubleshooting','Platform security'],projects:[['Vulnerability Assessment & Privilege Escalation','Linux/Windows vulnerable environments.','offensive','vulnhub'],['RTL8812BU Linux Driver Modernization','Linux kernel and hardware-backed engineering.','engineering','driver']]},
-    automation:{k:'11 · SECURITY AUTOMATION & DEVELOPMENT',t:'Security Automation & Development',summary:'Python, Bash, C, SQL, and web engineering used to make security research repeatable and to build focused proof-of-concept tooling.',tools:['Python','Bash','C','C++','SQL','HTML5','CSS3','JavaScript','Git/GitHub'],methods:['Security automation','Recon tooling','Vulnerability assessment tooling','PoC development','Data analysis','Web engineering'],projects:[['Security Automation & PoC Tooling','Repeatable security workflows and proof-of-concept development.','engineering','automation'],['Cybersecurity Portfolio Engineering','Static web engineering with interactive security content.','engineering','website']]},
-    research:{k:'12 · EVIDENCE & SECURITY REPORTING',t:'Evidence & Security Reporting',summary:'Turning technical activity into defensible security records through evidence handling, severity context, root-cause analysis, remediation mapping, and retest planning.',tools:['CVSS','CWE','SHA-256','Burp Suite','Wireshark','Nmap','Technical reporting'],methods:['Evidence preservation','Finding classification','Root-cause analysis','Impact analysis','Remediation mapping','Retest planning'],projects:[['Mediroza Web Application Security Assessment','Eight documented findings with CVSS/CWE context and evidence organization.','assessment','mediroza'],['Network Reconnaissance & Attack-Surface Mapping','Evidence-vs-hypothesis discipline in reconnaissance.','network','recon']]}
-  };
-  const scm=$('#securityCommandModal'), scContent=$('#securityCommandModalContent'), scTabs=$('#securityCommandTabs');
-  function projectButtonHtml(p){const ref=p[3]||projectRef(p[2]);return `<button type="button" class="security-related-case" data-security-project="${escapeHtml(ref||'')}"><strong>${escapeHtml(p[0])}</strong><span>${escapeHtml(p[1])}</span><i class="fas fa-arrow-right"></i></button>`;}
-  function renderSecurityDomain(key){
-    const d=securityDomainData[key]; if(!d||!scContent)return;
-    $$('.security-command-tab',scTabs).forEach(b=>b.classList.toggle('active',b.dataset.domain===key));
-    scContent.innerHTML=`<div class="sc-domain-head"><div><span class="modal-kicker">${escapeHtml(d.k)}</span><h3>${escapeHtml(d.t)}</h3><p>${escapeHtml(d.summary)}</p></div><div class="sc-domain-index">${String(Object.keys(securityDomainData).indexOf(key)+1).padStart(2,'0')} / ${Object.keys(securityDomainData).length}</div></div><section class="sc-method-panel"><h4><i class="fas fa-route"></i> Methods &amp; Practice</h4><ul>${d.methods.map(x=>`<li>${escapeHtml(x)}</li>`).join('')}</ul></section><section class="sc-depth-note"><div><span class="modal-kicker">HOW THIS SHOWS UP IN MY WORK</span><h4>${escapeHtml(d.t)} in practice</h4></div><p>${escapeHtml(d.summary)} I connect the methods below to documented technical work, then follow the evidence into a case file where available.</p></section><section class="sc-related"><div class="sc-related-head"><h4><i class="fas fa-file-shield"></i> Related Case Files</h4><small>Open a record to launch its full technical dossier.</small></div><div class="sc-related-grid">${d.projects.map(projectButtonHtml).join('')}</div></section><section class="sc-tools-panel"><div class="sc-tools-head"><div><span class="modal-kicker">TECHNICAL DEPTH</span><h4><i class="fas fa-screwdriver-wrench"></i> Skills &amp; Tools</h4></div><span class="env-depth-count">${d.tools.length} tools / technologies</span></div><div class="modal-meta">${d.tools.map(x=>`<span>${escapeHtml(x)}</span>`).join('')}</div></section>`;
-    scContent.querySelectorAll('[data-security-project]').forEach(b=>b.addEventListener('click',()=>{
-      const raw=b.dataset.securityProject;
-      const key=projectRef(raw);
-      const card=[...document.querySelectorAll('#projects .project-card')].find(c=>c.dataset.project===key);
-      if(!key || (!card && !window.openProjectModal)) return;
-      closeSecurityCommand();
-      setTimeout(()=>{
-        if(window.openProjectModal){ window.openProjectModal(key); }
-        else if(card){ card.querySelector('.project-open')?.click(); }
-      },80);
-    }));
-  }
-  function openSecurityCommand(key='web'){
-    if(!scm||!scContent)return;
-    scTabs.innerHTML=Object.entries(securityDomainData).map(([k,d])=>`<button class="security-command-tab${k===key?' active':''}" type="button" data-domain="${k}">${escapeHtml(d.t.replace(/ &.*$/,''))}</button>`).join('');
-    scTabs.querySelectorAll('[data-domain]').forEach(b=>b.addEventListener('click',()=>renderSecurityDomain(b.dataset.domain)));
-    renderSecurityDomain(key);
-    scm.classList.add('open');scm.setAttribute('aria-hidden','false');document.body.classList.add('modal-open');
-  }
-  function closeSecurityCommand(){if(!scm)return;scm.classList.remove('open');scm.setAttribute('aria-hidden','true');document.body.classList.remove('modal-open');}
-  window.openSecurityCommand=openSecurityCommand;
-  $('#openSecurityCommand')?.addEventListener('click',()=>openSecurityCommand('web'));
-  $('#openSecurityCommandBottom')?.addEventListener('click',()=>openSecurityCommand('offensive'));
-  $$('.unified-domain-card').forEach(b=>b.addEventListener('click',()=>openSecurityCommand(b.dataset.securityDomain)));
-  scm?.querySelectorAll('[data-close-security-command]').forEach(x=>x.addEventListener('click',closeSecurityCommand));
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&scm?.classList.contains('open'))closeSecurityCommand();});
-
-  // Command center
-  const commandItems=[
-    ['Overview','Jump to the portfolio start','home','NAV'],['Profile','Whoami and professional profile','about','NAV'],['Security Command','Unified security disciplines, tooling and case work','security-command','NAV'],['Research Environment','Hands-on labs, platforms, research infrastructure and adversary intelligence','research-environment','NAV'],['Experience','Experience and research record','experience','NAV'],['Case Studies','Open the technical case index','cases','ACTION'],['Research Priorities','Current research focus','focus','NAV'],['Professional Record','Evidence and milestones','achievements','NAV'],['Credentials','Certifications and training','certs','NAV'],['Services','How I can contribute','services','NAV'],['Contact','Open the conversation channel','conversation','ACTION'],['Refer / Share','Open referral and sharing tools','referral','ACTION'],['Resume','Open the latest resume','resume','ACTION'],['GitHub','Open source portfolio profile','github','ACTION'],['LinkedIn','Open professional profile','linkedin','ACTION'],['Email','Open direct email','email','ACTION'],['Toggle Theme','Switch dark/light interface','theme','ACTION']
-  ];
-  const commandList=$('#commandList'), search=$('#commandSearch');
-  function renderCommands(filter=''){
-    if(!commandList)return;
-    const f=filter.trim().toLowerCase();
-    const visible=commandItems.filter(x=>(x[0]+' '+x[1]+' '+x[3]).toLowerCase().includes(f));
-    commandList.innerHTML=visible.length?visible.map((x,i)=>`<button class="command-item${i===0?' active':''}" type="button" data-command="${x[2]}"><span><strong>${escapeHtml(x[0])}</strong><small>${escapeHtml(x[1])}</small></span><b>${escapeHtml(x[3])}</b></button>`).join(''):'<div class="command-empty">No matching command.</div>';
-  }
-  function openCommand(){openModal('commandModal','#commandSearch');renderCommands('');if(search){search.value='';setTimeout(()=>search.focus(),40);}}
-  $('#commandTrigger')?.addEventListener('click',openCommand);
-  $$('[data-command-action]').forEach(b=>b.addEventListener('click',()=>executeCommand(b.dataset.commandAction)));
-  function executeCommand(key){
-    if(key==='command'){openCommand();return;}
-    if(key==='conversation'){openModal('conversationModal','#conversationTopic');updateConversation();return;}
-    if(key==='referral'){openModal('referralModal');return;}
-    if(key==='share'){$('[data-referral="share"]')?.click();return;}
-    if(key==='cases'){const m=$('#caseIndexModal');if(m){m.classList.add('open');m.setAttribute('aria-hidden','false');document.body.classList.add('modal-open');}else{$('#caseIndexToggle')?.click();}return;}
-    if(key==='capabilities'||key==='security-command'){openSecurityCommand();return;}
-    if(key==='resume'){handleResumeClick({preventDefault(){}});return;}
-    if(key==='github'){window.open('https://github.com/Chandrashekar-Bala','_blank','noopener');return;}
-    if(key==='linkedin'){window.open('https://www.linkedin.com/in/chandrashekar-bala/','_blank','noopener');return;}
-    if(key==='email'){location.href='mailto:chandrashekar-bala@protonmail.com';return;}
-    if(key==='theme'){$('.theme-toggle')?.click();return;}
-    const target=document.getElementById(key);if(target){closeModal($('#commandModal'));target.scrollIntoView({behavior:'smooth',block:'start'});}
-  }
-  commandList?.addEventListener('click',e=>{const b=e.target.closest('[data-command]');if(b){closeModal($('#commandModal'));executeCommand(b.dataset.command);}});
-  search?.addEventListener('input',()=>renderCommands(search.value));
-  search?.addEventListener('keydown',e=>{
-    const items=$$('.command-item',commandList);if(!items.length)return;const active=Math.max(0,items.findIndex(x=>x.classList.contains('active')));
-    if(e.key==='ArrowDown'){e.preventDefault();items[active]?.classList.remove('active');items[(active+1)%items.length].classList.add('active');items[(active+1)%items.length].scrollIntoView({block:'nearest'});}
-    if(e.key==='ArrowUp'){e.preventDefault();items[active]?.classList.remove('active');items[(active-1+items.length)%items.length].classList.add('active');items[(active-1+items.length)%items.length].scrollIntoView({block:'nearest'});}
-    if(e.key==='Enter'){e.preventDefault();items[active]?.click();}
-  });
-  document.addEventListener('keydown',e=>{
-    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openCommand();}
-    if(e.key==='/' && !/input|textarea|select/i.test(document.activeElement?.tagName||'')){e.preventDefault();openCommand();}
-  });
-
-  // Share buttons and case deep-linking. Hashes make individual dossiers bookmarkable.
-  function syncHash(){
-    const hash=location.hash.replace(/^#/,'');
-    const m=hash.match(/^case\/(.+)$/);if(m&&window.openProjectModal){setTimeout(()=>window.openProjectModal(decodeURIComponent(m[1])),120);}
-    if(hash==='contact')setTimeout(()=>openModal('conversationModal','#conversationTopic'),120);
-  }
-  window.addEventListener('hashchange',syncHash);syncHash();
-  // Wrap v4 project opener once it exists so case files become addressable without changing its UI.
-  const patchProjectOpener=()=>{
-    if(!window.openProjectModal||window.__v5PatchedProject)return;
-    const original=window.openProjectModal;window.openProjectModal=function(key){
-      original(key);try{history.replaceState(null,'','#case/'+encodeURIComponent(key));}catch(e){}
-    };window.__v5PatchedProject=true;
-  };
-  setTimeout(()=>{patchProjectOpener();syncHash();},50);setTimeout(()=>{patchProjectOpener();syncHash();},500);
-
-  // Prevent stale #case hashes when navigating through primary sections.
-  $$('.nav-links a, .logo, .back-to-top').forEach(a=>a.addEventListener('click',()=>{if(location.hash.startsWith('#case/'))history.replaceState(null,'',a.getAttribute('href')||'#home');}));
-
-  // Add a small "secure interface" status toast on first load, but never obstruct the user.
-  setTimeout(()=>{if(!sessionStorage.getItem('cb_v5_seen')){notify('0xCB Research OS ready · 50+ web labs · 65+ evidence files.');sessionStorage.setItem('cb_v5_seen','1');}},900);
-})();
-
-
-/* =====================================================================
-   0xCB FINAL INTERACTION ROUTER
-   One canonical router for every nested Research OS → Case File path.
-   This intentionally runs in capture phase so legacy handlers cannot
-   swallow a click or route a project key to the wrong layer.
-   ===================================================================== */
-(function(){
-  const q=(s,r=document)=>r.querySelector(s);
-  const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
-  const canonical={
-    mediroza:'mediroza', assessment:'mediroza', 'mediroza assessment':'mediroza',
-    driver:'driver', engineering:'driver', 'rtl8812bu driver engineering':'driver', 'rtl8812bu linux driver modernization':'driver',
-    recon:'recon', network:'recon', 'network reconnaissance':'recon', 'network reconnaissance & attack-surface mapping':'recon',
-    web:'web', portswigger:'web', 'web application security lab':'web',
-    vulnhub:'vulnhub', offensive:'vulnhub', 'vulnerability assessment & privilege escalation':'vulnhub',
-    threat:'threat', defensive:'threat', 'network traffic analysis & threat hunting':'threat',
-    malware:'malware', forensics:'malware', 'malware analysis & windows forensics research':'malware',
-    android:'android', mobile:'android', 'android security analysis':'android',
-    wireless:'wireless', 'wireless security assessment lab':'wireless',
-    firmware:'firmware', 'spi flash & bios protection research':'firmware',
-    automation:'automation', 'security automation & poc tooling':'automation',
-    buffer:'buffer', 'buffer overflow exploit development':'buffer',
-    website:'website', 'cybersecurity portfolio engineering':'website',
-    password:'password', 'protected pdf & password security analysis':'password'
-  };
-  const norm=v=>String(v||'').trim().toLowerCase().replace(/&amp;/g,'&').replace(/\s+/g,' ');
-  function resolve(value){
-    const n=norm(value); if(canonical[n]) return canonical[n];
-    const card=qa('#projects .project-card').find(c=>norm(c.dataset.project)===n || norm(c.querySelector('h3')?.textContent)===n);
-    return card?.dataset.project||null;
-  }
-  function closeResearchLayers(){
-    ['envProjectModal','envModal','envGroupModal','researchMapModal','roleDossierModal','securityCommandModal','caseIndexModal'].forEach(id=>{
-      const m=q('#'+id); if(m){m.classList.remove('open');m.setAttribute('aria-hidden','true');}
-    });
-  }
-  function openCase(key){
-    const resolved=resolve(key);
-    if(!resolved){
-      const title=String(key||'').trim();
-      window.__cbNotify?.('No case file is mapped to this record yet.');
-      return false;
-    }
-    if(typeof window.openProjectModal!=='function'){
-      window.__cbNotify?.('Case file engine is still initializing. Please try again.');
-      return false;
-    }
-    closeResearchLayers();
-    requestAnimationFrame(()=>window.openProjectModal(resolved));
-    return true;
-  }
-  window.__cbOpenCase=openCase;
-  window.__cbNotify=window.__cbNotify||function(msg){
-    const t=q('#enhancedToast'); if(!t)return; t.textContent=msg; t.classList.add('show'); clearTimeout(t.__timer); t.__timer=setTimeout(()=>t.classList.remove('show'),2600);
-  };
-
-  /* Primary Research Environment map: bypass fragile legacy delegation. */
-  document.addEventListener('click',function(e){
-    const card=e.target.closest('.research-map-card[data-research-group]');
-    if(!card)return;
-    const key=card.dataset.researchGroup;
-    if(typeof window.__cbOpenResearchGroup==='function'){
-      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
-      window.__cbOpenResearchGroup(key);
-    }
-  },true);
-
-  /* Environment cards: direct, deterministic environment dossier. */
-  document.addEventListener('click',function(e){
-    const card=e.target.closest('.env-card[data-env]');
-    if(!card)return;
-    const key=card.dataset.env;
-    if(typeof window.__cbOpenResearchEnvironment==='function'){
-      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
-      window.__cbOpenResearchEnvironment(key, null);
-    }
-  },true);
-
-  /* Related Case Files in Security Practice Map. */
-  document.addEventListener('click',function(e){
-    const b=e.target.closest('.security-related-case,[data-domain-project],[data-role-project],[data-role-project-key],[data-case-open],[data-env-project-key]');
-    if(!b) return;
-    const key=b.dataset.securityProject||b.dataset.domainProject||b.dataset.roleProject||b.dataset.roleProjectKey||b.dataset.caseOpen||b.dataset.envProjectKey;
-    if(!key) return;
-    if(resolve(key)){
-      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
-      openCase(key);
-    }
-  },true);
-
-  /* Research Environment project-record buttons. */
-  document.addEventListener('click',function(e){
-    const b=e.target.closest('.env-related-project,[data-open-group-project-record],.env-project-item');
-    if(!b) return;
-    const key=b.dataset.openGroupProjectRecord||b.dataset.envProjectKey;
-    if(!key) return;
-    if(resolve(key)){
-      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
-      openCase(key);
-    }
-  },true);
-
-  /* Full Case File Index button: always opens the actual index modal. */
-  document.addEventListener('click',function(e){
-    const b=e.target.closest('[data-research-jump="casefiles"]');
-    if(!b)return;
-    e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
-    closeResearchLayers();
-    const m=q('#caseIndexModal');
-    if(m){m.classList.add('open');m.setAttribute('aria-hidden','false');document.body.classList.add('modal-open');}
-  },true);
-
-  /* Keep case index entries deterministic even when legacy handlers change. */
-  document.addEventListener('click',function(e){
-    const b=e.target.closest('#caseIndexList [data-case-open]');
-    if(!b)return;
-    const key=b.dataset.caseOpen;
-    if(resolve(key)){
-      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
-      const m=q('#caseIndexModal'); if(m){m.classList.remove('open');m.setAttribute('aria-hidden','true');}
-      openCase(key);
-    }
-  },true);
-
-  /* Make Security Practice Map project references resilient to renamed labels. */
-  document.addEventListener('click',function(e){
-    const b=e.target.closest('.detail-project-btn');
-    if(!b)return;
-    const key=b.dataset.domainProject;
-    if(resolve(key)){
-      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
-      openCase(key);
-    }
-  },true);
-
-  /* Accessibility: Enter/Space activates the same routing as a click. */
-  document.addEventListener('keydown',function(e){
-    if(e.key!=='Enter'&&e.key!==' ')return;
-    const el=e.target.closest('.security-related-case,.env-related-project,.env-project-item,.detail-project-btn,[data-case-open]');
-    if(!el)return;
-    e.preventDefault(); el.click();
-  });
-})();
-
-
-/* 0xCB HARD-WIRED ENVIRONMENT DOSSIERS — independent fallback router */
-(function(){
-const D={
-portswigger:{t:'PortSwigger Web Security Academy',k:'01 · WEB APPLICATION SECURITY',lead:'50+ labs supporting sustained application-security practice and manual attack-path reasoning.',what:['Analyze authentication and authorization boundaries.','Test access control, injection, SSRF and request manipulation.','Use manual request/response analysis to validate observable behavior.'],method:'Discover → Manipulate → Validate → Explain',lens:['Authentication','Authorization','Access Control','SQL Injection','SSRF','HTTP','Sessions','Attack Paths'],skills:['Web Application Security','Manual Validation','Attack-Path Analysis','Burp Suite','OWASP'],tools:['Burp Suite','OWASP ZAP','Browser DevTools','Nmap','PortSwigger Web Security Academy'],projects:[['mediroza','Mediroza Web Application Security Assessment','8+ findings and a demonstrated SQLi/authentication-bypass chain.'],['web','Web Application Security Lab','50+ PortSwigger application-security labs.']]},
-bugbounty:{t:'Bug Bounty & Responsible Disclosure',k:'02 · BUG BOUNTY & RESPONSIBLE DISCLOSURE',lead:'Web-focused vulnerability research centered on discovery, manual validation, impact reasoning, report quality and responsible disclosure.',what:['Discover web vulnerabilities through attack-surface analysis.','Manually validate findings and reason about impact.','Translate technical observations into clear remediation and retest guidance.'],method:'Discover → Validate → Assess Impact → Report → Retest',lens:['Attack Surface','Authentication','Authorization','Injection','Access Control','Impact','Reporting'],skills:['Vulnerability Research','Manual Validation','Impact Analysis','Responsible Disclosure','Web Security'],tools:['Burp Suite','HTTP/HTTPS','Browser DevTools','OWASP','Nmap'],projects:[['web','Web Application Security Lab','50+ PortSwigger labs supporting application-security practice.'],['mediroza','Mediroza Web Application Security Assessment','Authorized black-box assessment with 8+ findings.']]},
-htb:{t:'Hack The Box',k:'03 · OFFENSIVE SECURITY',lead:'Hands-on environments for attack-path reasoning across reconnaissance, exploitation and privilege escalation.',what:['Map attack surfaces and enumerate exposed services.','Validate practical exploitation paths in controlled environments.','Work through Linux/Windows privilege escalation and post-exploitation reasoning.'],method:'Recon → Enumerate → Exploit → Escalate → Analyze',lens:['Reconnaissance','Enumeration','Service Analysis','Exploitation','Privilege Escalation','Post-Exploitation'],skills:['Pentesting','Linux','Windows','Attack Paths','Privilege Escalation'],tools:['Hack The Box','Nmap','Metasploit','Burp Suite','Kali Linux'],projects:[['vulnhub','Vulnerability Assessment & Privilege Escalation','Controlled vulnerable-environment research.'],['recon','Network Reconnaissance & Attack-Surface Mapping','Evidence-led reconnaissance and service validation.']]},
-vulnhub:{t:'VulnHub',k:'04 · VULNERABLE ENVIRONMENTS',lead:'Self-contained vulnerable systems used to reproduce attack chains and validate exploitability.',what:['Enumerate services and identify attack paths.','Reproduce vulnerabilities in controlled systems.','Validate privilege escalation and post-exploitation behavior.'],method:'Map → Validate → Exploit → Escalate → Document',lens:['Service Discovery','Vulnerability Validation','Exploitation','Privilege Escalation','Post-Exploitation','Evidence'],skills:['VAPT','Exploitation','Privilege Escalation','Attack Paths','Evidence Capture'],tools:['VulnHub','Nmap','Metasploit','VirtualBox','Linux','Windows'],projects:[['vulnhub','Vulnerability Assessment & Privilege Escalation','Repeatable vulnerable-environment practice.'],['buffer','Buffer Overflow Exploit Development','Controlled low-level security research.']]},
-overthewire:{t:'OverTheWire',k:'05 · LINUX SECURITY',lead:'Command-line environments that sharpen Linux security reasoning around permissions, authentication, filesystems and shell behavior.',what:['Reason through Linux permissions and authentication.','Analyze filesystems and shell behavior.','Solve constrained security problems through observation and verification.'],method:'Observe → Reason → Execute → Verify',lens:['Permissions','Authentication','Filesystem','Shell Behavior','CLI Reasoning'],skills:['Linux Security','Bash','CLI','Filesystem Analysis','Problem Solving'],tools:['OverTheWire','Bash','SSH','Core Unix Utilities','Linux'],projects:[['vulnhub','Vulnerability Assessment & Privilege Escalation','Linux security and privilege-escalation environments.'],['driver','RTL8812BU Linux Driver Modernization','Linux systems engineering and kernel-facing work.']]},
-kali:{t:'Kali / Parrot',k:'06 · SECURITY OPERATING ENVIRONMENTS',lead:'Primary Linux environments for reconnaissance, application testing, network analysis, wireless research and technical troubleshooting.',what:['Build repeatable security-testing workflows.','Perform reconnaissance, packet analysis and wireless testing.','Troubleshoot security tooling and Linux networking.'],method:'Prepare → Test → Capture → Analyze',lens:['Reconnaissance','Web Testing','Network Analysis','Wireless Security','Packet Capture','Tooling'],skills:['Security Testing','Network Analysis','Wireless Security','Linux','Technical Troubleshooting'],tools:['Kali Linux','Parrot OS','Nmap','Burp Suite','Wireshark','Aircrack-ng'],projects:[['recon','Network Reconnaissance & Attack-Surface Mapping','Reconnaissance and service validation.'],['wireless','Wireless Security Assessment Lab','Monitor mode and controlled wireless testing.'],['driver','RTL8812BU Linux Driver Modernization','Linux wireless-driver engineering.']]},
-crossplatform:{t:'Windows / Linux',k:'07 · CROSS-PLATFORM ANALYSIS',lead:'Cross-platform environments for security testing, forensic analysis, network investigation and system behavior research.',what:['Investigate Windows artifacts and filesystem activity.','Use Linux for networking, testing and systems analysis.','Correlate endpoint, filesystem and network evidence.'],method:'Acquire → Analyze → Correlate → Report',lens:['Windows Artifacts','Filesystem Activity','Network Behavior','Evidence Review','System Security'],skills:['Digital Forensics','Windows Analysis','Linux Security','Network Investigation','Evidence Correlation'],tools:['Windows','Linux','Wireshark','Volatility','Autopsy','PowerShell'],projects:[['malware','Malware Analysis & Windows Forensics Research','Windows artifacts and forensic investigation.'],['threat','Network Traffic Analysis & Threat Hunting','Packet-level defensive investigation.']]},
-virtualbox:{t:'VirtualBox',k:'08 · RESEARCH INFRASTRUCTURE',lead:'Isolated virtual infrastructure for reproducible vulnerable systems and controlled attack-path research.',what:['Build isolated vulnerable environments.','Use snapshots and controlled networking for repeatable testing.','Reproduce attack chains without changing external systems.'],method:'Build → Isolate → Test → Reset',lens:['Virtualization','Isolation','Network Configuration','Snapshots','Reproducibility'],skills:['Lab Infrastructure','Virtualization','Network Isolation','Attack-Path Reproduction'],tools:['VirtualBox','Kali Linux','Windows VMs','Linux VMs','Vulnerable VMs'],projects:[['vulnhub','Vulnerability Assessment & Privilege Escalation','Controlled vulnerable systems.'],['buffer','Buffer Overflow Exploit Development','Controlled low-level research.']]},
-github:{t:'GitHub',k:'09 · ENGINEERING ARCHIVE',lead:'Public technical archive showing security engineering, Linux driver work, security tooling and documented research.',what:['Build and maintain technical security projects.','Document engineering decisions and validation results.','Use version control to preserve research traceability.'],method:'Build → Version → Validate → Publish',lens:['Source Code','Engineering Decisions','Validation','Documentation','Reproducibility'],skills:['Git','C','Python','Bash','Linux','Security Engineering'],tools:['GitHub','Git','GCC','GDB','Python','Linux'],projects:[['driver','RTL8812BU Linux Driver Modernization','13+ source files and real-hardware validation.'],['automation','Security Automation & PoC Tooling','Python/Bash security tooling.'],['website','Cybersecurity Portfolio Engineering','This Research OS as a technical web-engineering project.']]},
-networkwalks:{t:'Networkwalks',k:'10 · PROFESSIONAL SECURITY WORK',lead:'Professional cybersecurity work spanning assessment, offensive and defensive analysis, adversary research, engineering and technical project execution.',what:['Perform and contribute to VAPT and security assessment work.','Work across offensive, defensive and adversary-research activities.','Coordinate technical execution and produce structured security deliverables.'],method:'Assess → Investigate → Coordinate → Deliver',lens:['VAPT','Offensive Security','Defensive Security','Adversary Research','Security Engineering','Technical Projects'],skills:['VAPT','Security Assessment','Threat Research','Investigation','Technical Coordination'],tools:['Burp Suite','Nmap','Wireshark','Linux','Python','Git'],projects:[['mediroza','Mediroza Web Application Security Assessment','Authorized black-box assessment with 8+ findings.'],['recon','Network Reconnaissance & Attack-Surface Mapping','Evidence-led reconnaissance.'],['driver','RTL8812BU Linux Driver Modernization','Security engineering and troubleshooting.']]},
-underground:{t:'Dark Web & Underground Intelligence',k:'11 · ADVERSARY & UNDERGROUND INTELLIGENCE',lead:'Research into underground ecosystems as intelligence sources: hidden forums and communities, threat actors, infrastructure, exposed information, data-dump reporting and adversary behavior.',what:['Study underground forums, communities and threat-actor activity as intelligence sources.','Research criminal-service ecosystems, leak/exposure signals and data-dump reporting.','Correlate infrastructure, actors, behavior and TTPs into threat context.'],method:'Discover → Correlate → Contextualize → Map',lens:['Underground Ecosystems','Threat Actors','Forums & Communities','Leak Intelligence','Infrastructure','TTPs'],skills:['Dark Web Research','OSINT','CTI','Threat Actor Research','Infrastructure Analysis','TTP Mapping'],tools:['Tor Browser','I2P research','Dread / forum observation','Maltego','WHOIS / DNS','Threat Reports'],projects:[['threat','Adversary Research','Threat intelligence, actor context and TTP analysis.'],['recon','Network Reconnaissance & Attack-Surface Mapping','Infrastructure discovery and correlation.']]},
-osint:{t:'OSINT & Threat Intelligence',k:'12 · THREAT INTELLIGENCE',lead:'Open-source intelligence collection and correlation used to build context around infrastructure, actors, campaigns and indicators.',what:['Discover infrastructure and relationships from open sources.','Correlate domains, IPs, certificates, services and threat reports.','Build adversary context from fragmented intelligence and map relevant TTPs.'],method:'Collect → Correlate → Assess → Inform',lens:['Infrastructure','Domains / IPs','Certificates','Threat Reports','IOCs','TTPs'],skills:['OSINT','Threat Intelligence','Infrastructure Research','IOC Analysis','MITRE ATT&CK'],tools:['WHOIS','DNSRecon','crt.sh','CertSpotter','Subfinder','theHarvester','Maltego'],projects:[['recon','Network Reconnaissance & Attack-Surface Mapping','Evidence-led infrastructure discovery.'],['threat','Adversary Research','Threat intelligence and TTP analysis.']]}
+    clearTimeout(window.__cbNotifyTimer);
+    window.__cbNotifyTimer = setTimeout(() => toast.classList.remove('show'), 2800);
 };
-const modal=document.getElementById('envModal'),content=document.getElementById('envModalContent'),pmodal=document.getElementById('envProjectModal'),pcontent=document.getElementById('envProjectModalContent'),ptitle=document.getElementById('envProjectModalTitle'),plead=document.getElementById('envProjectModalLead');if(!modal||!content)return;
-const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function close(m){if(!m)return;m.classList.remove('open');m.setAttribute('aria-hidden','true');if(!document.querySelector('.env-modal.open,.env-project-modal.open,.env-group-modal.open,.research-map-modal.open,.role-dossier-modal.open'))document.body.classList.remove('modal-open');}
-function openEnv(k){const d=D[k];if(!d)return;close(pmodal);modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.classList.add('modal-open');const cards=d.projects.map((p,i)=>`<button type="button" class="env-evidence-card cb-hard-project" data-cb-project="${esc(p[0])}"><span>CASE ${String(i+1).padStart(2,'0')}</span><strong>${esc(p[1])}</strong><small>${esc(p[2])}</small><i class="fas fa-arrow-right"></i></button>`).join('');content.innerHTML=`<div class="env-dossier-identity"><div><span class="modal-kicker">${esc(d.k)}</span><h2 id="envModalTitle">${esc(d.t)}</h2><p class="env-modal-lead">${esc(d.lead)}</p></div><span class="env-dossier-status">HANDS-ON · DOSSIER</span></div><section class="cb-env-objective"><span class="modal-kicker">RESEARCH OBJECTIVE</span><h3>What this environment contributes</h3><p>${esc(d.lead)}</p></section><div class="env-modal-grid"><section><h4><i class="fas fa-crosshairs"></i> What I Actually Do</h4><ul>${d.what.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></section><section><h4><i class="fas fa-route"></i> Working Method</h4><div class="env-flow"><small>WORKFLOW</small><strong>${esc(d.method)}</strong></div><div class="cb-env-lens"><small>RESEARCH LENS</small><div>${d.lens.map(x=>`<span>${esc(x)}</span>`).join('')}</div></div></section></div><section class="env-depth-panel"><div class="env-depth-head"><div><span class="modal-kicker">PRACTICAL DEPTH</span><h4><i class="fas fa-screwdriver-wrench"></i> Skills &amp; Tools</h4></div><span class="env-depth-count">${d.skills.length+d.tools.length} signals</span></div><div class="env-depth-columns"><div><small>SKILLS</small><div class="env-signal-tags">${d.skills.map(x=>`<span>${esc(x)}</span>`).join('')}</div></div><div><small>TOOLS / PLATFORMS</small><div class="env-signal-tags">${d.tools.map(x=>`<span>${esc(x)}</span>`).join('')}</div></div></div></section><section class="env-related env-evidence-record"><div class="env-related-head"><div><span class="modal-kicker">CONNECTED WORK</span><h4><i class="fas fa-link"></i> Related Projects &amp; Case Files</h4></div><small>Open a record for the full technical dossier.</small></div><div class="env-evidence-grid">${cards}</div></section><div class="env-modal-actions"><button type="button" class="env-back-link cb-hard-close"><i class="fas fa-arrow-left"></i> Back to Research Environment</button></div>`;}
-function openRecord(k){const d=D[k];if(!d||!pmodal)return;ptitle.textContent=d.t+' · Technical Record';plead.textContent='Selected technical records connected to this environment.';pcontent.innerHTML=`<button type="button" class="env-back-link cb-hard-back"><i class="fas fa-arrow-left"></i> Back to ${esc(d.t)}</button><div class="env-project-list">${d.projects.map(p=>`<button type="button" class="env-project-item cb-hard-case" data-cb-case="${esc(p[0])}"><span class="env-project-item-kicker">TECHNICAL CASE FILE</span><strong>${esc(p[1])}</strong><span>${esc(p[2])}</span><i class="fas fa-arrow-right"></i></button>`).join('')}</div>`;close(modal);pmodal.classList.add('open');pmodal.setAttribute('aria-hidden','false');document.body.classList.add('modal-open');pmodal.dataset.envKey=k;}
-function openCase(k){close(pmodal);if(typeof window.__cbOpenCase==='function'){window.__cbOpenCase(k);return;}if(typeof window.openProjectModal==='function'){window.openProjectModal(k);return;}const card=document.querySelector(`#projects .project-card[data-project="${k}"]`);card?.scrollIntoView({behavior:'smooth',block:'center'});}
-window.cbOpenEnvironment=openEnv;
-// Inline handlers are present as a second safety path; this listener is direct, not delegated.
-document.querySelectorAll('.env-card[data-env]').forEach(c=>c.addEventListener('click',()=>openEnv(c.dataset.env)));
-content.addEventListener('click',e=>{const b=e.target.closest('.cb-hard-project');if(b){openRecord(b.dataset.cbProject);return;}if(e.target.closest('.cb-hard-close'))close(modal);});
-pcontent?.addEventListener('click',e=>{const b=e.target.closest('.cb-hard-back');if(b){pmodal.classList.remove('open');pmodal.setAttribute('aria-hidden','true');openEnv(pmodal.dataset.envKey);return;}const c=e.target.closest('.cb-hard-case');if(c)openCase(c.dataset.cbCase);});
-document.querySelectorAll('[data-close-env]').forEach(b=>b.addEventListener('click',()=>close(modal)));document.querySelectorAll('[data-close-env-project]').forEach(b=>b.addEventListener('click',()=>close(pmodal)));
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(pmodal?.classList.contains('open'))close(pmodal);else if(modal.classList.contains('open'))close(modal);}});
-})();
+function notify(m) { window.__cbNotify(m); }
+
+function syncFromHash() {
+    const hash = location.hash.replace(/^#/, '');
+    const m = hash.match(/^case\/(.+)$/);
+    if (m) {
+        const id = decodeURIComponent(m[1]);
+        if (Cases.resolve(id, 'hash')) {
+            setTimeout(() => Cases.open(id, { from: 'hash' }), 120);
+        } else {
+            console.warn('[Cases] hash refers to unknown case:', id);
+        }
+    }
+}
+
+/* ============================================================
+   PART 10 — OPEN CASE HOOK FOR EXTERNAL CALLERS
+   ============================================================ */
+
+window.__cbOpenCase = function (id, from) {
+    return Cases.open(id, { from: from || 'external' });
+};
