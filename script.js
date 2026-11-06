@@ -120,7 +120,6 @@ function initMatrixRain() {
     const chars = (katakana + latin + nums + symbols).split('');
     
     const fontSize = 14;
-        // leave padding on both sides so rain doesn't draw flush at the edges
         const horizontalPadding = Math.max(8, Math.floor(fontSize / 1.5));
         let columns = Math.floor((canvas.width - horizontalPadding * 2) / fontSize);
         let drops = Array(columns).fill(1);
@@ -135,29 +134,24 @@ function initMatrixRain() {
     function draw() {
         frameCount++;
         
-        // Fade effect for trail
         ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
         for (let i = 0; i < drops.length; i++) {
             const text = chars[Math.floor(Math.random() * chars.length)];
             const x = i * fontSize + horizontalPadding;
-            // skip columns that would render too close to the right edge
             if (x < horizontalPadding || x > canvas.width - horizontalPadding - fontSize) continue;
             const y = drops[i] * fontSize;
             
-            // Head character - bright green
             ctx.fillStyle = '#00ff41';
             ctx.font = `bold ${fontSize}px "Fira Code", monospace`;
             ctx.fillText(text, x, y);
             
-            // Glow effect on head
             ctx.shadowColor = '#00ff41';
             ctx.shadowBlur = 6;
             ctx.fillText(text, x, y);
             ctx.shadowBlur = 0;
             
-            // Trail characters - fading
             for (let j = 1; j < 5; j++) {
                 const trailY = y - j * fontSize;
                 if (trailY > 0) {
@@ -169,16 +163,13 @@ function initMatrixRain() {
                 }
             }
             
-            // Reset drop
             if (y > canvas.height && Math.random() > 0.975) {
                 drops[i] = 0;
             }
             
-            // Random speed variation
             drops[i] += Math.random() > 0.1 ? 1 : 2;
         }
         
-        // Occasional bright flash
         if (frameCount % 120 === 0) {
             ctx.fillStyle = 'rgba(0, 255, 65, 0.03)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -239,7 +230,6 @@ function initParticleSystem() {
         });
     }
     
-    // Animate particles
     function animateParticles() {
         particles.forEach(p => {
             p.x += p.speedX;
@@ -317,7 +307,6 @@ function initThemeSystem() {
         if (themeIcon) {
             themeIcon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
         }
-        // Add transition class
         document.body.classList.add('theme-transitioning');
         setTimeout(() => document.body.classList.remove('theme-transitioning'), 500);
     }
@@ -347,14 +336,12 @@ function initNavigation() {
     const hamburger = document.querySelector('.hamburger');
     const navLinks = document.querySelector('.nav-links');
     
-    // Mobile menu
     hamburger?.addEventListener('click', () => {
         hamburger.classList.toggle('active');
         navLinks.classList.toggle('active');
         document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
     });
     
-    // Close on click
     document.querySelectorAll('.nav-links a').forEach(link => {
         link.addEventListener('click', () => {
             hamburger?.classList.remove('active');
@@ -363,7 +350,6 @@ function initNavigation() {
         });
     });
     
-    // Navbar hide/show on scroll
     let lastScroll = 0;
     window.addEventListener('scroll', () => {
         const currentScroll = window.pageYOffset;
@@ -484,7 +470,6 @@ function initCounterAnimation() {
                     const elapsed = currentTime - startTime;
                     const progress = Math.min(elapsed / duration, 1);
                     
-                    // Ease out cubic
                     const eased = 1 - Math.pow(1 - progress, 3);
                     const current = Math.floor(eased * target);
                     
@@ -861,16 +846,16 @@ document.addEventListener('DOMContentLoaded',()=>{
     htb:[['vulnhub','Vulnerability Assessment & Privilege Escalation','Controlled attack-path research across vulnerable environments.'],['buffer','Buffer Overflow Exploit Development','Low-level controlled exploitation and debugger-assisted research.']],
     vulnhub:[['vulnhub','Vulnerability Assessment & Privilege Escalation','Vulnerable systems, service enumeration, exploitation and privilege escalation.']],
     overthewire:[['vulnhub','Vulnerability Assessment & Privilege Escalation','Linux command-line reasoning connected to privilege-escalation practice.']],
-    kali:[['recon','Network Reconnaissance & Attack-Surface Mapping','Reconnaissance, enumeration and service validation.'],['web','Web Application Security Lab','Application-security testing and HTTP analysis.'],['wireless','Wireless Security Assessment Lab','Wireless packet analysis and controlled testing.'],['driver','RTL8812BU Linux Driver Modernization','Linux wireless driver engineering on real hardware.']],
-    crossplatform:[['malware','Malware Analysis & Windows Forensics Research','Windows artifacts, suspicious files and evidence-oriented investigation.'],['threat','Network Traffic Analysis & Threat Hunting','Packet analysis and IOC-oriented investigation.'],['vulnhub','Vulnerability Assessment & Privilege Escalation','Cross-platform vulnerable environments and privilege escalation.']],
+    kali:[['nth-signal','Network Threat Hunting & Anomaly Detection','Offline flow/PCAP analysis and investigation reporting.'],['recon','Network Reconnaissance & Attack-Surface Mapping','Reconnaissance, enumeration and service validation.'],['web','Web Application Security Lab','Application-security testing and HTTP analysis.'],['wireless','Wireless Security Assessment Lab','Wireless packet analysis and controlled testing.'],['driver','RTL8812BU Linux Driver Modernization','Linux wireless driver engineering on real hardware.']],
+    crossplatform:[['nth-signal','Network Threat Hunting & Anomaly Detection','Network-flow and packet evidence analysis.'],['malware','Malware Analysis & Windows Forensics Research','Windows artifacts, suspicious files and evidence-oriented investigation.'],['threat','Network Traffic Analysis & Threat Hunting','Packet analysis and IOC-oriented investigation.'],['vulnhub','Vulnerability Assessment & Privilege Escalation','Cross-platform vulnerable environments and privilege escalation.']],
     virtualbox:[['vulnhub','Vulnerability Assessment & Privilege Escalation','Controlled vulnerable virtual machines and attack-path reproduction.'],['buffer','Buffer Overflow Exploit Development','Isolated low-level exploitation research.']],
-    github:[['driver','RTL8812BU Linux Driver Modernization','13+ source files, kernel compatibility work and real-hardware validation.'],['firmware','SPI Flash & BIOS Protection Research','Firmware protection and flash-analysis research.'],['automation','Security Automation & PoC Tooling','Python/Bash security tooling and repeatable research workflows.'],['website','Cybersecurity Portfolio Engineering','The Research OS itself as a technical web-engineering project.']],
-    networkwalks:[['mediroza','Mediroza Web Application Security Assessment','Authorized assessment with evidence-driven reporting.'],['recon','Network Reconnaissance & Attack-Surface Mapping','Structured reconnaissance and attack-surface analysis.'],['web','Web Application Security Lab','50+ PortSwigger labs and application-security research.'],['driver','RTL8812BU Linux Driver Modernization','Security engineering and systems research.']],
+    github:[['nth-signal','Network Threat Hunting & Anomaly Detection','Python network telemetry analysis and explainable detection engineering.'],['driver','RTL8812BU Linux Driver Modernization','13+ source files, kernel compatibility work and real-hardware validation.'],['firmware','SPI Flash & BIOS Protection Research','Firmware protection and flash-analysis research.'],['automation','Security Automation & PoC Tooling','Python/Bash security tooling and repeatable research workflows.'],['website','Cybersecurity Portfolio Engineering','The Research OS itself as a technical web-engineering project.']],
+    networkwalks:[['nth-signal','Network Threat Hunting & Anomaly Detection','Independent security-tool engineering and network investigation.'],['mediroza','Mediroza Web Application Security Assessment','Authorized assessment with evidence-driven reporting.'],['recon','Network Reconnaissance & Attack-Surface Mapping','Structured reconnaissance and attack-surface analysis.'],['web','Web Application Security Lab','50+ PortSwigger labs and application-security research.'],['driver','RTL8812BU Linux Driver Modernization','Security engineering and systems research.']],
     underground:[['recon','Network Reconnaissance & Attack-Surface Mapping','Infrastructure discovery and evidence correlation.'],['threat','Network Traffic Analysis & Threat Hunting','Adversary-behavior and IOC investigation.']],
     osint:[['recon','Network Reconnaissance & Attack-Surface Mapping','DNS, certificates, infrastructure and web-fingerprinting research.'],['threat','Network Traffic Analysis & Threat Hunting','IOC and attacker-behavior investigation.']],
   };
   const groupProjects={
-    web:['web','mediroza'],bugbounty:['web','mediroza'],offensive:['vulnhub','buffer','web'],systems:['malware','threat','vulnhub','firmware'],engineering:['driver','automation','firmware','website'],adversary:['recon','threat'],professional:['mediroza','recon','driver','web']
+    web:['web','mediroza'],bugbounty:['web','mediroza'],offensive:['vulnhub','buffer','web'],systems:['malware','threat','vulnhub','firmware'],engineering:['driver','automation','firmware','website','nth-signal'],adversary:['recon','threat','nth-signal'],defensive:['nth-signal','threat','malware'],network:['nth-signal','recon','threat'],professional:['mediroza','recon','driver','web','nth-signal']
   };
   const externalLinks={
     portswigger:['https://portswigger.net/web-security','Open PortSwigger Web Security Academy'],
@@ -887,9 +872,9 @@ document.addEventListener('DOMContentLoaded',()=>{
     teamlead:{k:'CURRENT ROLE · NETWORKWALKS',t:'TEAM LEAD — CYBERSECURITY',accent:'professional',what:'Lead and contribute to multidisciplinary cybersecurity work across VAPT, offensive security, defensive security, adversary research, security engineering, and technical project execution.',how:['Understand the objective, system and attack surface before choosing a technique','Coordinate technical work while staying close to hands-on validation and investigation','Review findings and deliverables for accuracy, evidence, impact and remediation value','Connect offensive observations with defensive and engineering decisions','Keep technical work reproducible, documented and defensible'],skills:['VAPT','Offensive Security','Defensive Security','Adversary Research','Security Engineering','Technical Projects'],tools:['Burp Suite','Nmap','Wireshark','Linux','Python','Git','Security Tooling'],related:[['Mediroza Web Application Security Assessment','8+ documented findings','assessment'],['RTL8812BU Driver Engineering','13+ source files and hardware validation','engineering'],['Network Reconnaissance & Attack-Surface Mapping','Evidence-led reconnaissance','network']]},
     vapt:{k:'01 · ROLE SCOPE',t:'VAPT — ASSESSMENT MINDSET',accent:'vapt',what:'Assess attack surfaces, validate vulnerabilities, reconstruct practical attack paths and translate evidence into defensible findings.',how:['Reconnaissance before assumptions','Manual validation of observable behavior','Impact and risk analysis','Evidence preservation and technical reporting','Remediation mapping and retest thinking'],skills:['Reconnaissance','Vulnerability Validation','CVSS / CWE','Attack Paths','Evidence','Reporting'],tools:['Nmap','Burp Suite','Nessus','CVSS / CWE','Technical Reporting'],related:[['Mediroza Web Application Security Assessment','8+ documented findings','assessment']]},
     offensive:{k:'02 · ROLE SCOPE',t:'OFFENSIVE SECURITY — ATTACKER PERSPECTIVE',accent:'offensive',what:'Reason through how systems can be attacked, where trust boundaries fail and how individual weaknesses combine into meaningful attack paths.',how:['Attack-surface mapping','Enumeration and service analysis','Controlled exploitation','Privilege escalation reasoning','Post-exploitation impact analysis'],skills:['Attack-Surface Analysis','Enumeration','Controlled Exploitation','Privilege Escalation','Post-Exploitation','Attack Paths'],tools:['Nmap','Burp Suite','Metasploit','Kali Linux','Linux / Windows'],related:[['Vulnerability Assessment & Privilege Escalation','Controlled attack-path research','offensive'],['Web Application Security Lab','50+ PortSwigger labs','web']]},
-    defensive:{k:'03 · ROLE SCOPE',t:'DEFENSIVE SECURITY — INVESTIGATION MINDSET',accent:'defensive',what:'Use technical evidence to understand suspicious activity, correlate indicators and think from the perspective of detection and response.',how:['Network and endpoint observation','IOC correlation','Log and traffic analysis','Evidence-driven investigation','Detection and hardening considerations'],skills:['Network Analysis','IOC Correlation','Threat Hunting','Forensic Review','Detection Thinking','Incident Investigation'],tools:['Wireshark','Splunk','Google Chronicle','Volatility','Tcpdump'],related:[['Network Traffic Analysis & Threat Hunting','Packet-level investigation','defensive'],['Malware Analysis & Windows Forensics','Evidence-focused research','forensics']]},
+    defensive:{k:'03 · ROLE SCOPE',t:'DEFENSIVE SECURITY — INVESTIGATION MINDSET',accent:'defensive',what:'Use technical evidence to understand suspicious activity, correlate indicators and think from the perspective of detection and response.',how:['Network and endpoint observation','IOC correlation','Log and traffic analysis','Evidence-driven investigation','Detection and hardening considerations'],skills:['Network Analysis','IOC Correlation','Threat Hunting','Forensic Review','Detection Thinking','Incident Investigation'],tools:['Wireshark','Splunk','Google Chronicle','Volatility','Tcpdump'],related:[['Network Threat Hunting & Anomaly Detection','Explainable network signals and evidence-backed triage','network','nth-signal'],['Network Traffic Analysis & Threat Hunting','Packet-level investigation','defensive','threat'],['Malware Analysis & Windows Forensics','Evidence-focused research','forensics']]},
     adversary:{k:'04 · ROLE SCOPE',t:'ADVERSARY RESEARCH — INTELLIGENCE MINDSET',accent:'adversary',what:'Study threat actors, infrastructure, underground ecosystems and TTPs to connect fragmented observations into useful intelligence.',how:['Source collection and correlation','Infrastructure research','Actor and campaign context','Underground ecosystem research','TTP mapping and defensive context'],skills:['OSINT','CTI','Dark Web Research','Infrastructure Research','MITRE ATT&CK','TTP Analysis'],tools:['WHOIS','DNSRecon','crt.sh','Subfinder','Maltego','Tor / I2P research'],related:[['Adversary Research','Threat intelligence and actor analysis','threat'],['Network Reconnaissance','Infrastructure discovery','network']]},
-    engineering:{k:'05 · ROLE SCOPE',t:'SECURITY ENGINEERING — BUILD & VALIDATE',accent:'engineering',what:'Stay hands-on with systems, code, networking, wireless and tooling to understand security at the implementation level.',how:['Kernel-facing C analysis','Compatibility troubleshooting','Security automation','Proof-of-concept development','Real-system validation and reproducibility'],skills:['Kernel-Facing C','Linux Systems','Wireless Security','Compatibility Analysis','Security Tooling','Hardware Validation'],tools:['C','Python','GCC','Git','Linux','RTL8812BU'],related:[['RTL8812BU Driver Engineering','13+ source files','engineering'],['Security Automation & PoC Tooling','Python / Bash tooling','automation']]},
+    engineering:{k:'05 · ROLE SCOPE',t:'SECURITY ENGINEERING — BUILD & VALIDATE',accent:'engineering',what:'Stay hands-on with systems, code, networking, wireless and tooling to understand security at the implementation level.',how:['Kernel-facing C analysis','Compatibility troubleshooting','Security automation','Proof-of-concept development','Real-system validation and reproducibility'],skills:['Kernel-Facing C','Linux Systems','Wireless Security','Compatibility Analysis','Security Tooling','Hardware Validation'],tools:['C','Python','GCC','Git','Linux','RTL8812BU'],related:[['Network Threat Hunting & Anomaly Detection','Python network-analysis and detection tooling','engineering','nth-signal'],['RTL8812BU Driver Engineering','13+ source files','engineering'],['Security Automation & PoC Tooling','Python / Bash tooling','automation']]},
     projects:{k:'06 · ROLE SCOPE',t:'TECHNICAL PROJECTS — EXECUTION',accent:'projects',what:'Work across multiple security projects and connect technical execution to evidence, documentation and defensible outcomes.',how:['Break objectives into technical work','Select the right research environment','Validate rather than assume','Document evidence and limitations','Connect work to remediation or engineering outcomes'],skills:['Research','PoC Development','Documentation','Evidence','Project Execution','Technical Review'],tools:['GitHub','Python','Bash','C','Burp Suite','Nmap'],related:[['Web Application Security Assessment','Security assessment evidence','assessment'],['RTL8812BU Driver Engineering','Systems engineering','engineering'],['Security Automation & PoC Tooling','Security tooling','automation']]}
   };
   let researchParentGroup=null;
@@ -905,6 +890,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   /* Central project resolver. Every interactive layer uses the same canonical IDs. */
   const projectAliases={
     assessment:'mediroza', mediroza:'mediroza', 'mediroza assessment':'mediroza',
+    'network threat hunting':'nth-signal', 'network threat hunting & anomaly detection':'nth-signal', 'network threat hunting and anomaly detection':'nth-signal', 'nth-signal':'nth-signal',
     engineering:'driver', driver:'driver', 'rtl8812bu driver engineering':'driver', 'rtl8812bu linux driver modernization':'driver',
     network:'recon', recon:'recon', 'network reconnaissance':'recon', 'network reconnaissance & attack-surface mapping':'recon', 'enterprise network penetration testing':'recon',
     web:'web', 'web application security lab':'web', portswigger:'web',
@@ -985,7 +971,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   function openEnvProjects(key){const d=envData[key];researchParentProject=key;closeLayer(envModal);renderProjectRecord(`${d?.t||'Related Work'} · Project Record`,`Selected projects and technical evidence connected to this environment.`,envProjects[key]||[],'environment',key);}
   function openGroupProjects(key){const d=groups[key];researchParentProject=key;closeLayer(envGroupModal);renderProjectRecord(`${d?.title||'Research Domain'} · Project Record`,`Projects and case files connected to this research domain.`,groupProjects[key]||[],'group',key);}
 
-  function renderRole(key){const d=roleData[key];if(!d)return;roleContent.innerHTML=`<span class="modal-kicker">${d.k}</span><div class="role-dossier-head"><div><h2 id="roleDossierTitle">${d.t}</h2><p>${d.what}</p></div><span class="role-dossier-index">TEAM LEAD</span></div><div class="role-dossier-grid"><section><h4><i class="fas fa-brain"></i> How I Work</h4><ul>${d.how.map(x=>`<li>${x}</li>`).join('')}</ul><div class="role-dossier-principle"><small>DECISION PRINCIPLE</small><strong>Understand → Validate → Correlate → Improve</strong></div></section><section><h4><i class="fas fa-bullseye"></i> What This Looks Like</h4><p class="role-dossier-explanation">I stay close to the technical problem: understand the system, validate observable behaviour, follow the evidence, connect it to impact, and turn the result into a defensible security or engineering decision.</p><div class="role-thinking-flow"><span>OBSERVE</span><b>→</b><span>VALIDATE</span><b>→</b><span>INVESTIGATE</span><b>→</b><span>IMPROVE</span></div></section></div><section class="role-related"><h4><i class="fas fa-link"></i> Related Work</h4><div class="role-related-grid">${d.related.map(x=>`<button type="button" data-env-related="${x[2]}"><strong>${x[0]}</strong><span>${x[1]}</span><i class="fas fa-arrow-right"></i></button>`).join('')}</div></section><section class="role-depth-panel"><div class="role-depth-head"><div><span class="modal-kicker">TECHNICAL DEPTH</span><h4><i class="fas fa-layer-group"></i> Skills &amp; Tools</h4></div><span class="env-depth-count">${d.skills.length+d.tools.length} signals</span></div><div class="role-depth-columns"><div><small>SKILLS</small><div class="role-dossier-tags">${d.skills.map(x=>`<span>${x}</span>`).join('')}</div></div><div><small>TOOLS / PLATFORMS</small><div class="role-dossier-tags">${d.tools.map(x=>`<span>${x}</span>`).join('')}</div></div></div></section>`;openLayer(roleModal);}
+  function renderRole(key){const d=roleData[key];if(!d)return;roleContent.innerHTML=`<span class="modal-kicker">${d.k}</span><div class="role-dossier-head"><div><h2 id="roleDossierTitle">${d.t}</h2><p>${d.what}</p></div><span class="role-dossier-index">TEAM LEAD</span></div><div class="role-dossier-grid"><section><h4><i class="fas fa-brain"></i> How I Work</h4><ul>${d.how.map(x=>`<li>${x}</li>`).join('')}</ul><div class="role-dossier-principle"><small>DECISION PRINCIPLE</small><strong>Understand → Validate → Correlate → Improve</strong></div></section><section><h4><i class="fas fa-bullseye"></i> What This Looks Like</h4><p class="role-dossier-explanation">I stay close to the technical problem: understand the system, validate observable behaviour, follow the evidence, connect it to impact, and turn the result into a defensible security or engineering decision.</p><div class="role-thinking-flow"><span>OBSERVE</span><b>→</b><span>VALIDATE</span><b>→</b><span>INVESTIGATE</span><b>→</b><span>IMPROVE</span></div></section></div><section class="role-related"><h4><i class="fas fa-link"></i> Related Work</h4><div class="role-related-grid">${d.related.map(x=>`<button type="button" ${x[3]?`data-role-project-key="${projectRef(x[3])}"`:`data-env-related="${x[2]}"`}><strong>${x[0]}</strong><span>${x[1]}</span><i class="fas fa-arrow-right"></i></button>`).join('')}</div></section><section class="role-depth-panel"><div class="role-depth-head"><div><span class="modal-kicker">TECHNICAL DEPTH</span><h4><i class="fas fa-layer-group"></i> Skills &amp; Tools</h4></div><span class="env-depth-count">${d.skills.length+d.tools.length} signals</span></div><div class="role-depth-columns"><div><small>SKILLS</small><div class="role-dossier-tags">${d.skills.map(x=>`<span>${x}</span>`).join('')}</div></div><div><small>TOOLS / PLATFORMS</small><div class="role-dossier-tags">${d.tools.map(x=>`<span>${x}</span>`).join('')}</div></div></div></section>`;openLayer(roleModal);}
   document.getElementById('heroResearchEnvironment')?.addEventListener('click',()=>openLayer(mapModal));
   document.getElementById('openResearchEnvironment')?.addEventListener('click',()=>openLayer(mapModal));
   document.querySelectorAll('[data-close-research-map]').forEach(el=>el.addEventListener('click',()=>closeLayer(mapModal)));
@@ -1039,7 +1025,6 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 /* ===== FINAL PROJECT + ARSENAL INTERACTIONS ===== */
 document.addEventListener('DOMContentLoaded', () => {
-    // Project filtering — includes featured and comprehensive project cards.
     const filterButtons = document.querySelectorAll('.project-filter');
     const projectCards = document.querySelectorAll('#projects .project-card');
     const jumpToProjects = (filter = 'all') => {
@@ -1066,7 +1051,6 @@ document.addEventListener('DOMContentLoaded', () => {
         button.addEventListener('click', () => jumpToProjects(button.dataset.projectFilter || 'all'));
     });
 
-    // Project detail modal.
     const modal = document.getElementById('projectModal');
     const content = document.getElementById('modalContent');
     const projectDetails = {
@@ -1083,18 +1067,54 @@ document.addEventListener('DOMContentLoaded', () => {
         buffer: {kicker:'Exploit Development · Controlled Research', title:'Buffer Overflow Exploit Development', body:`<p>Low-level security research focused on memory, stack behavior, control flow, and debugger-assisted proof-of-concept development in controlled environments.</p><h4>Tooling</h4><ul><li>GDB and WinDbg for debugging and memory inspection.</li><li>C for understanding low-level memory behavior.</li><li>Stack analysis, control-flow analysis, and controlled proof-of-concept workflows.</li></ul><div class="modal-meta"><span>C</span><span>GDB</span><span>WinDbg</span><span>Memory Analysis</span><span>PoC</span></div>`},
         firmware: {kicker:'Systems Security · Firmware Research', title:'SPI Flash & BIOS Protection Research', body:`<p>Firmware research on a Lenovo G580 involving SPI flash/NVRAM protection analysis and Linux-based firmware investigation.</p><h4>Research record</h4><ul><li>Used flashrom to investigate internal programmer access and read-protection behavior.</li><li>Acquired an 8 MB full-flash image and extracted the BIOS region for analysis.</li><li>Used dmidecode and dmesg to correlate platform and firmware-loading observations.</li></ul><div class="modal-meta"><span>flashrom</span><span>SPI Flash</span><span>NVRAM</span><span>BIOS</span><span>dmidecode</span></div>`},
         automation: {kicker:'Security Development · Automation', title:'Security Automation & PoC Tooling', body:`<p>Python- and Bash-based security development supporting reconnaissance, vulnerability assessment, network analysis, research, and repeatable proof-of-concept workflows.</p><h4>Engineering approach</h4><ul><li>Automate repeatable reconnaissance and validation steps where it improves consistency.</li><li>Build small proof-of-concept tools to understand vulnerabilities and security behavior.</li><li>Document inputs, outputs, limitations, and defensive considerations rather than treating automation as a substitute for validation.</li></ul><div class="modal-meta"><span>Python</span><span>Bash</span><span>SQL</span><span>Automation</span><span>PoC</span></div>`},
+        'nth-signal': {kicker:'Detection Engineering · Offline Network Investigation · Active Development', title:'Network Threat Hunting & Anomaly Detection', body:`
+<p class="nth-story-lead">Security defenders are often surrounded by telemetry but short on time to interpret it. A suspicious connection, an unusual transfer, or a recurring DNS pattern can be easy to overlook when each record is viewed in isolation. I wanted to build a practical tool that helps an analyst move from scattered network observations to a structured starting point for investigation—without pretending that an alert is the same as proof.</p>
+<div class="nth-callout"><span class="modal-kicker">THE ENGINEERING INTENT</span><p>Make network signals inspectable. Each finding should show the behavior that triggered it, the rule and evidence behind it, its severity, confidence and triage priority—while leaving the final judgement with the analyst.</p></div>
+<h4>What it does</h4>
+<p>Network Threat Hunting & Anomaly Detection is a local-first Python utility for offline analysis of supplied network telemetry. It accepts CSV/TSV flow exports, Zeek logs, and supported PCAP/PCAPNG captures, normalizes the available metadata, runs configurable behavioral rules, optionally matches local IP/domain indicators, and produces a standalone HTML investigation report plus a machine-readable JSON export.</p>
+<h4>Analysis pipeline</h4>
+<div class="nth-pipeline"><div><b>01 · INGEST</b><span>CSV / TSV · Zeek · PCAP / PCAPNG</span></div><i>→</i><div><b>02 · NORMALIZE</b><span>Consistent network-flow records</span></div><i>→</i><div><b>03 · DETECT</b><span>14 explainable behavioral rules</span></div><i>→</i><div><b>04 · CORRELATE</b><span>Evidence · local IOCs · ATT&amp;CK candidates</span></div><i>→</i><div><b>05 · REPORT</b><span>HTML investigation report · JSON findings</span></div></div>
+<h4>Detection coverage</h4>
+<ul>
+<li><strong>Reconnaissance and scanning:</strong> horizontal scanning, vertical port scanning, distributed probing, and repeated connection failures.</li>
+<li><strong>Connection behavior:</strong> unsuccessful connections, long-lived flows, and regular connection-timing patterns that may resemble beaconing.</li>
+<li><strong>Traffic anomalies:</strong> outbound-volume outliers and large asymmetric transfers that may warrant data-staging or exfiltration investigation.</li>
+<li><strong>DNS heuristics:</strong> long query names and high-entropy DNS labels.</li>
+<li><strong>Threat intelligence:</strong> matches against a locally supplied IP/domain IOC list, with source, confidence, and freshness context.</li>
+</ul>
+<h4>Evidence before conclusions</h4>
+<ul>
+<li>Findings carry structured evidence records with source, stable rule ID/version, observed time, entities, and observation attributes.</li>
+<li><strong>Severity</strong> represents the potential impact assigned by the detection rule; <strong>confidence</strong> reflects the strength of supporting observations; <strong>priority</strong> is a configurable triage aid—not a probability of malicious activity.</li>
+<li>Selected detections include conservative MITRE ATT&amp;CK technique candidates for analyst consideration, not confirmed attribution.</li>
+<li>Local IOC matching keeps supplied indicators and telemetry on the local analysis path; the implementation does not query external reputation services.</li>
+</ul>
+<h4>Why this matters to a security team</h4>
+<p>For a SOC analyst or incident investigator, the value is not simply that something was flagged. The analyst needs to understand <em>why</em> it surfaced, which hosts and flows are involved, which signals corroborate one another, and what should be validated against endpoint, identity, DNS, or firewall telemetry. Network Threat Hunting & Anomaly Detection organizes those leads into a reviewable record so investigation can start with evidence and context instead of an unexplained score.</p>
+<h4>Engineering and validation</h4>
+<ul>
+<li>Python 3.10+ implementation using the Python standard library; no third-party Python packages are required.</li>
+<li>Validated JSON configuration for thresholds, ports, and disabled rules.</li>
+<li>Dependency-free classic PCAP and PCAPNG parsing for supported link types, Ethernet/VLAN, Linux cooked capture, raw IPv4/IPv6, TCP/UDP metadata, and UDP DNS question extraction.</li>
+<li>Automated unit and regression suite: <strong>29 tests passed</strong> in the supplied development baseline.</li>
+</ul>
+<div class="nth-limits"><span class="modal-kicker">SCOPE &amp; LIMITATIONS · IMPORTANT</span><p>This is an offline telemetry-analysis tool—not a live packet sensor, continuous monitoring daemon, SIEM, or automated response platform. It does not currently perform full TCP stream reconstruction, IP fragment reassembly, DNS-over-TCP parsing, encrypted payload inspection, endpoint/identity correlation, or machine-learning-based anomaly detection. Rule matches are investigation leads, not proof of compromise; detection accuracy has not been benchmarked against representative enterprise traffic.</p></div>
+<h4>Demonstration data</h4>
+<p>The repository includes a synthetic demo dataset and standalone HTML report for exploring the interface. Demo hosts, flows, and indicators are illustrative records—not observations from a live enterprise network or verified malicious infrastructure.</p>
+<div class="modal-meta"><span>Python 3.10+</span><span>Network Telemetry</span><span>PCAP / PCAPNG</span><span>Zeek</span><span>Rule-Based Detection</span><span>Statistical Outliers</span><span>Local IOC Matching</span><span>MITRE ATT&amp;CK</span><span>Evidence Engineering</span><span>HTML / JSON</span><span>29 Unit Tests</span></div>
+<div class="modal-links nth-links"><a class="modal-source" href="https://github.com/Chandrashekar-Bala/Network-Threat-Hunting-and-Anomaly-Detection" target="_blank" rel="noopener noreferrer">Explore source repository <i class="fab fa-github"></i></a><a class="modal-source" href="https://github.com/Chandrashekar-Bala/Network-Threat-Hunting-and-Anomaly-Detection/archive/refs/heads/main.zip" target="_blank" rel="noopener noreferrer">Download project &amp; local demo <i class="fas fa-download"></i></a><a class="modal-source" href="https://github.com/Chandrashekar-Bala/Network-Threat-Hunting-and-Anomaly-Detection/blob/main/README.md" target="_blank" rel="noopener noreferrer">Read technical documentation <i class="fas fa-book-open"></i></a><a class="modal-source" href="https://github.com/Chandrashekar-Bala/Network-Threat-Hunting-and-Anomaly-Detection/blob/main/demo_report.html" target="_blank" rel="noopener noreferrer">Inspect synthetic demo report <i class="fas fa-chart-line"></i></a></div>
+`},
         website: {kicker:'Web Engineering · Portfolio System', title:'Cybersecurity Portfolio Engineering', body:`<p>This portfolio itself is a technical project: a static web system designed to present security research, assessment work, engineering projects, and evidence in a usable interface.</p><h4>What I built</h4><ul><li>Semantic HTML structure with responsive layouts and a terminal-inspired visual system.</li><li>JavaScript-driven project filtering, technical-detail modals, theme switching, navigation behavior, counters, and UI feedback.</li><li>Accessibility-oriented controls, keyboard interaction, reduced-motion support, SEO/social metadata, and GitHub Pages deployment structure.</li></ul><div class="modal-meta"><span>HTML5</span><span>CSS3</span><span>JavaScript</span><span>Accessibility</span><span>SEO</span><span>GitHub Pages</span></div><a class="modal-source" href="https://github.com/Chandrashekar-Bala" target="_blank" rel="noopener noreferrer">View GitHub profile <i class="fab fa-github"></i></a>`}
     };
     if (modal && content) {
-        const openProject = key => { const item = projectDetails[key]; if (!item) return; content.innerHTML = `<span class="modal-kicker">${item.kicker}</span><h2 id="modalTitle">${item.title}</h2><div class="modal-body">${item.body}</div>`; modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.classList.add('modal-open'); };
-        const closeProject = () => { modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); document.body.classList.remove('modal-open'); };
+        const openProject = key => { const item = projectDetails[key]; if (!item) return; modal.classList.toggle('network-threat-hunting-open', key === 'nth-signal'); content.innerHTML = `<span class="modal-kicker">${item.kicker}</span><h2 id="modalTitle">${item.title}</h2><div class="modal-body">${item.body}</div>`; modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.classList.add('modal-open'); };
+        const closeProject = () => { modal.classList.remove('open','network-threat-hunting-open'); modal.setAttribute('aria-hidden','true'); document.body.classList.remove('modal-open'); };
         document.querySelectorAll('#projects .project-open').forEach(button => button.addEventListener('click', () => openProject(button.closest('.project-card')?.dataset.project)));
         window.openProjectModal = openProject;
         modal.querySelectorAll('[data-close-modal]').forEach(el => el.addEventListener('click', closeProject));
         document.addEventListener('keydown', event => { if (event.key === 'Escape' && modal.classList.contains('open')) closeProject(); });
     }
 
-    // Security Arsenal command-center modal.
     const arsenalModal = document.getElementById('arsenalModal');
     const arsenalTitle = document.getElementById('arsenalModalTitle');
     const arsenalKicker = document.getElementById('arsenalModalKicker');
@@ -1102,9 +1122,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const arsenalDetails = {
         offensive:{k:'01 · OFFENSIVE SECURITY',t:'Offensive Security',tools:['Nmap','Nessus','Metasploit','Burp Suite','OWASP ZAP','SQLMap','John the Ripper','Hydra','Medusa','GDB','WinDbg'],methods:['Reconnaissance','Service enumeration','Vulnerability validation','Controlled exploitation','Privilege escalation','Post-exploitation analysis'],projects:[['Mediroza Web Application Security Assessment','Authorized black-box assessment with demonstrated SQLi/authentication-bypass chain.','assessment','mediroza'],['Vulnerability Assessment & Privilege Escalation','Controlled vulnerable-environment practice using VulnHub/HTB/VMs.','offensive'],['Web Application Security Lab','PortSwigger application-security practice.','web'],['Buffer Overflow Exploit Development','Debugger-assisted low-level research.','engineering']]},
         web:{k:'02 · WEB & APPLICATION SECURITY',t:'Web & Application Security',tools:['Burp Suite','OWASP ZAP','Nmap','cURL','WhatWeb','WAFW00F','SQLMap'],methods:['HTTP request/response analysis','Authentication testing','Authorization and access control','SQL injection','XSS / CSRF / SSRF','Session and parameter analysis'],projects:[['Mediroza Web Application Security Assessment','Flagship assessment with manual validation and CVSS/CWE reporting.','assessment'],['Web Application Security Lab','50+ PortSwigger labs across OWASP-aligned scenarios.','web']]},
-        defensive:{k:'03 · DEFENSIVE SECURITY',t:'Defensive Security',tools:['Splunk','Google Chronicle','Wireshark','Tcpdump','Zeek','Volatility'],methods:['Security monitoring','Log analysis','Alert triage','IOC analysis','Threat hunting','Incident-response thinking'],projects:[['Network Traffic Analysis & Threat Hunting','Packet-level investigation and ATT&CK-aligned threat hunting.','defensive','threat'],['Malware Analysis & Windows Forensics Research','Evidence-focused malware and forensic exercises.','forensics'],['Mediroza Assessment','Findings translated into remediation and detection considerations.','assessment']]},
+        defensive:{k:'03 · DEFENSIVE SECURITY',t:'Defensive Security',tools:['Splunk','Google Chronicle','Wireshark','Tcpdump','Zeek','Volatility','Python'],methods:['Security monitoring','Log analysis','Alert triage','IOC analysis','Threat hunting','Network behavior analysis','Evidence correlation','Incident-response thinking'],projects:[['Network Threat Hunting & Anomaly Detection','Offline telemetry analysis, explainable rules, structured evidence and investigation reports.','network','nth-signal'],['Network Traffic Analysis & Threat Hunting','Packet-level investigation and ATT&CK-aligned threat hunting.','defensive','threat'],['Malware Analysis & Windows Forensics Research','Evidence-focused malware and forensic exercises.','forensics'],['Mediroza Assessment','Findings translated into remediation and detection considerations.','assessment']]},
         adversary:{k:'04 · THREAT INTELLIGENCE & ADVERSARY RESEARCH',t:'Threat Intelligence & Adversary Research',tools:['Maltego','theHarvester','Subfinder','crt.sh','CertSpotter','WHOIS','MITRE ATT&CK'],methods:['OSINT','Infrastructure research','TTP analysis','Threat-report analysis','Adversary behavior mapping','OpSec research'],projects:[['Network Reconnaissance & Attack-Surface Mapping','Passive intelligence, DNS, certificates, web fingerprinting and service validation.','network','recon'],['Active Directory Attack-Path Research','Kerberoasting, Pass-the-Hash, ACL abuse and detection considerations.','threat'],['Network Traffic Analysis & Threat Hunting','IOC and attacker-behavior investigation.','defensive']]},
-        network:{k:'05 · NETWORK SECURITY',t:'Network Security',tools:['Nmap','Nessus','Wireshark','Tcpdump','Zeek','NSE','dig','DNSRecon','cURL'],methods:['Reconnaissance','Service/version validation','TCP/IP and DNS analysis','TLS inspection','Packet analysis','Suspicious-connection investigation'],projects:[['Network Reconnaissance & Attack-Surface Mapping','Reconnaissance Research structured reconnaissance.','network'],['Network Traffic Analysis & Threat Hunting','Traffic analysis and IOC-oriented investigation.','defensive'],['Vulnerability Assessment & Privilege Escalation','Network/service enumeration across controlled VMs.','offensive']]},
+        network:{k:'05 · NETWORK SECURITY',t:'Network Security',tools:['Nmap','Nessus','Wireshark','Tcpdump','Zeek','NSE','dig','DNSRecon','cURL','Python'],methods:['Reconnaissance','Service/version validation','TCP/IP and DNS analysis','TLS inspection','Packet analysis','Flow analysis','Suspicious-connection investigation'],projects:[['Network Threat Hunting & Anomaly Detection','Network-flow and supported packet-capture analysis with evidence-backed findings.','network','nth-signal'],['Network Reconnaissance & Attack-Surface Mapping','Reconnaissance Research structured reconnaissance.','network'],['Network Traffic Analysis & Threat Hunting','Traffic analysis and IOC-oriented investigation.','defensive'],['Vulnerability Assessment & Privilege Escalation','Network/service enumeration across controlled VMs.','offensive']]},
         wireless:{k:'06 · WIRELESS SECURITY',t:'Wireless Security',tools:['Aircrack-ng','Wireshark','hcxdumptool','rtl88x2bu / 88x2bu','iw','Linux wireless tooling'],methods:['Monitor mode','Packet capture','Protocol analysis','Controlled Wi-Fi testing','Driver capability validation'],projects:[['Wireless Security Assessment Lab','Controlled wireless assessment and packet-analysis workflows.','wireless'],['RTL8812BU Linux Driver Modernization','Kernel compatibility work enabling real-hardware wireless testing.','engineering']]},
         mobile:{k:'07 · MOBILE SECURITY',t:'Mobile Security',tools:['Drozer','Dex2jar','JD-GUI','Logcat','Android Studio'],methods:['APK inspection','Decompilation','Static analysis','Dynamic analysis','Runtime observation','Reverse engineering'],projects:[['Android Security Analysis','APK inspection, static/dynamic analysis and runtime behavior review.','mobile','android']]},
         malware:{k:'08 · MALWARE ANALYSIS & REVERSE ENGINEERING',t:'Malware Analysis & Reverse Engineering',tools:['Ghidra','IDA Pro','GDB','Volatility','Wireshark'],methods:['Static analysis','Dynamic analysis','Binary investigation','Execution behavior','Memory / stack analysis','Control-flow analysis','IOC extraction'],projects:[['Malware Analysis & Windows Forensics Research','Hands-on static/dynamic and evidence-analysis exercises.','forensics'],['Buffer Overflow Exploit Development','C and debugger-assisted low-level research.','engineering','buffer']]},
@@ -1135,7 +1155,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const $ = (s,root=document) => root.querySelector(s);
   const $$ = (s,root=document) => [...root.querySelectorAll(s)];
 
-  // Curated case index: secondary projects remain available without overwhelming the page.
   const caseToggle = $('#caseIndexToggle');
   if(caseToggle){
     caseToggle.addEventListener('click',()=>{
@@ -1146,7 +1165,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Full case index modal.
   const caseModal=$('#caseIndexModal'), caseList=$('#caseIndexList');
   if(caseModal && caseList){
     $$('#projects .project-card').forEach(card=>{
@@ -1162,7 +1180,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&caseModal.classList.contains('open'))close();});
   }
 
-  // If a project card has a secondary index entry, make the full card visually actionable.
   $$('#projects .project-card').forEach(card=>{
     card.addEventListener('click',e=>{
       if(e.target.closest('button,a')) return;
@@ -1170,7 +1187,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Expertise domain dossiers. These are deliberately separate from the technical-capability modal system.
   const expertise={
     adversary:{title:'Adversary Research & Simulation',kicker:'01 · ADVERSARY RESEARCH',summary:'Research focused on adversary behavior, operational security, infrastructure, TTPs, and controlled simulation—then translating those observations into defensive insight.',methods:['Threat-intelligence gathering and infrastructure research','MITRE ATT&CK-aligned TTP analysis','OpSec and controlled adversary-simulation research','Active Directory attack-path analysis'],tools:['MITRE ATT&CK','OSINT','Maltego','theHarvester','Subfinder'],projects:['threat','recon']},
     network:{title:'Network & Wireless Security',kicker:'02 · NETWORK SECURITY',summary:'Security work across network discovery, protocol behavior, packet analysis, wireless assessment, and infrastructure exposure.',methods:['Service and version discovery','TCP/IP, DNS and TLS analysis','Packet capture and traffic investigation','Wireless assessment, monitor mode and packet analysis'],tools:['Nmap','NSE','Wireshark','Aircrack-ng','DNSRecon','cURL'],projects:['recon','network','wireless','driver']},
@@ -1198,7 +1214,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&em.classList.contains('open'))closeExpert();});
   }
 
-  // Role cards become direct entry points into evidence instead of dead-end filter buttons.
   $$('.role-project-link').forEach(btn=>{
     btn.addEventListener('click',()=>{
       const key=(window.resolveProjectKey?window.resolveProjectKey(btn.dataset.projectKey):btn.dataset.projectKey);
@@ -1256,7 +1271,6 @@ document.addEventListener('DOMContentLoaded', () => {
     else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
   });
 
-  // Conversation composer — professional, topic-specific drafts that remain user-editable.
   const topic=$('#conversationTopic'), name=$('#conversationName'), organization=$('#conversationOrganization'), message=$('#conversationMessage'), preview=$('#conversationPreview');
   const defaultMessages={
     'Cybersecurity role or recruitment':'Hello Chandrashekar, I reviewed your portfolio and would like to discuss a cybersecurity opportunity aligned with your work across security assessment, security engineering, or security operations. Could we arrange a conversation about the role, team, and technical expectations?',
@@ -1306,7 +1320,6 @@ document.addEventListener('DOMContentLoaded', () => {
     catch{notify('Clipboard access was unavailable. Select and copy the draft manually.');}
   });
   updateConversation();
-  // Referral / share
   function referralText(){return 'I’d like to recommend Chandrashekar Bala for a cybersecurity opportunity. His portfolio documents security assessment, web application security, threat intelligence, DFIR, wireless security, and security engineering work. Portfolio: '+location.href.split('#')[0];}
   $('#referralButton')?.addEventListener('click',()=>openModal('referralModal'));
   $('#navConversationTrigger')?.addEventListener('click',()=>{openModal('conversationModal','#conversationTopic');updateConversation();});
@@ -1317,13 +1330,12 @@ document.addEventListener('DOMContentLoaded', () => {
     else {try{await navigator.clipboard.writeText(data.url);notify('Portfolio link copied.');}catch{notify('Portfolio link: '+data.url);}}
   }));
 
-  // Unified Security Command Center: expertise + capabilities in one interface.
   const securityDomainData={
     offensive:{k:'01 · OFFENSIVE SECURITY',t:'Offensive Security',summary:'Controlled security assessment work focused on understanding attack surfaces, validating weaknesses, reconstructing attack paths, and documenting defensible impact.',tools:['Nmap','Nessus','Metasploit','Burp Suite','OWASP ZAP','GDB','John the Ripper'],methods:['Reconnaissance','Service enumeration','Vulnerability validation','Controlled exploitation','Privilege escalation','Post-exploitation analysis'],projects:[['Mediroza Web Application Security Assessment','Authorized black-box assessment with demonstrated SQLi/authentication-bypass chain.','assessment','mediroza'],['Vulnerability Assessment & Privilege Escalation','Controlled vulnerable-environment practice using VulnHub/HTB/VMs.','offensive','vulnhub'],['Web Application Security Lab','50+ PortSwigger application-security labs.','web','web'],['Buffer Overflow Exploit Development','Debugger-assisted low-level research.','exploit','buffer']]},
     web:{k:'02 · WEB & APPLICATION SECURITY',t:'Web & Application Security',summary:'Manual application-security analysis centered on HTTP behavior, authentication, authorization, access control, request manipulation, and vulnerability validation.',tools:['Burp Suite','OWASP ZAP','Nmap','cURL','WhatWeb','WAFW00F','SQLMap'],methods:['Request/response analysis','Authentication testing','Authorization and access control','SQL injection','XSS / CSRF / SSRF','Session and parameter analysis'],projects:[['Mediroza Web Application Security Assessment','Flagship assessment with manual validation and CVSS/CWE reporting.','assessment','mediroza'],['Web Application Security Lab','50+ PortSwigger labs across application-security scenarios.','web','web']]},
-    defensive:{k:'03 · DEFENSIVE SECURITY',t:'Defensive Security',summary:'Defensive investigation connecting network visibility, SIEM workflows, indicators, threat hunting, incident response, and detection logic.',tools:['Splunk','Google Chronicle','Wireshark','Tcpdump','Volatility'],methods:['Security monitoring','Log analysis','Alert triage','IOC analysis','Threat hunting','Incident-response thinking'],projects:[['Network Traffic Analysis & Threat Hunting','Packet-level investigation and ATT&CK-aligned threat hunting.','defensive','threat'],['Malware Analysis & Windows Forensics Research','Evidence-focused malware and forensic research.','forensics','malware']]},
+    defensive:{k:'03 · DEFENSIVE SECURITY',t:'Defensive Security',summary:'Defensive investigation connecting network visibility, SIEM workflows, indicators, threat hunting, incident response, and explainable detection logic.',tools:['Splunk','Google Chronicle','Wireshark','Tcpdump','Zeek','Volatility','Python'],methods:['Security monitoring','Log analysis','Alert triage','IOC analysis','Network behavior analysis','Evidence correlation','Threat hunting','Incident-response thinking'],projects:[['Network Threat Hunting & Anomaly Detection','Offline network-flow analysis, explainable detections and evidence-backed investigation output.','network','nth-signal'],['Network Traffic Analysis & Threat Hunting','Packet-level investigation and ATT&CK-aligned threat hunting.','defensive','threat'],['Malware Analysis & Windows Forensics Research','Evidence-focused malware and forensic research.','forensics','malware']]},
     adversary:{k:'04 · ADVERSARY & UNDERGROUND INTELLIGENCE',t:'Adversary & Underground Intelligence',summary:'Research into threat actors, underground ecosystems, adversary infrastructure, exposed information, operational behavior, and TTPs — connecting intelligence collection with defensive insight.',tools:['OSINT','Maltego','theHarvester','Subfinder','crt.sh','WHOIS','Tor / I2P research','MITRE ATT&CK'],methods:['Underground ecosystem research','Threat-actor research','Infrastructure correlation','Leak / exposure research','TTP analysis','Threat-report analysis','Adversary behavior mapping'],projects:[['Network Reconnaissance & Attack-Surface Mapping','Infrastructure discovery, DNS, certificates, web fingerprinting and service validation.','network','recon'],['Network Traffic Analysis & Threat Hunting','Network evidence and attacker-behavior investigation.','threat','threat']]},
-    network:{k:'05 · NETWORK & WIRELESS SECURITY',t:'Network & Wireless Security',summary:'Network discovery, protocol behavior, packet analysis, wireless assessment, DNS/TLS investigation, and hardware-backed wireless research.',tools:['Nmap','Wireshark','Aircrack-ng','DNSRecon','dig','NSE','iw'],methods:['Reconnaissance','Service/version validation','TCP/IP and DNS analysis','TLS inspection','Packet analysis','Monitor mode','Controlled Wi-Fi testing'],projects:[['Network Reconnaissance & Attack-Surface Mapping','Structured reconnaissance and service validation.','network','recon'],['Network Traffic Analysis & Threat Hunting','Traffic analysis and IOC-oriented investigation.','defensive','threat'],['RTL8812BU Linux Driver Modernization','Kernel compatibility work validated on real hardware.','engineering','driver']]},
+    network:{k:'05 · NETWORK & WIRELESS SECURITY',t:'Network & Wireless Security',summary:'Network discovery, flow and packet analysis, offline threat hunting, DNS/TLS investigation, wireless assessment, and hardware-backed research.',tools:['Nmap','Wireshark','Aircrack-ng','DNSRecon','dig','NSE','iw','Python','Zeek'],methods:['Reconnaissance','Service/version validation','Flow analysis','TCP/IP and DNS analysis','TLS inspection','Behavioral detection','Local IOC correlation','Packet analysis','Monitor mode','Controlled Wi-Fi testing'],projects:[['Network Threat Hunting & Anomaly Detection','Offline network-telemetry analysis and explainable threat-hunting leads.','network','nth-signal'],['Network Reconnaissance & Attack-Surface Mapping','Structured reconnaissance and service validation.','network','recon'],['Network Traffic Analysis & Threat Hunting','Traffic analysis and IOC-oriented investigation.','defensive','threat'],['RTL8812BU Linux Driver Modernization','Kernel compatibility work validated on real hardware.','engineering','driver']]},
     mobile:{k:'06 · MOBILE SECURITY',t:'Mobile Security',summary:'Android-focused security research spanning APK inspection, static/dynamic analysis, runtime observation, logging, and reverse engineering.',tools:['ADB','Logcat','Dex2jar','JD-GUI','Ghidra'],methods:['APK inspection','Decompilation','Static analysis','Dynamic analysis','Runtime observation','Reverse engineering'],projects:[['Android Security Analysis','APK inspection, static/dynamic analysis and runtime behavior review.','mobile','android']]},
     exploit:{k:'07 · EXPLOIT DEVELOPMENT',t:'Exploit Development',summary:'Low-level research into memory behavior, stack state, control flow, debugging, and controlled proof-of-concept development.',tools:['C','GDB','WinDbg'],methods:['Memory and stack analysis','Debugger-assisted investigation','Control-flow analysis','Controlled PoC development'],projects:[['Buffer Overflow Exploit Development','C and debugger-assisted low-level research.','exploit','buffer']]},
     forensics:{k:'08 · MALWARE ANALYSIS & DIGITAL FORENSICS',t:'Malware Analysis & Digital Forensics',summary:'Static and dynamic malware analysis combined with Windows forensic artifacts, memory/disk evidence, suspicious-file investigation, and indicator extraction.',tools:['Ghidra','IDA Pro','GDB','Volatility','Autopsy','Wireshark'],methods:['Static analysis','Dynamic analysis','Binary investigation','Windows artifact review','Memory/disk investigation','IOC extraction','Timeline-oriented review'],projects:[['Malware Analysis & Windows Forensics Research','Hands-on static/dynamic and evidence-analysis exercises.','forensics','malware'],['Network Traffic Analysis & Threat Hunting','Network evidence and IOC correlation.','defensive','threat']]},
@@ -1365,7 +1377,6 @@ document.addEventListener('DOMContentLoaded', () => {
   scm?.querySelectorAll('[data-close-security-command]').forEach(x=>x.addEventListener('click',closeSecurityCommand));
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&scm?.classList.contains('open'))closeSecurityCommand();});
 
-  // Command center
   const commandItems=[
     ['Overview','Jump to the portfolio start','home','NAV'],['Profile','Whoami and professional profile','about','NAV'],['Security Command','Unified security disciplines, tooling and case work','security-command','NAV'],['Research Environment','Hands-on labs, platforms, research infrastructure and adversary intelligence','research-environment','NAV'],['Experience','Experience and research record','experience','NAV'],['Case Studies','Open the technical case index','cases','ACTION'],['Research Priorities','Current research focus','focus','NAV'],['Professional Record','Evidence and milestones','achievements','NAV'],['Credentials','Certifications and training','certs','NAV'],['Services','How I can contribute','services','NAV'],['Contact','Open the conversation channel','conversation','ACTION'],['Refer / Share','Open referral and sharing tools','referral','ACTION'],['Resume','Open the latest resume','resume','ACTION'],['GitHub','Open source portfolio profile','github','ACTION'],['LinkedIn','Open professional profile','linkedin','ACTION'],['Email','Open direct email','email','ACTION'],['Toggle Theme','Switch dark/light interface','theme','ACTION']
   ];
@@ -1406,14 +1417,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if(e.key==='/' && !/input|textarea|select/i.test(document.activeElement?.tagName||'')){e.preventDefault();openCommand();}
   });
 
-  // Share buttons and case deep-linking. Hashes make individual dossiers bookmarkable.
   function syncHash(){
     const hash=location.hash.replace(/^#/,'');
     const m=hash.match(/^case\/(.+)$/);if(m&&window.openProjectModal){setTimeout(()=>window.openProjectModal(decodeURIComponent(m[1])),120);}
     if(hash==='contact')setTimeout(()=>openModal('conversationModal','#conversationTopic'),120);
   }
   window.addEventListener('hashchange',syncHash);syncHash();
-  // Wrap v4 project opener once it exists so case files become addressable without changing its UI.
   const patchProjectOpener=()=>{
     if(!window.openProjectModal||window.__v5PatchedProject)return;
     const original=window.openProjectModal;window.openProjectModal=function(key){
@@ -1422,10 +1431,8 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   setTimeout(()=>{patchProjectOpener();syncHash();},50);setTimeout(()=>{patchProjectOpener();syncHash();},500);
 
-  // Prevent stale #case hashes when navigating through primary sections.
   $$('.nav-links a, .logo, .back-to-top').forEach(a=>a.addEventListener('click',()=>{if(location.hash.startsWith('#case/'))history.replaceState(null,'',a.getAttribute('href')||'#home');}));
 
-  // Add a small "secure interface" status toast on first load, but never obstruct the user.
   setTimeout(()=>{if(!sessionStorage.getItem('cb_v5_seen')){notify('0xCB Research OS ready · 50+ web labs · 65+ evidence files.');sessionStorage.setItem('cb_v5_seen','1');}},900);
 })();
 
@@ -1441,6 +1448,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
   const canonical={
     mediroza:'mediroza', assessment:'mediroza', 'mediroza assessment':'mediroza',
+    'network threat hunting':'nth-signal', 'network threat hunting & anomaly detection':'nth-signal', 'network threat hunting and anomaly detection':'nth-signal', 'nth-signal':'nth-signal',
     driver:'driver', engineering:'driver', 'rtl8812bu driver engineering':'driver', 'rtl8812bu linux driver modernization':'driver',
     recon:'recon', network:'recon', 'network reconnaissance':'recon', 'network reconnaissance & attack-surface mapping':'recon', 'enterprise network penetration testing':'recon',
     web:'web', portswigger:'web', 'web application security lab':'web',
