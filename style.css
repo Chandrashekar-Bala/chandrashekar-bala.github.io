@@ -3897,3 +3897,40 @@ body.credential-open{overflow:hidden}
   #conversationModal .enhanced-actions { display: grid; grid-template-columns: minmax(0, 1fr); }
   #conversationModal .enhanced-actions .btn { width: 100%; justify-content: center; }
 }
+
+
+
+/* ===== Network Threat Hunting & Anomaly Detection project identity ===== */
+.network-threat-hunting-project {
+    background: linear-gradient(145deg, rgba(6,182,212,.075), var(--bg-card) 56%);
+    border-color: rgba(6,182,212,.38) !important;
+    box-shadow: 0 18px 44px rgba(0,0,0,.16);
+}
+.network-threat-hunting-project::before { background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green)); }
+.network-threat-hunting-project .project-icon { color: var(--accent-cyan); }
+.network-threat-hunting-project .project-badge { border-color: rgba(6,182,212,.32); color: var(--accent-cyan); }
+.network-threat-hunting-project .project-proof-grid b { color: var(--accent-cyan); }
+.network-threat-hunting-project .project-repo-link { color: var(--accent-cyan); }
+.nth-story-lead { color: var(--text-primary); font-size: 1.02rem; line-height: 1.8; padding-left: 1rem; border-left: 2px solid var(--accent-cyan); }
+.nth-callout, .nth-limits { margin: 1.1rem 0; padding: 1rem 1.1rem; border: 1px solid var(--border-color); border-left: 3px solid var(--accent-cyan); background: var(--bg-secondary); border-radius: 8px; }
+.nth-callout p, .nth-limits p { margin: .35rem 0 0; }
+.nth-pipeline { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: .45rem; align-items: stretch; margin: .8rem 0 1.15rem; }
+.nth-pipeline > div { min-width: 0; display: flex; flex-direction: column; gap: .35rem; padding: .7rem .65rem; border: 1px solid var(--border-color); background: var(--bg-secondary); border-radius: 7px; }
+.nth-pipeline b { color: var(--accent-cyan); font: 600 .64rem var(--font-mono); letter-spacing: .04em; }
+.nth-pipeline span { color: var(--text-secondary); font-size: .72rem; line-height: 1.5; overflow-wrap: anywhere; }
+.nth-pipeline > i { display: none; }
+.nth-links { display: flex; flex-wrap: wrap; gap: .65rem; margin-top: 1.25rem; }
+.nth-links .modal-source { margin: 0; }
+.network-threat-hunting-open .project-modal-dialog { border-top: 2px solid var(--accent-cyan); }
+.network-threat-hunting-open .modal-kicker { color: var(--accent-cyan); }
+.network-threat-hunting-open .modal-body h4 { color: var(--text-primary); }
+.network-threat-hunting-open .modal-meta span { border-color: rgba(6,182,212,.25); }
+@media (max-width: 760px) {
+    .nth-pipeline { grid-template-columns: 1fr; }
+    .nth-pipeline > div { padding: .6rem .75rem; }
+    .nth-pipeline span { font-size: .76rem; }
+}
+@media (max-width: 560px) {
+    .nth-links { flex-direction: column; align-items: stretch; }
+    .nth-links .modal-source { width: 100%; justify-content: space-between; }
+}
